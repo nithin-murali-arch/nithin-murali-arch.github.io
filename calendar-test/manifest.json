@@ -1,0 +1,32 @@
+{
+	"name": "Nithins Zendesk Test",
+	"author": {
+	  "name": "Nithin Murali",
+	  "email": "nithin93@gmail.com",
+	  "url": ""
+	},
+	"defaultLocale": "en",
+	"private": true,
+	"location": {
+	  "support": {
+		"ticket_sidebar": {
+			"url": "assets/index.html",
+			"autoLoad": true,
+			"size":{
+				"height": "650px",
+				"width": "360px"
+			}
+		  },
+		"modal":{
+			"url": "assets/image.html",
+			"size": {
+				"height": "80%",
+				"width": "80%"
+			}
+		}
+	  }
+	},
+	"version": "1.0",
+	"frameworkVersion": "2.0"
+  }
+  
