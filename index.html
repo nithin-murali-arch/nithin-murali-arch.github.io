@@ -348,36 +348,83 @@
           width: 150px;
         }
       }
+
+      .page-flex-wrapper {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+        width: 100vw;
+      }
+      .ad-space {
+        width: 160px; /* Standard skyscraper ad width */
+        min-width: 120px;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+      .ad-left {
+        /* Optionally add border or background for testing */
+      }
+      .ad-right {
+        /* Optionally add border or background for testing */
+      }
+      .main-content {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        height: 100vh;
+        overflow: hidden;
+      }
+      @media (max-width: 900px) {
+        .ad-space {
+          display: none;
+        }
+        .main-content {
+          width: 100vw;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1 class="title">🎮 Mouse Practice Game! 🎮</h1>
-      <div class="score">
-        Score: <span id="score">0</span> | Level: <span id="level">1</span>
+    <div class="page-flex-wrapper">
+      <div class="ad-space ad-left">
+        <!-- Adsense code can be inserted here -->
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress"></div>
-      </div>
-      <div class="timer-container" id="timerContainer">
-        <div class="timer-bar">
-          <div class="timer-fill" id="timerFill"></div>
-          <div class="timer-text" id="timerText">⏰ 15s</div>
+      <div class="main-content">
+        <div class="header">
+          <h1 class="title">🎮 Mouse Practice Game! 🎮</h1>
+          <div class="score">
+            Score: <span id="score">0</span> | Level: <span id="level">1</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+          </div>
+          <div class="timer-container" id="timerContainer">
+            <div class="timer-bar">
+              <div class="timer-fill" id="timerFill"></div>
+              <div class="timer-text" id="timerText">⏰ 15s</div>
+            </div>
+          </div>
         </div>
+
+        <div class="instructions" id="instructions">
+          🌟 Click the colorful button to score points! 🌟<br />
+          Sometimes you'll need to right-click for a special menu!
+        </div>
+
+        <div class="game-container" id="gameContainer">
+          <!-- Button rows will be generated here -->
+        </div>
+
+        <div class="save-indicator" id="saveIndicator">Progress Saved! 💾</div>
+      </div>
+      <div class="ad-space ad-right">
+        <!-- Adsense code can be inserted here -->
       </div>
     </div>
-
-    <div class="instructions" id="instructions">
-      🌟 Click the colorful button to score points! 🌟<br />
-      Sometimes you'll need to right-click for a special menu!
-    </div>
-
-    <div class="game-container" id="gameContainer">
-      <!-- Button rows will be generated here -->
-    </div>
-
-    <div class="save-indicator" id="saveIndicator">Progress Saved! 💾</div>
-
     <script>
       class MousePracticeGame {
         constructor() {
@@ -449,7 +496,15 @@
         }
 
         calculateLayout() {
-          const containerWidth = window.innerWidth - 40;
+          // Use the actual width of the main-content element for layout
+          let containerWidth = 0;
+          const mainContent = document.querySelector('.main-content');
+          if (mainContent) {
+            containerWidth = mainContent.clientWidth - 40;
+          } else {
+            // fallback for initial load
+            containerWidth = window.innerWidth - 320 - 40; // 160px for each ad
+          }
           const containerHeight =
             window.innerHeight - (this.hasTimer ? 320 : 280);
 
@@ -457,9 +512,9 @@
           const gap = 10;
           const buttonWithGap = buttonSize + gap;
 
-          const buttonsPerRow = Math.floor(
+          const buttonsPerRow = Math.max(1, Math.floor(
             (containerWidth + gap) / buttonWithGap
-          );
+          ));
           const maxRows = Math.floor((containerHeight + gap) / buttonWithGap);
 
           return {
