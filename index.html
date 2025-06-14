@@ -20,6 +20,9 @@
       gtag("js", new Date());
 
       gtag("config", "G-9LBRY92EL5");
+
+      // Simple mobile detection
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
     </script>
     <title>Mouse Practice Game</title>
     <style>
@@ -462,7 +465,7 @@
           this.buttons = [];
 
           // Timer properties
-          this.hasTimer = this.level >= 5;
+          this.hasTimer = this.level >= 3;
           this.timeLeft = 0;
           this.maxTime = 0;
           this.timerInterval = null;
@@ -500,8 +503,8 @@
           }
 
           // For artifact demo, starting fresh each time
-          this.score = 0;
-          this.level = 1;
+          // this.score = 0;
+          // this.level = 1;
         }
 
         showSaveIndicator() {
@@ -542,11 +545,14 @@
         }
 
         getTimerDuration() {
-          if (this.level < 5) return 0;
+          if (this.level < 3) return 0;
 
           // Liberal timing for children - starts at 15 seconds and slowly decreases
-          const baseTime = 15;
-          const reduction = Math.floor((this.level - 5) / 2); // Reduce 1 second every 2 levels
+          let baseTime = 15;
+          if (isMobile) {
+            baseTime = 10; // Shorter timer for mobile
+          }
+          const reduction = Math.floor((this.level - 3) / 2); // Reduce 1 second every 2 levels
           return Math.max(8, baseTime - reduction); // Minimum 8 seconds
         }
 
@@ -676,8 +682,12 @@
           const randomIndex = Math.floor(Math.random() * this.buttons.length);
           this.targetButton = this.buttons[randomIndex];
 
-          // Determine if this should be a context menu button
-          this.contextMenuActive = Math.random() < this.contextMenuChance;
+          // Set context menu active state (if not mobile)
+          if (isMobile) {
+            this.contextMenuActive = false;
+          } else {
+            this.contextMenuActive = Math.random() < this.contextMenuChance;
+          }
 
           // Set active styles
           this.targetButton.classList.add("active");
@@ -701,8 +711,8 @@
 
           // Handle context menu (right-click)
           this.gameContainer.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            if (e.target.classList.contains("button-square")) {
+            e.preventDefault(); // Prevent default browser context menu
+            if (!isMobile) {
               this.handleContextMenu(e.target, e);
             }
           });
@@ -742,17 +752,16 @@
         }
 
         handleContextMenu(button, event) {
-          // Remove any existing context menus
           this.removeAllContextMenus();
-
-          if (button === this.targetButton && this.contextMenuActive) {
+          if (button === this.targetButton && this.contextMenuActive && !isMobile) {
             this.showContextMenu(button, event);
-          } else {
-            this.showMessage("Wrong button! 😅", false);
           }
         }
 
         showContextMenu(button, event) {
+          if (isMobile) {
+            return; // Do not show context menu on mobile
+          }
           const contextMenu = document.createElement("div");
           contextMenu.className = "context-menu";
 
