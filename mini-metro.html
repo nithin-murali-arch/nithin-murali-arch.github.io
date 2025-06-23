@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9LBRY92EL5"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-9LBRY92EL5");
+
+      // Simple mobile detection
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    </script>
+    <title>Mini Metro Clone</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            color: white;
+            touch-action: none;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: #34495e;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 100;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .line-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-size: 16px;
+            touch-action: manipulation;
+        }
+
+        .line-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .line-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background: #34495e;
+            color: white;
+            font-size: 20px;
+            touch-action: manipulation;
+        }
+
+        .control-btn:hover {
+            background: #4a5f7a;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            font-size: 12px;
+            max-width: 150px;
+        }
+
+        #upgrades {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+        }
+
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        .upgrade-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .upgrade-btn:hover:not(:disabled) {
+            background: #2ecc71;
+        }
+
+        .upgrade-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+
+        .upgrade-status {
+            font-size: 11px;
+            color: #bdc3c7;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            #ui {
+                font-size: 12px;
+                padding: 8px;
+            }
+            
+            #info {
+                font-size: 10px;
+                padding: 8px;
+                max-width: 120px;
+            }
+            
+            #upgrades {
+                min-width: 150px;
+                padding: 10px;
+            }
+            
+            .line-btn, .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 14px;
+            }
+        }
+
+        .stat {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 200;
+            backdrop-filter: blur(15px);
+        }
+
+        .restart-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="ui">
+        <div class="stat">Week: <span id="week">1</span></div>
+        <div class="stat">Score: <span id="score">0</span></div>
+        <div class="stat">Lines: <span id="lines">3</span></div>
+        <div class="stat">Trains: <span id="trains">6</span></div>
+        <div class="stat">Tunnels: <span id="tunnels">2</span></div>
+        <div class="stat">Bridges: <span id="bridges">2</span></div>
+    </div>
+
+    <div id="controls">
+        <button class="control-btn" id="pauseBtn" onclick="togglePause()">⏸️</button>
+        <button class="line-btn" style="background: #e74c3c;" data-color="#e74c3c">R</button>
+        <button class="line-btn" style="background: #3498db;" data-color="#3498db">B</button>
+        <button class="line-btn" style="background: #2ecc71;" data-color="#2ecc71">G</button>
+    </div>
+
+    <div id="info">
+        <div>🚇 Mini Metro Clone</div>
+        <div style="font-size: 12px; margin-top: 10px;">
+            Click and drag to build lines<br>
+            Connect multiple stations per line<br>
+            Manage passenger flow efficiently
+        </div>
+    </div>
+
+    <div id="upgrades">
+        <h3 style="margin-top: 0;">Weekly Upgrades</h3>
+        <div class="upgrade-status">
+            Upgrades used: <span id="upgradesUsed">0</span>/<span id="maxUpgrades">1</span>
+        </div>
+        <div class="upgrade-item">
+            <span>+1 Line</span>
+            <button class="upgrade-btn" onclick="buyUpgrade('line')">Buy</button>
+        </div>
+        <div class="upgrade-item">
+            <span>+2 Trains</span>
+            <button class="upgrade-btn" onclick="buyUpgrade('train')">Buy</button>
+        </div>
+        <div class="upgrade-item">
+            <span>+1 Tunnel</span>
+            <button class="upgrade-btn" onclick="buyUpgrade('tunnel')">Buy</button>
+        </div>
+        <div class="upgrade-item">
+            <span>+1 Bridge</span>
+            <button class="upgrade-btn" onclick="buyUpgrade('bridge')">Buy</button>
+        </div>
+        <div class="upgrade-item">
+            <span>+1 Interchange</span>
+            <button class="upgrade-btn" onclick="buyUpgrade('interchange')">Buy</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game state
+        let gameState = {
+            week: 1,
+            score: 0,
+            linesAvailable: 3,
+            trainsAvailable: 6,
+            tunnelsAvailable: 2,
+            bridgesAvailable: 2,
+            interchangesAvailable: 1,
+            gameOver: false,
+            paused: false,
+            selectedLine: '#e74c3c',
+            isDrawing: false,
+            currentPath: [],
+            upgradesPurchased: 0,
+            maxUpgradesPerWeek: 1
+        };
+
+        // Game objects
+        let stations = [];
+        let lines = {};
+        let trains = [];
+        let passengers = [];
+        let gameTime = 0;
+        let weekTimer = 0;
+
+        // Station shapes
+        const shapes = ['circle', 'square', 'triangle', 'diamond', 'pentagon', 'star'];
+        const shapeColors = {
+            circle: '#f39c12',
+            square: '#9b59b6',
+            triangle: '#e67e22',
+            diamond: '#1abc9c',
+            pentagon: '#e91e63',
+            star: '#ff9800'
+        };
+
+        // Initialize game
+        function init() {
+            // Create initial stations
+            createStation(200, 200, 'circle');
+            createStation(400, 300, 'square');
+            createStation(600, 250, 'triangle');
+            
+            // Initialize lines with trains
+            lines = {
+                '#e74c3c': { stations: [], path: [], trains: [] },
+                '#3498db': { stations: [], path: [], trains: [] },
+                '#2ecc71': { stations: [], path: [], trains: [] }
+            };
+
+            // Create initial trains
+            addTrainsToLines();
+            
+            // Start game loop
+            gameLoop();
+            
+            // Spawn passengers periodically
+            setInterval(spawnPassenger, 3000);
+            
+            // Spawn new stations less frequently
+            setInterval(spawnStation, 30000);
+            
+            // Week progression
+            setInterval(progressWeek, 60000); // 1 minute = 1 week
+            
+            // Initial UI update
+            updateUpgradeButtons();
+        }
+
+        function createStation(x, y, shape) {
+            stations.push({
+                x: x,
+                y: y,
+                shape: shape,
+                passengers: [],
+                connected: false,
+                isInterchange: false
+            });
+        }
+
+        function spawnStation() {
+            if (gameState.gameOver || gameState.paused) return;
+            
+            const x = Math.random() * (canvas.width - 100) + 50;
+            const y = Math.random() * (canvas.height - 100) + 50;
+            const shape = shapes[Math.floor(Math.random() * Math.min(shapes.length, 3 + Math.floor(gameState.week / 2)))];
+            
+            createStation(x, y, shape);
+        }
+
+        function spawnPassenger() {
+            if (gameState.gameOver || gameState.paused || stations.length < 2) return;
+            
+            const spawnRate = Math.min(0.7, 0.1 + gameState.week * 0.05);
+            if (Math.random() > spawnRate) return;
+            
+            const fromStation = stations[Math.floor(Math.random() * stations.length)];
+            const possibleDestinations = stations.filter(s => s.shape !== fromStation.shape);
+            
+            if (possibleDestinations.length === 0) return;
+            
+            const toShape = possibleDestinations[Math.floor(Math.random() * possibleDestinations.length)].shape;
+            
+            fromStation.passengers.push({
+                destination: toShape,
+                waitTime: 0,
+                id: Math.random().toString(36).substr(2, 9)
+            });
+        }
+
+        function addTrainsToLines() {
+            let trainsToDistribute = gameState.trainsAvailable;
+            const activeLines = Object.values(lines).filter(line => line.stations.length >= 2);
+            
+            if (activeLines.length === 0) return;
+            
+            // Distribute trains evenly among active lines
+            const trainsPerLine = Math.floor(trainsToDistribute / activeLines.length);
+            const remainder = trainsToDistribute % activeLines.length;
+            
+            let lineIndex = 0;
+            Object.entries(lines).forEach(([color, line]) => {
+                if (line.stations.length >= 2) {
+                    const trainsForThisLine = trainsPerLine + (lineIndex < remainder ? 1 : 0);
+                    line.trains = [];
+                    
+                    for (let i = 0; i < trainsForThisLine; i++) {
+                        line.trains.push({
+                            position: i / trainsForThisLine,
+                            direction: 1,
+                            passengers: [],
+                            currentStationIndex: 0,
+                            color: color
+                        });
+                    }
+                    lineIndex++;
+                }
+            });
+        }
+
+        function progressWeek() {
+            if (gameState.gameOver || gameState.paused) return;
+            
+            gameState.week++;
+            gameState.upgradesPurchased = 0; // Reset upgrades for new week
+            updateUpgradeButtons();
+            
+            // Spawn new stations more frequently in higher weeks
+            if (gameState.week % 2 === 0) {
+                spawnStation();
+            }
+        }
+
+        function buyUpgrade(type) {
+            // Check if player can still buy upgrades this week
+            if (gameState.upgradesPurchased >= gameState.maxUpgradesPerWeek) {
+                console.log('No more upgrades available this week');
+                return;
+            }
+            
+            let upgradeSuccessful = false;
+            
+            switch (type) {
+                case 'line':
+                    if (gameState.linesAvailable < 6) {
+                        gameState.linesAvailable++;
+                        addNewLine();
+                        upgradeSuccessful = true;
+                    }
+                    break;
+                case 'train':
+                    gameState.trainsAvailable += 2;
+                    addTrainsToLines();
+                    upgradeSuccessful = true;
+                    break;
+                case 'tunnel':
+                    gameState.tunnelsAvailable++;
+                    upgradeSuccessful = true;
+                    break;
+                case 'bridge':
+                    gameState.bridgesAvailable++;
+                    upgradeSuccessful = true;
+                    break;
+                case 'interchange':
+                    gameState.interchangesAvailable++;
+                    upgradeSuccessful = true;
+                    break;
+            }
+            
+            if (upgradeSuccessful) {
+                gameState.upgradesPurchased++;
+                updateUpgradeButtons();
+                updateUI(); // Update the UI to show new values
+                console.log(`Purchased ${type} upgrade. Upgrades used: ${gameState.upgradesPurchased}/${gameState.maxUpgradesPerWeek}`);
+            }
+        }
+
+        function addNewLine() {
+            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22'];
+            const colorLabels = ['R', 'B', 'G', 'Y', 'P', 'O'];
+            const newColor = colors[gameState.linesAvailable - 1];
+            
+            if (newColor && !lines[newColor]) {
+                lines[newColor] = { stations: [], path: [], trains: [] };
+                
+                // Add button for new line
+                const controlsDiv = document.getElementById('controls');
+                const newBtn = document.createElement('button');
+                newBtn.className = 'line-btn';
+                newBtn.style.background = newColor;
+                newBtn.dataset.color = newColor;
+                newBtn.textContent = colorLabels[gameState.linesAvailable - 1];
+                
+                newBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.line-btn').forEach(b => b.classList.remove('active'));
+                    newBtn.classList.add('active');
+                    gameState.selectedLine = newColor;
+                });
+                
+                controlsDiv.appendChild(newBtn);
+            }
+        }
+
+        function updateUpgradeButtons() {
+            const buttons = document.querySelectorAll('.upgrade-btn');
+            const maxUpgradesReached = gameState.upgradesPurchased >= gameState.maxUpgradesPerWeek;
+            
+            buttons.forEach(btn => {
+                btn.disabled = maxUpgradesReached;
+            });
+            
+            // Update the upgrade status display
+            document.getElementById('upgradesUsed').textContent = gameState.upgradesPurchased;
+            document.getElementById('maxUpgrades').textContent = gameState.maxUpgradesPerWeek;
+        }
+
+        function drawStation(station) {
+            const size = 30;
+            ctx.fillStyle = shapeColors[station.shape];
+            ctx.strokeStyle = station.isInterchange ? '#ffffff' : '#2c3e50';
+            ctx.lineWidth = station.isInterchange ? 6 : 4;
+            
+            ctx.save();
+            ctx.translate(station.x, station.y);
+            
+            switch (station.shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'square':
+                    ctx.fillRect(-size, -size, size * 2, size * 2);
+                    ctx.strokeRect(-size, -size, size * 2, size * 2);
+                    break;
+                case 'triangle':
+                    ctx.beginPath();
+                    ctx.moveTo(0, -size);
+                    ctx.lineTo(-size, size);
+                    ctx.lineTo(size, size);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    ctx.moveTo(0, -size);
+                    ctx.lineTo(size, 0);
+                    ctx.lineTo(0, size);
+                    ctx.lineTo(-size, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'pentagon':
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+                        const x = Math.cos(angle) * size;
+                        const y = Math.sin(angle) * size;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'star':
+                    ctx.beginPath();
+                    for (let i = 0; i < 10; i++) {
+                        const angle = (i * Math.PI) / 5 - Math.PI / 2;
+                        const radius = i % 2 === 0 ? size : size * 0.5;
+                        const x = Math.cos(angle) * radius;
+                        const y = Math.sin(angle) * radius;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+            }
+            
+            ctx.restore();
+            
+            // Draw passenger waiting indicators
+            if (station.passengers.length > 0) {
+                // Group passengers by destination
+                const passengerGroups = {};
+                station.passengers.forEach(p => {
+                    if (!passengerGroups[p.destination]) {
+                        passengerGroups[p.destination] = 0;
+                    }
+                    passengerGroups[p.destination]++;
+                });
+                
+                // Draw passenger indicators
+                const destinations = Object.keys(passengerGroups);
+                destinations.forEach((dest, index) => {
+                    const count = passengerGroups[dest];
+                    const angle = (index * 2 * Math.PI) / destinations.length;
+                    const indicatorX = station.x + Math.cos(angle) * 50;
+                    const indicatorY = station.y + Math.sin(angle) * 50;
+                    
+                    // Background for count
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                    ctx.beginPath();
+                    ctx.arc(indicatorX, indicatorY, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Destination shape
+                    ctx.fillStyle = shapeColors[dest];
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    
+                    const iconSize = 8;
+                    ctx.save();
+                    ctx.translate(indicatorX, indicatorY - 5);
+                    
+                    switch (dest) {
+                        case 'circle':
+                            ctx.beginPath();
+                            ctx.arc(0, 0, iconSize, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'square':
+                            ctx.fillRect(-iconSize, -iconSize, iconSize * 2, iconSize * 2);
+                            ctx.strokeRect(-iconSize, -iconSize, iconSize * 2, iconSize * 2);
+                            break;
+                        case 'triangle':
+                            ctx.beginPath();
+                            ctx.moveTo(0, -iconSize);
+                            ctx.lineTo(-iconSize, iconSize);
+                            ctx.lineTo(iconSize, iconSize);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'diamond':
+                            ctx.beginPath();
+                            ctx.moveTo(0, -iconSize);
+                            ctx.lineTo(iconSize, 0);
+                            ctx.lineTo(0, iconSize);
+                            ctx.lineTo(-iconSize, 0);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'pentagon':
+                            ctx.beginPath();
+                            for (let i = 0; i < 5; i++) {
+                                const angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+                                const x = Math.cos(angle) * iconSize;
+                                const y = Math.sin(angle) * iconSize;
+                                if (i === 0) ctx.moveTo(x, y);
+                                else ctx.lineTo(x, y);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                        case 'star':
+                            ctx.beginPath();
+                            for (let i = 0; i < 10; i++) {
+                                const angle = (i * Math.PI) / 5 - Math.PI / 2;
+                                const radius = i % 2 === 0 ? iconSize : iconSize * 0.5;
+                                const x = Math.cos(angle) * radius;
+                                const y = Math.sin(angle) * radius;
+                                if (i === 0) ctx.moveTo(x, y);
+                                else ctx.lineTo(x, y);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                            break;
+                    }
+                    
+                    ctx.restore();
+                    
+                    // Count
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(count, indicatorX, indicatorY + 8);
+                });
+            }
+        }
+
+        function drawLines() {
+            Object.entries(lines).forEach(([color, line]) => {
+                if (line.path.length > 1) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 6;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(line.path[0].x, line.path[0].y);
+                    for (let i = 1; i < line.path.length; i++) {
+                        ctx.lineTo(line.path[i].x, line.path[i].y);
+                    }
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function drawTrains() {
+            Object.entries(lines).forEach(([color, line]) => {
+                if (line.stations.length >= 2 && line.trains) {
+                    line.trains.forEach(train => {
+                        if (train.currentStationIndex < line.stations.length) {
+                            const station = line.stations[train.currentStationIndex];
+                            
+                            // Draw train
+                            ctx.fillStyle = color;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.arc(station.x, station.y, 15, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.stroke();
+                            
+                            // Draw passenger count on train
+                            if (train.passengers.length > 0) {
+                                ctx.fillStyle = '#ffffff';
+                                ctx.font = 'bold 12px Arial';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(train.passengers.length, station.x, station.y);
+                                
+                                // Show passenger destinations as small dots
+                                const uniqueDestinations = [...new Set(train.passengers.map(p => p.destination))];
+                                uniqueDestinations.forEach((dest, index) => {
+                                    const dotAngle = (index * 2 * Math.PI) / uniqueDestinations.length;
+                                    const dotX = station.x + Math.cos(dotAngle) * 25;
+                                    const dotY = station.y + Math.sin(dotAngle) * 25;
+                                    
+                                    ctx.fillStyle = shapeColors[dest];
+                                    ctx.beginPath();
+                                    ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+                                    ctx.fill();
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function drawCurrentPath() {
+            if (gameState.currentPath.length > 1) {
+                ctx.strokeStyle = gameState.selectedLine;
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.setLineDash([5, 5]);
+                
+                ctx.beginPath();
+                ctx.moveTo(gameState.currentPath[0].x, gameState.currentPath[0].y);
+                for (let i = 1; i < gameState.currentPath.length; i++) {
+                    ctx.lineTo(gameState.currentPath[i].x, gameState.currentPath[i].y);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function updateTrains() {
+            if (gameState.paused) return;
+            
+            Object.entries(lines).forEach(([color, line]) => {
+                if (line.stations.length >= 2 && line.trains) {
+                    line.trains.forEach(train => {
+                        // Simple train movement simulation
+                        if (Math.random() < 0.1) { // 10% chance to move
+                            // Pick up passengers at current station
+                            const currentStation = line.stations[train.currentStationIndex];
+                            if (currentStation) {
+                                for (let i = currentStation.passengers.length - 1; i >= 0; i--) {
+                                    const passenger = currentStation.passengers[i];
+                                    // Check if passenger wants to go to a station on this line
+                                    const canPickup = line.stations.some(s => s.shape === passenger.destination);
+                                    if (canPickup && train.passengers.length < 6) {
+                                        train.passengers.push(passenger);
+                                        currentStation.passengers.splice(i, 1);
+                                    }
+                                }
+                                
+                                // Drop off passengers at destination
+                                for (let i = train.passengers.length - 1; i >= 0; i--) {
+                                    const passenger = train.passengers[i];
+                                    if (currentStation.shape === passenger.destination) {
+                                        train.passengers.splice(i, 1);
+                                        gameState.score += 10;
+                                    }
+                                }
+                            }
+                            
+                            // Move to next station
+                            train.currentStationIndex += train.direction;
+                            
+                            // Reverse direction at ends
+                            if (train.currentStationIndex >= line.stations.length) {
+                                train.currentStationIndex = line.stations.length - 2;
+                                train.direction = -1;
+                            } else if (train.currentStationIndex < 0) {
+                                train.currentStationIndex = 1;
+                                train.direction = 1;
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updatePassengers() {
+            if (gameState.paused) return;
+            
+            gameTime++;
+            
+            // Update wait times
+            stations.forEach(station => {
+                station.passengers.forEach(passenger => {
+                    passenger.waitTime++;
+                    if (passenger.waitTime > 2400) { // 40 seconds at 60fps
+                        gameState.gameOver = true;
+                    }
+                });
+            });
+        }
+
+        function checkGameOver() {
+            stations.forEach(station => {
+                if (station.passengers.length > 12) {
+                    gameState.game
