@@ -121,11 +121,94 @@
             top: 10px;
             left: 10px;
             z-index: 100;
-            background: rgba(0,0,0,0.8);
-            padding: 10px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            font-size: 14px;
+            background: rgba(10,12,16,0.95) !important;
+            padding: 18px 18px 14px 18px !important;
+            border-radius: 14px !important;
+            box-shadow: 0 4px 24px #0006 !important;
+            font-size: 15px !important;
+            min-width: 220px;
+            max-width: 320px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #f8f8f8;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+        }
+
+        .ui-stats {
+            width: 100%;
+            margin-bottom: 6px;
+        }
+
+        .stat {
+            margin: 2px 0;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .stat-main {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .ui-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, #222 0%, #444 100%);
+            opacity: 0.5;
+            margin: 10px 0 8px 0;
+            border-radius: 1px;
+        }
+
+        #inventoryPanel {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        #inventoryPanel .upgrade-btn {
+            border-radius: 6px;
+            margin-right: 0;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 18px;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #0002;
+        }
+
+        #inventoryPanel .upgrade-btn:last-child {
+            border-radius: 6px;
+            margin-right: 0;
+            border: none;
+        }
+
+        #inventoryPanel .upgrade-btn:hover:not(:disabled) {
+            background: #2ecc71 !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px #27ae6040;
+        }
+
+        #inventoryPanel .upgrade-btn:active {
+            background: #229954 !important;
+            color: #fff !important;
+        }
+
+        @media (max-width: 600px) {
+            #ui {
+                min-width: 140px;
+                max-width: 98vw;
+                padding: 10px 6px 8px 8px !important;
+                font-size: 13px !important;
+            }
+            .stat-main { font-size: 15px; }
+            #inventoryPanel .upgrade-btn { font-size: 13px; padding: 7px 10px; }
         }
 
         #controls {
@@ -271,11 +354,6 @@
             }
         }
 
-        .stat {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
         .game-over {
             position: absolute;
             top: 50%;
@@ -333,16 +411,24 @@
             box-sizing: border-box !important;
             display: block !important;
         }
+
+        /* Add margin to collapse icons */
+        #collapseUpgradesBtn, #collapseInfoBtn {
+            margin-right: 8px !important;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
     
     <div id="ui">
-        <div class="stat">Week: <span id="week">1</span></div>
-        <div class="stat">Score: <span id="score">0</span></div>
-        <div class="stat">Lines: <span id="lines">3</span></div>
-        <div class="stat">Trains: <span id="trains">6</span></div>
+        <div class="ui-stats">
+            <div class="stat stat-main">Week: <span id="week">1</span></div>
+            <div class="stat stat-main">Score: <span id="score">0</span></div>
+            <div class="stat">Lines: <span id="lines">3</span></div>
+            <div class="stat">Trains: <span id="trains">6</span></div>
+        </div>
+        <div class="ui-divider"></div>
         <div id="inventoryPanel"></div>
     </div>
 
@@ -474,13 +560,36 @@
             });
         };
 
-        // --- Helper: Ensure minimum distance between stations ---
-        function isFarFromAllStations(x, y, minDist = 100) {
-            return stations.every(s => Math.hypot(s.x - x, s.y - y) >= minDist);
+        // --- Helper: Ensure minimum distance between stations and UI panels ---
+        function isFarFromAllStationsAndUI(x, y, minDist = 100) {
+            // Check distance from all stations
+            if (!stations.every(s => Math.hypot(s.x - x, s.y - y) >= minDist)) return false;
+            // Check distance from UI panels (status, upgrades, info)
+            const uiPanels = ['ui', 'upgrades', 'info'].map(id => document.getElementById(id)).filter(Boolean);
+            for (const panel of uiPanels) {
+                const rect = panel.getBoundingClientRect();
+                // Panel bounding box in canvas coordinates
+                const panelLeft = rect.left;
+                const panelRight = rect.right;
+                const panelTop = rect.top;
+                const panelBottom = rect.bottom;
+                // Convert canvas-relative x/y to screen coordinates
+                const canvasRect = canvas.getBoundingClientRect();
+                const screenX = x + canvasRect.left;
+                const screenY = y + canvasRect.top;
+                // Check if within 200px of any edge
+                if (
+                    screenX > panelLeft - 200 && screenX < panelRight + 200 &&
+                    screenY > panelTop - 200 && screenY < panelBottom + 200
+                ) {
+                    return false;
+                }
+            }
+            return true;
         }
-        // --- Patch createStation to enforce min distance ---
+        // --- Patch createStation to enforce min distance from UI ---
         function createStation(x, y, shape) {
-            if (!isFarFromAllStations(x, y)) return false;
+            if (!isFarFromAllStationsAndUI(x, y, 100)) return false;
             stations.push({
                 x: x,
                 y: y,
@@ -491,7 +600,7 @@
             });
             return true;
         }
-        // --- Patch spawnStation to retry for min distance ---
+        // --- Patch spawnStation to retry for min distance from UI ---
         function spawnStation() {
             if (gameState.gameOver || gameState.paused) return;
             let tries = 0, placed = false;
@@ -1283,10 +1392,25 @@
             gameTime = 0;
             weekTimer = 0;
 
-            // Create initial stations
-            createStation(200, 200, 'circle');
-            createStation(400, 300, 'square');
-            createStation(600, 250, 'triangle');
+            // Place 3 initial stations randomly but efficiently spaced
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 180;
+            const shapesInit = ['circle', 'square', 'triangle'];
+            for (let i = 0; i < 3; i++) {
+                let angle = Math.random() * Math.PI * 2 + i * (2 * Math.PI / 3);
+                let x = centerX + Math.cos(angle) * radius;
+                let y = centerY + Math.sin(angle) * radius;
+                // Ensure not too close to UI panels or each other
+                let tries = 0;
+                while ((!isFarFromAllStationsAndUI(x, y, 120) || stations.some(s => Math.hypot(s.x - x, s.y - y) < 120)) && tries < 20) {
+                    angle += Math.PI / 6;
+                    x = centerX + Math.cos(angle) * radius;
+                    y = centerY + Math.sin(angle) * radius;
+                    tries++;
+                }
+                createStation(x, y, shapesInit[i]);
+            }
 
             // Initialize lines with trains
             lines = {
