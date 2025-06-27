@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google-adsense-account" content="ca-pub-8268518333873371">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371"
+     crossorigin="anonymous"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9LBRY92EL5"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-9LBRY92EL5");
+
+      // Simple mobile detection
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    </script>
+    <title>Mouse Practice Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
+        background-size: 400% 400%;
+        animation: gradientShift 5s ease infinite;
+        height: 100vh;
+        padding: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+        flex-shrink: 0;
+      }
+
+      .title {
+        font-size: 2em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 5px;
+      }
+
+      .score {
+        font-size: 1.2em;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 8px 15px;
+        border-radius: 25px;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .timer-container {
+        margin: 5px 0;
+        display: none;
+      }
+
+      .timer-container.active {
+        display: block;
+      }
+
+      .timer-bar {
+        width: 200px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .timer-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50, #ffc107, #ff5722);
+        width: 100%;
+        transition: width 0.1s linear;
+        border-radius: 10px;
+      }
+
+      .timer-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #333;
+        font-weight: bold;
+        font-size: 0.9em;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        padding: 10px;
+        overflow: hidden;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: nowrap;
+      }
+
+      .button-square {
+        width: 70px;
+        height: 70px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        background: #e0e0e0;
+        flex-shrink: 0;
+      }
+
+      .button-square:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .button-square.active {
+        animation: pulse 1s ease-in-out infinite alternate,
+          rainbow 2s linear infinite;
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+          0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      @keyframes pulse {
+        from {
+          transform: scale(1.1);
+        }
+        to {
+          transform: scale(1.2);
+        }
+      }
+
+      @keyframes rainbow {
+        0% {
+          background: #ff6b6b;
+        }
+        16% {
+          background: #feca57;
+        }
+        32% {
+          background: #48dbfb;
+        }
+        48% {
+          background: #ff9ff3;
+        }
+        64% {
+          background: #54a0ff;
+        }
+        80% {
+          background: #5f27cd;
+        }
+        100% {
+          background: #ff6b6b;
+        }
+      }
+
+      .button-square.clicked {
+        animation: celebrate 0.6s ease-out;
+      }
+
+      @keyframes celebrate {
+        0% {
+          transform: scale(1.1);
+        }
+        50% {
+          transform: scale(1.4) rotate(180deg);
+        }
+        100% {
+          transform: scale(1.1);
+        }
+      }
+
+      .button-square.timeout {
+        animation: timeoutFlash 0.5s ease-out;
+      }
+
+      @keyframes timeoutFlash {
+        0% {
+          background: #ff4757;
+          transform: scale(1.1);
+        }
+        50% {
+          background: #ff6b6b;
+          transform: scale(1.3);
+        }
+        100% {
+          background: #e0e0e0;
+          transform: scale(1);
+        }
+      }
+
+      .context-menu {
+        position: absolute;
+        background: white;
+        border: 3px solid #333;
+        border-radius: 10px;
+        padding: 5px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        min-width: 120px;
+      }
+
+      .context-menu-item {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: none;
+        font-family: inherit;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin: 2px 0;
+      }
+
+      .context-menu-item:hover {
+        background: #4caf50;
+        color: white;
+      }
+
+      .celebration {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 4em;
+        z-index: 1001;
+        animation: celebrationPop 1s ease-out;
+        pointer-events: none;
+      }
+
+      @keyframes celebrationPop {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.2);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0;
+        }
+      }
+
+      .instructions {
+        text-align: center;
+        margin: 5px 0;
+        font-size: 1em;
+        color: #333;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+      }
+
+      .special-button {
+        position: relative;
+      }
+
+      .special-button::after {
+        content: "🎯";
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(30%, -30%);
+        font-size: 20px;
+        animation: bounce 1s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 15px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 5px 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50, #8bc34a);
+        width: 0%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+
+      .save-indicator {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(76, 175, 80, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .save-indicator.show {
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        .button-square {
+          width: 60px;
+          height: 60px;
+        }
+
+        .title {
+          font-size: 1.8em;
+        }
+
+        .timer-bar {
+          width: 150px;
+        }
+      }
+
+      .page-flex-wrapper {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+        width: 100vw;
+      }
+      .ad-space {
+        width: 160px; /* Standard skyscraper ad width */
+        min-width: 120px;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+      .ad-left {
+        /* Optionally add border or background for testing */
+      }
+      .ad-right {
+        /* Optionally add border or background for testing */
+      }
+      .main-content {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        height: 100vh;
+        overflow: hidden;
+      }
+      @media (max-width: 900px) {
+        .ad-space {
+          display: none;
+        }
+        .main-content {
+          width: 100vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-flex-wrapper">
+      <div class="ad-space ad-left">
+        <!-- Adsense code can be inserted here -->
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <h1 class="title">🎮 Mouse Practice Game! 🎮</h1>
+          <div class="score">
+            Score: <span id="score">0</span> | Level: <span id="level">1</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+          </div>
+          <div class="timer-container" id="timerContainer">
+            <div class="timer-bar">
+              <div class="timer-fill" id="timerFill"></div>
+              <div class="timer-text" id="timerText">⏰ 15s</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          🌟 Click the colorful button to score points! 🌟<br />
+          Sometimes you'll need to right-click for a special menu!
+        </div>
+
+        <div class="game-container" id="gameContainer">
+          <!-- Button rows will be generated here -->
+        </div>
+
+        <div class="save-indicator" id="saveIndicator">Progress Saved! 💾</div>
+      </div>
+      <div class="ad-space ad-right">
+        <!-- Adsense code can be inserted here -->
+      </div>
+    </div>
+    <script>
+      class MousePracticeGame {
+        constructor() {
+          // Load saved progress or start fresh
+          this.loadProgress();
+
+          this.targetButton = null;
+          this.contextMenuActive = false;
+          this.contextMenuChance = 0.3; // 30% chance for context menu
+          this.scoreElement = document.getElementById("score");
+          this.levelElement = document.getElementById("level");
+          this.progressElement = document.getElementById("progress");
+          this.gameContainer = document.getElementById("gameContainer");
+          this.timerContainer = document.getElementById("timerContainer");
+          this.timerFill = document.getElementById("timerFill");
+          this.timerText = document.getElementById("timerText");
+          this.instructionsElement = document.getElementById("instructions");
+          this.saveIndicator = document.getElementById("saveIndicator");
+          this.buttons = [];
+
+          // Timer properties
+          this.hasTimer = this.level >= 3;
+          this.timeLeft = 0;
+          this.maxTime = 0;
+          this.timerInterval = null;
+
+          this.celebrations = ["🎉", "⭐", "🌟", "✨", "🎊", "🥳", "👏", "🎈"];
+
+          this.init();
+        }
+
+        // In-memory storage simulation
+        saveProgress() {
+          // In a real environment, this would use localStorage:
+          localStorage.setItem(
+            "mousePracticeGame",
+            JSON.stringify({
+              score: this.score,
+              level: this.level,
+            })
+          );
+
+          // For now, just show a visual indicator
+          this.showSaveIndicator();
+        }
+
+        loadProgress() {
+          // In a real environment, this would use localStorage:
+          const saved = localStorage.getItem("mousePracticeGame");
+          if (saved) {
+            const data = JSON.parse(saved);
+            this.score = data.score || 0;
+            this.level = data.level || 1;
+          } else {
+            this.score = 0;
+            this.level = 1;
+          }
+
+          // For artifact demo, starting fresh each time
+          // this.score = 0;
+          // this.level = 1;
+        }
+
+        showSaveIndicator() {
+          this.saveIndicator.classList.add("show");
+          setTimeout(() => {
+            this.saveIndicator.classList.remove("show");
+          }, 2000);
+        }
+
+        calculateLayout() {
+          // Use the actual width of the main-content element for layout
+          let containerWidth = 0;
+          const mainContent = document.querySelector(".main-content");
+          if (mainContent) {
+            containerWidth = mainContent.clientWidth - 40;
+          } else {
+            // fallback for initial load
+            containerWidth = window.innerWidth - 320 - 40; // 160px for each ad
+          }
+          const containerHeight =
+            window.innerHeight - (this.hasTimer ? 320 : 280);
+
+          const buttonSize = window.innerWidth <= 768 ? 60 : 70;
+          const gap = 10;
+          const buttonWithGap = buttonSize + gap;
+
+          const buttonsPerRow = Math.max(
+            1,
+            Math.floor((containerWidth + gap) / buttonWithGap)
+          );
+          const maxRows = Math.floor((containerHeight + gap) / buttonWithGap);
+
+          return {
+            buttonsPerRow,
+            maxRows,
+            totalButtons: buttonsPerRow * maxRows,
+          };
+        }
+
+        getTimerDuration() {
+          if (this.level < 3) return 0;
+
+          // Liberal timing for children - starts at 15 seconds and slowly decreases
+          let baseTime = 15;
+          if (isMobile) {
+            baseTime = 10; // Shorter timer for mobile
+          }
+          const reduction = Math.floor((this.level - 3) / 2); // Reduce 1 second every 2 levels
+          return Math.max(8, baseTime - reduction); // Minimum 8 seconds
+        }
+
+        startTimer() {
+          if (!this.hasTimer) return;
+
+          this.maxTime = this.getTimerDuration();
+          this.timeLeft = this.maxTime;
+
+          this.timerContainer.classList.add("active");
+          this.updateTimerDisplay();
+
+          this.timerInterval = setInterval(() => {
+            this.timeLeft -= 0.1;
+            this.updateTimerDisplay();
+
+            if (this.timeLeft <= 0) {
+              this.handleTimeout();
+            }
+          }, 100);
+        }
+
+        stopTimer() {
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+          }
+        }
+
+        updateTimerDisplay() {
+          if (!this.hasTimer) return;
+
+          const percentage = (this.timeLeft / this.maxTime) * 100;
+          this.timerFill.style.width = Math.max(0, percentage) + "%";
+          this.timerText.textContent = `⏰ ${Math.max(
+            0,
+            Math.ceil(this.timeLeft)
+          )}s`;
+
+          // Change color as time runs out
+          if (percentage <= 25) {
+            this.timerFill.style.background = "#FF5722";
+          } else if (percentage <= 50) {
+            this.timerFill.style.background = "#FFC107";
+          } else {
+            this.timerFill.style.background =
+              "linear-gradient(90deg, #4CAF50, #FFC107, #FF5722)";
+          }
+        }
+
+        handleTimeout() {
+          this.stopTimer();
+
+          // Visual feedback for timeout
+          if (this.targetButton) {
+            this.targetButton.classList.add("timeout");
+            setTimeout(() => {
+              if (this.targetButton) {
+                this.targetButton.classList.remove("timeout");
+              }
+            }, 500);
+          }
+
+          // Deduct points but keep score non-negative
+          this.score = Math.max(0, this.score - 5);
+          this.checkLevelDemotion();
+          this.showMessage("Time's up! Try to be faster! ⏰", false);
+
+          // Set new target after a brief delay
+          setTimeout(() => {
+            this.setNewTarget();
+            this.updateDisplay();
+          }, 1000);
+        }
+
+        init() {
+          this.createButtons();
+          this.setNewTarget();
+          this.bindEvents();
+          this.updateDisplay();
+          this.updateInstructions();
+        }
+
+        updateInstructions() {
+          if (this.hasTimer) {
+            this.instructionsElement.innerHTML =
+              "🌟 Click the colorful button before time runs out! ⏰<br>" +
+              "Sometimes you'll need to right-click for a special menu!";
+          } else {
+            this.instructionsElement.innerHTML =
+              "🌟 Click the colorful button to score points! 🌟<br>" +
+              "Sometimes you'll need to right-click for a special menu!";
+          }
+        }
+
+        createButtons() {
+          this.gameContainer.innerHTML = "";
+          this.buttons = [];
+
+          const layout = this.calculateLayout();
+
+          for (let row = 0; row < layout.maxRows; row++) {
+            const buttonRow = document.createElement("div");
+            buttonRow.className = "button-row";
+
+            for (let col = 0; col < layout.buttonsPerRow; col++) {
+              const button = document.createElement("button");
+              button.className = "button-square";
+              button.dataset.index = this.buttons.length;
+              buttonRow.appendChild(button);
+              this.buttons.push(button);
+            }
+
+            this.gameContainer.appendChild(buttonRow);
+          }
+        }
+
+        setNewTarget() {
+          this.stopTimer();
+
+          // Remove active class from current target
+          if (this.targetButton) {
+            this.targetButton.classList.remove("active", "special-button");
+          }
+
+          // Select random button
+          const randomIndex = Math.floor(Math.random() * this.buttons.length);
+          this.targetButton = this.buttons[randomIndex];
+
+          // Set context menu active state (if not mobile)
+          if (isMobile) {
+            this.contextMenuActive = false;
+          } else {
+            this.contextMenuActive = Math.random() < this.contextMenuChance;
+          }
+
+          // Set active styles
+          this.targetButton.classList.add("active");
+          if (this.contextMenuActive) {
+            this.targetButton.classList.add("special-button");
+          }
+
+          // Start timer if applicable
+          if (this.hasTimer) {
+            this.startTimer();
+          }
+        }
+
+        bindEvents() {
+          // Handle regular clicks
+          this.gameContainer.addEventListener("click", (e) => {
+            if (e.target.classList.contains("button-square")) {
+              this.handleButtonClick(e.target, e);
+            }
+          });
+
+          // Handle context menu (right-click)
+          this.gameContainer.addEventListener("contextmenu", (e) => {
+            e.preventDefault(); // Prevent default browser context menu
+            if (!isMobile) {
+              this.handleContextMenu(e.target, e);
+            }
+          });
+
+          // Close context menus when clicking elsewhere
+          document.addEventListener("click", (e) => {
+            if (
+              !e.target.closest(".context-menu") &&
+              !e.target.classList.contains("button-square")
+            ) {
+              this.removeAllContextMenus();
+            }
+          });
+
+          // Handle window resize
+          window.addEventListener("resize", () => {
+            this.createButtons();
+            this.setNewTarget();
+          });
+        }
+
+        handleButtonClick(button, event) {
+          // Remove any existing context menus
+          this.removeAllContextMenus();
+
+          if (button === this.targetButton) {
+            if (this.contextMenuActive) {
+              // Wrong action - should have right-clicked
+              this.showMessage("Try right-clicking! 🖱️", false);
+              return;
+            }
+
+            this.handleCorrectClick(button);
+          } else {
+            this.handleIncorrectClick(button);
+          }
+        }
+
+        handleContextMenu(button, event) {
+          this.removeAllContextMenus();
+          if (button === this.targetButton && this.contextMenuActive && !isMobile) {
+            this.showContextMenu(button, event);
+          }
+        }
+
+        showContextMenu(button, event) {
+          if (isMobile) {
+            return; // Do not show context menu on mobile
+          }
+          const contextMenu = document.createElement("div");
+          contextMenu.className = "context-menu";
+
+          const rect = button.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          // Dynamically calculate header height
+          const headerEl = document.querySelector(".header");
+          const headerHeight = headerEl
+            ? headerEl.getBoundingClientRect().bottom
+            : 220;
+          const margin = 15; // Margin from edges
+
+          // Create menu temporarily to measure its size
+          document.body.appendChild(contextMenu);
+
+          // Add menu items first to get accurate measurements
+          const wrongChoices = [
+            "❌ Wrong Choice",
+            "🚫 Not This One",
+            "💭 Maybe Not",
+            "🤷 Try Again",
+            "⛔ Nope!",
+            "🙈 Wrong Way",
+            "🔄 Keep Looking",
+          ];
+
+          const shuffledWrong = [...wrongChoices].sort(
+            () => Math.random() - 0.5
+          );
+          const menuItems = [
+            { text: "🎯 Click Me!", correct: true },
+            { text: shuffledWrong[0], correct: false },
+            { text: shuffledWrong[1], correct: false },
+          ];
+
+          // Shuffle menu items
+          for (let i = menuItems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [menuItems[i], menuItems[j]] = [menuItems[j], menuItems[i]];
+          }
+
+          menuItems.forEach((item) => {
+            const menuItem = document.createElement("button");
+            menuItem.className = "context-menu-item";
+            menuItem.textContent = item.text;
+            menuItem.addEventListener("click", () => {
+              if (item.correct) {
+                this.handleCorrectClick(button);
+              } else {
+                this.showMessage("Try again! 🤔", false);
+              }
+              this.removeAllContextMenus();
+            });
+            contextMenu.appendChild(menuItem);
+          });
+
+          // Now get the actual menu dimensions
+          const menuRect = contextMenu.getBoundingClientRect();
+          let menuWidth = menuRect.width;
+          let menuHeight = menuRect.height;
+
+          // Ensure minimum width for usability
+          if (menuWidth < 150) {
+            contextMenu.style.minWidth = "150px";
+            menuWidth = 150;
+          }
+
+          let left, top;
+
+          // Try positioning to the right first
+          if (rect.right + menuWidth + margin <= viewportWidth) {
+            left = rect.right + 10;
+          }
+          // Try positioning to the left
+          else if (rect.left - menuWidth - margin >= 0) {
+            left = rect.left - menuWidth - 10;
+          }
+          // Center it horizontally with some offset from button
+          else {
+            left = Math.max(
+              margin,
+              Math.min(
+                viewportWidth - menuWidth - margin,
+                rect.left + rect.width / 2 - menuWidth / 2
+              )
+            );
+          }
+
+          // Vertical positioning - try below first
+          if (
+            rect.bottom + menuHeight + margin <= viewportHeight &&
+            rect.bottom >= headerHeight
+          ) {
+            top = rect.bottom + 10;
+          }
+          // Try above the button
+          else if (rect.top - menuHeight - margin >= headerHeight) {
+            top = rect.top - menuHeight - 10;
+          }
+          // Position it in the safe zone, avoiding header
+          else {
+            // Find the best vertical position in the safe zone
+            const safeZoneTop = headerHeight + margin;
+            const safeZoneBottom = viewportHeight - margin;
+            const availableHeight = safeZoneBottom - safeZoneTop;
+
+            if (menuHeight <= availableHeight) {
+              // Center it in the safe zone, but prefer being near the button
+              const buttonCenter = rect.top + rect.height / 2;
+              const idealTop = buttonCenter - menuHeight / 2;
+
+              if (
+                idealTop >= safeZoneTop &&
+                idealTop + menuHeight <= safeZoneBottom
+              ) {
+                top = idealTop;
+              } else if (idealTop < safeZoneTop) {
+                top = safeZoneTop;
+              } else {
+                top = safeZoneBottom - menuHeight;
+              }
+            } else {
+              // Menu is too tall, position at top of safe zone
+              top = safeZoneTop;
+            }
+          }
+
+          // Final bounds checking
+          left = Math.max(
+            margin,
+            Math.min(left, viewportWidth - menuWidth - margin)
+          );
+          top = Math.max(
+            headerHeight + margin,
+            Math.min(top, viewportHeight - menuHeight - margin)
+          );
+
+          // Apply final positioning
+          contextMenu.style.left = left + "px";
+          contextMenu.style.top = top + "px";
+
+          // Add a small animation for better UX
+          contextMenu.style.opacity = "0";
+          contextMenu.style.transform = "scale(0.9)";
+          requestAnimationFrame(() => {
+            contextMenu.style.transition =
+              "opacity 0.15s ease, transform 0.15s ease";
+            contextMenu.style.opacity = "1";
+            contextMenu.style.transform = "scale(1)";
+          });
+        }
+
+        removeAllContextMenus() {
+          document.querySelectorAll(".context-menu").forEach((menu) => {
+            menu.remove();
+          });
+        }
+
+        handleCorrectClick(button) {
+          this.stopTimer();
+
+          // Add celebration animation
+          button.classList.add("clicked");
+
+          // Update score with bonus for timer levels
+          const points = this.contextMenuActive ? 20 : 10;
+          const timerBonus = this.hasTimer ? 5 : 0;
+          this.score += points + timerBonus;
+
+          // Show celebration
+          this.showCelebration();
+
+          // Level up logic
+          if (this.score >= this.level * 100) {
+            this.level++;
+
+            // Update timer status
+            const wasTimerActive = this.hasTimer;
+            this.hasTimer = this.level >= 5;
+
+            if (!wasTimerActive && this.hasTimer) {
+              this.showMessage(
+                `Level ${this.level}! Timer challenge starts! ⏰`,
+                true
+              );
+              this.updateInstructions();
+            } else {
+              this.showMessage(`Level ${this.level}! 🎊`, true);
+            }
+
+            this.contextMenuChance = Math.min(0.6, 0.2 + this.level * 0.1);
+            this.saveProgress();
+          }
+
+          // Set new target after a short delay
+          setTimeout(() => {
+            button.classList.remove("clicked");
+            this.setNewTarget();
+            this.updateDisplay();
+          }, 600);
+        }
+
+        handleIncorrectClick(button) {
+          // Brief flash animation for incorrect click
+          button.style.background = "#ff4757";
+          setTimeout(() => {
+            button.style.background = "";
+          }, 200);
+
+          this.score = Math.max(0, this.score - 2); // Optionally penalize
+          this.checkLevelDemotion();
+          this.showMessage("Try the colorful button! 🌈", false);
+        }
+
+        showCelebration() {
+          const celebration = document.createElement("div");
+          celebration.className = "celebration";
+          celebration.textContent =
+            this.celebrations[
+              Math.floor(Math.random() * this.celebrations.length)
+            ];
+
+          // Random position around the screen center
+          const randomX = (Math.random() - 0.5) * 200;
+          const randomY = (Math.random() - 0.5) * 200;
+          celebration.style.left = `calc(50% + ${randomX}px)`;
+          celebration.style.top = `calc(50% + ${randomY}px)`;
+
+          document.body.appendChild(celebration);
+
+          setTimeout(() => {
+            celebration.remove();
+          }, 1000);
+        }
+
+        showMessage(message, isPositive) {
+          const messageEl = document.createElement("div");
+          messageEl.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: ${isPositive ? "#4CAF50" : "#ff6b6b"};
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    font-size: 1.2em;
+                    z-index: 1002;
+                    animation: slideDown 0.3s ease-out;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                `;
+          messageEl.textContent = message;
+
+          document.body.appendChild(messageEl);
+
+          setTimeout(() => {
+            messageEl.style.animation = "slideUp 0.3s ease-in forwards";
+            setTimeout(() => messageEl.remove(), 300);
+          }, 2000);
+        }
+
+        updateDisplay() {
+          this.scoreElement.textContent = this.score;
+          this.levelElement.textContent = this.level;
+
+          // Update progress bar
+          const progressPercent = ((this.score % 100) / 100) * 100;
+          this.progressElement.style.width = progressPercent + "%";
+
+          // Show/hide timer
+          if (this.hasTimer) {
+            this.timerContainer.classList.add("active");
+          } else {
+            this.timerContainer.classList.remove("active");
+          }
+        }
+
+        // Add this helper to check and demote level if needed
+        checkLevelDemotion() {
+          // Player should be at least level 1
+          while (this.level > 1 && this.score < (this.level - 1) * 100) {
+            this.level--;
+            this.hasTimer = this.level >= 5;
+            this.contextMenuChance = Math.min(0.6, 0.2 + this.level * 0.1);
+            this.showMessage(`Dropped to Level ${this.level}!`, false);
+            this.saveProgress();
+            this.updateInstructions();
+          }
+        }
+      }
+
+      // Add slide animations
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateX(-50%) translateY(-100%); }
+                to { transform: translateX(-50%) translateY(0); }
+            }
+            
+            @keyframes slideUp {
+                from { transform: translateX(-50%) translateY(0); }
+                to { transform: translateX(-50%) translateY(-100%); }
+            }
+        `;
+      document.head.appendChild(style);
+
+      // Initialize the game
+      const game = new MousePracticeGame();
+
+      // Add some encouraging sounds (visual feedback instead)
+      console.log("🎮 Mouse Practice Game Started! Have fun! 🎮");
+    </script>
+  </body>
+</html>
