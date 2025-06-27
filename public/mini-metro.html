@@ -1030,67 +1030,56 @@
                         ctx.fillStyle = color;
                         ctx.strokeStyle = '#ffffff';
                         ctx.lineWidth = 2;
-                        // Rectangle: width 40, height 20, rounded corners
-                        const w = 40, h = 20, r = 8;
+                        // Draw square: 20x20 centered at (0,0)
+                        const size = 20;
                         ctx.beginPath();
-                        ctx.moveTo(-w/2 + r, -h/2);
-                        ctx.lineTo(w/2 - r, -h/2);
-                        ctx.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + r);
-                        ctx.lineTo(w/2, h/2 - r);
-                        ctx.quadraticCurveTo(w/2, h/2, w/2 - r, h/2);
-                        ctx.lineTo(-w/2 + r, h/2);
-                        ctx.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - r);
-                        ctx.lineTo(-w/2, -h/2 + r);
-                        ctx.quadraticCurveTo(-w/2, -h/2, -w/2 + r, -h/2);
-                        ctx.closePath();
+                        ctx.rect(-size/2, -size/2, size, size);
                         ctx.fill();
                         ctx.stroke();
-                        // Draw headlight at front depending on direction
+                        // Draw headlight as a small square at the front depending on direction
                         ctx.save();
                         if (train.direction === 1) {
-                            ctx.translate(w/2 - 6, 0);
+                            ctx.translate(size/2, 0);
                         } else {
-                            ctx.translate(-w/2 + 6, 0);
+                            ctx.translate(-size/2, 0);
                         }
                         ctx.fillStyle = '#fffbe6';
-                        ctx.beginPath();
-                        ctx.arc(0, 0, 4, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.fillRect(-3, -3, 6, 6);
                         ctx.restore();
                         // Draw passenger shapes/colors inside train
-                        const px0 = -w/2 + 10, py0 = -h/2 + 10;
+                        const px0 = -size/2 + 5, py0 = -size/2 + 5;
                         train.passengers.forEach((p, i) => {
                             ctx.save();
-                            ctx.translate(px0 + (i % 3) * 12, py0 + Math.floor(i / 3) * 12);
+                            ctx.translate(px0 + (i % 3) * 7, py0 + Math.floor(i / 3) * 7);
                             ctx.fillStyle = shapeColors[p.destination];
                             ctx.strokeStyle = '#222';
                             ctx.lineWidth = 1.5;
                             switch (p.destination) {
                                 case 'circle':
                                     ctx.beginPath();
-                                    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+                                    ctx.arc(0, 0, 3, 0, Math.PI * 2);
                                     ctx.fill();
                                     ctx.stroke();
                                     break;
                                 case 'square':
-                                    ctx.fillRect(-4, -4, 8, 8);
-                                    ctx.strokeRect(-4, -4, 8, 8);
+                                    ctx.fillRect(-3, -3, 6, 6);
+                                    ctx.strokeRect(-3, -3, 6, 6);
                                     break;
                                 case 'triangle':
                                     ctx.beginPath();
-                                    ctx.moveTo(0, -4);
-                                    ctx.lineTo(-4, 4);
-                                    ctx.lineTo(4, 4);
+                                    ctx.moveTo(0, -3);
+                                    ctx.lineTo(-3, 3);
+                                    ctx.lineTo(3, 3);
                                     ctx.closePath();
                                     ctx.fill();
                                     ctx.stroke();
                                     break;
                                 case 'diamond':
                                     ctx.beginPath();
-                                    ctx.moveTo(0, -4);
-                                    ctx.lineTo(4, 0);
-                                    ctx.lineTo(0, 4);
-                                    ctx.lineTo(-4, 0);
+                                    ctx.moveTo(0, -3);
+                                    ctx.lineTo(3, 0);
+                                    ctx.lineTo(0, 3);
+                                    ctx.lineTo(-3, 0);
                                     ctx.closePath();
                                     ctx.fill();
                                     ctx.stroke();
@@ -1099,8 +1088,8 @@
                                     ctx.beginPath();
                                     for (let j = 0; j < 5; j++) {
                                         const angle = (j * 2 * Math.PI) / 5 - Math.PI / 2;
-                                        const x = Math.cos(angle) * 4;
-                                        const y = Math.sin(angle) * 4;
+                                        const x = Math.cos(angle) * 3;
+                                        const y = Math.sin(angle) * 3;
                                         if (j === 0) ctx.moveTo(x, y);
                                         else ctx.lineTo(x, y);
                                     }
@@ -1112,7 +1101,7 @@
                                     ctx.beginPath();
                                     for (let j = 0; j < 10; j++) {
                                         const angle = (j * Math.PI) / 5 - Math.PI / 2;
-                                        const radius = j % 2 === 0 ? 4 : 2;
+                                        const radius = j % 2 === 0 ? 3 : 1.5;
                                         const x = Math.cos(angle) * radius;
                                         const y = Math.sin(angle) * radius;
                                         if (j === 0) ctx.moveTo(x, y);

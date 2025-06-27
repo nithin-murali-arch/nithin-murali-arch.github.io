@@ -86,21 +86,29 @@
       }
 
       .timer-bar {
-        width: 200px;
-        height: 20px;
+        width: 60px;
+        height: 60px;
         background: rgba(255, 255, 255, 0.3);
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
         margin: 0 auto;
         position: relative;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .timer-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
         height: 100%;
-        background: linear-gradient(90deg, #4caf50, #ffc107, #ff5722);
         width: 100%;
+        background: linear-gradient(90deg, #4caf50, #ffc107, #ff5722);
         transition: width 0.1s linear;
-        border-radius: 10px;
+        border-radius: 12px;
+        z-index: 1;
       }
 
       .timer-text {
@@ -110,8 +118,10 @@
         transform: translate(-50%, -50%);
         color: #333;
         font-weight: bold;
-        font-size: 0.9em;
+        font-size: 1.1em;
         text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        z-index: 2;
+        pointer-events: none;
       }
 
       .game-container {
@@ -121,6 +131,7 @@
         flex: 1;
         padding: 10px;
         overflow: hidden;
+        height: 100%;
       }
 
       .button-row {
@@ -280,18 +291,6 @@
         }
       }
 
-      .instructions {
-        text-align: center;
-        margin: 5px 0;
-        font-size: 1em;
-        color: #333;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 8px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        flex-shrink: 0;
-      }
-
       .special-button {
         position: relative;
       }
@@ -392,7 +391,7 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
-        height: 100vh;
+        height: 100%;
         overflow: hidden;
       }
       @media (max-width: 900px) {
@@ -411,31 +410,17 @@
         <!-- Adsense code can be inserted here -->
       </div>
       <div class="main-content">
-        <div class="header">
-          <h1 class="title">🎮 Mouse Practice Game! 🎮</h1>
-          <div class="score">
-            Score: <span id="score">0</span> | Level: <span id="level">1</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress"></div>
-          </div>
-          <div class="timer-container" id="timerContainer">
-            <div class="timer-bar">
-              <div class="timer-fill" id="timerFill"></div>
-              <div class="timer-text" id="timerText">⏰ 15s</div>
-            </div>
-          </div>
+        <div style="display:none">
+          <span id="score"></span>
+          <span id="level"></span>
+          <div id="progress"></div>
+          <div id="timerContainer"></div>
+          <div id="timerFill"></div>
+          <div id="timerText"></div>
         </div>
-
-        <div class="instructions" id="instructions">
-          🌟 Click the colorful button to score points! 🌟<br />
-          Sometimes you'll need to right-click for a special menu!
-        </div>
-
         <div class="game-container" id="gameContainer">
           <!-- Button rows will be generated here -->
         </div>
-
         <div class="save-indicator" id="saveIndicator">Progress Saved! 💾</div>
       </div>
       <div class="ad-space ad-right">
@@ -451,6 +436,8 @@
           this.targetButton = null;
           this.contextMenuActive = false;
           this.contextMenuChance = 0.3; // 30% chance for context menu
+
+          // Assign DOM elements after loadProgress
           this.scoreElement = document.getElementById("score");
           this.levelElement = document.getElementById("level");
           this.progressElement = document.getElementById("progress");
@@ -458,7 +445,6 @@
           this.timerContainer = document.getElementById("timerContainer");
           this.timerFill = document.getElementById("timerFill");
           this.timerText = document.getElementById("timerText");
-          this.instructionsElement = document.getElementById("instructions");
           this.saveIndicator = document.getElementById("saveIndicator");
           this.buttons = [];
 
@@ -469,6 +455,8 @@
           this.timerInterval = null;
 
           this.celebrations = ["🎉", "⭐", "🌟", "✨", "🎊", "🥳", "👏", "🎈"];
+
+          this.inputLocked = false;
 
           this.init();
         }
@@ -503,6 +491,9 @@
           // For artifact demo, starting fresh each time
           // this.score = 0;
           // this.level = 1;
+
+          // Sync parent page on load
+          sendUpdateToParent(this.score, this.level);
         }
 
         showSaveIndicator() {
@@ -513,17 +504,19 @@
         }
 
         calculateLayout() {
-          // Use the actual width of the main-content element for layout
+          // Use the actual width and height of the game-container for layout
           let containerWidth = 0;
-          const mainContent = document.querySelector(".main-content");
-          if (mainContent) {
-            containerWidth = mainContent.clientWidth - 40;
+          let containerHeight = 0;
+          const gameContainer = this.gameContainer;
+          if (gameContainer) {
+            const rect = gameContainer.getBoundingClientRect();
+            containerWidth = rect.width;
+            containerHeight = rect.height;
           } else {
             // fallback for initial load
             containerWidth = window.innerWidth - 320 - 40; // 160px for each ad
+            containerHeight = window.innerHeight - (this.hasTimer ? 320 : 280);
           }
-          const containerHeight =
-            window.innerHeight - (this.hasTimer ? 320 : 280);
 
           const buttonSize = window.innerWidth <= 768 ? 60 : 70;
           const gap = 10;
@@ -590,7 +583,28 @@
             Math.ceil(this.timeLeft)
           )}s`;
 
-          // Change color as time runs out
+          // Update SVG timer border if present
+          if (this.targetButton) {
+            const svg = this.targetButton.querySelector('.timer-border');
+            if (svg) {
+              const circle = svg.querySelector('circle');
+              if (circle) {
+                const total = 220; // Circumference
+                const offset = total * (1 - this.timeLeft / this.maxTime);
+                circle.setAttribute('stroke-dashoffset', offset.toString());
+                // Color change as time runs out
+                if (percentage <= 25) {
+                  circle.setAttribute('stroke', '#FF5722');
+                } else if (percentage <= 50) {
+                  circle.setAttribute('stroke', '#FFC107');
+                } else {
+                  circle.setAttribute('stroke', '#4CAF50');
+                }
+              }
+            }
+          }
+
+          // Change color as time runs out (legacy bar)
           if (percentage <= 25) {
             this.timerFill.style.background = "#FF5722";
           } else if (percentage <= 50) {
@@ -624,6 +638,9 @@
             this.setNewTarget();
             this.updateDisplay();
           }, 1000);
+
+          // NEW: Send update
+          sendUpdateToParent(this.score, this.level);
         }
 
         init() {
@@ -631,19 +648,6 @@
           this.setNewTarget();
           this.bindEvents();
           this.updateDisplay();
-          this.updateInstructions();
-        }
-
-        updateInstructions() {
-          if (this.hasTimer) {
-            this.instructionsElement.innerHTML =
-              "🌟 Click the colorful button before time runs out! ⏰<br>" +
-              "Sometimes you'll need to right-click for a special menu!";
-          } else {
-            this.instructionsElement.innerHTML =
-              "🌟 Click the colorful button to score points! 🌟<br>" +
-              "Sometimes you'll need to right-click for a special menu!";
-          }
         }
 
         createButtons() {
@@ -671,9 +675,15 @@
         setNewTarget() {
           this.stopTimer();
 
+          // Always update hasTimer based on current level
+          this.hasTimer = this.level >= 3;
+
           // Remove active class from current target
           if (this.targetButton) {
             this.targetButton.classList.remove("active", "special-button");
+            // Remove timer SVG if present
+            const oldTimer = this.targetButton.querySelector('.timer-border');
+            if (oldTimer) oldTimer.remove();
           }
 
           // Select random button
@@ -691,6 +701,32 @@
           this.targetButton.classList.add("active");
           if (this.contextMenuActive) {
             this.targetButton.classList.add("special-button");
+          }
+
+          // Add timer border SVG if timer is active
+          if (this.hasTimer) {
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("class", "timer-border");
+            svg.setAttribute("width", "76");
+            svg.setAttribute("height", "76");
+            svg.style.position = "absolute";
+            svg.style.top = "-3px";
+            svg.style.left = "-3px";
+            svg.style.pointerEvents = "none";
+            svg.style.zIndex = "2";
+            const circle = document.createElementNS(svgNS, "circle");
+            circle.setAttribute("cx", "38");
+            circle.setAttribute("cy", "38");
+            circle.setAttribute("r", "35");
+            circle.setAttribute("fill", "none");
+            circle.setAttribute("stroke", "#ff5722");
+            circle.setAttribute("stroke-width", "6");
+            circle.setAttribute("stroke-dasharray", "220");
+            circle.setAttribute("stroke-dashoffset", "0");
+            circle.setAttribute("stroke-linecap", "round");
+            svg.appendChild(circle);
+            this.targetButton.appendChild(svg);
           }
 
           // Start timer if applicable
@@ -733,16 +769,14 @@
         }
 
         handleButtonClick(button, event) {
-          // Remove any existing context menus
+          if (this.inputLocked) return;
           this.removeAllContextMenus();
 
           if (button === this.targetButton) {
             if (this.contextMenuActive) {
-              // Wrong action - should have right-clicked
               this.showMessage("Try right-clicking! 🖱️", false);
               return;
             }
-
             this.handleCorrectClick(button);
           } else {
             this.handleIncorrectClick(button);
@@ -750,6 +784,7 @@
         }
 
         handleContextMenu(button, event) {
+          if (this.inputLocked) return;
           this.removeAllContextMenus();
           if (button === this.targetButton && this.contextMenuActive && !isMobile) {
             this.showContextMenu(button, event);
@@ -922,11 +957,12 @@
 
         handleCorrectClick(button) {
           this.stopTimer();
+          this.inputLocked = true;
 
           // Add celebration animation
           button.classList.add("clicked");
 
-          // Update score with bonus for timer levels
+          // Update score with bonus for timer levels (do this immediately)
           const points = this.contextMenuActive ? 20 : 10;
           const timerBonus = this.hasTimer ? 5 : 0;
           this.score += points + timerBonus;
@@ -935,19 +971,21 @@
           this.showCelebration();
 
           // Level up logic
+          let leveledUp = false;
           if (this.score >= this.level * 100) {
             this.level++;
+            leveledUp = true;
+
+            // Always update hasTimer after level up
+            this.hasTimer = this.level >= 3;
 
             // Update timer status
             const wasTimerActive = this.hasTimer;
-            this.hasTimer = this.level >= 5;
-
             if (!wasTimerActive && this.hasTimer) {
               this.showMessage(
                 `Level ${this.level}! Timer challenge starts! ⏰`,
                 true
               );
-              this.updateInstructions();
             } else {
               this.showMessage(`Level ${this.level}! 🎊`, true);
             }
@@ -956,12 +994,18 @@
             this.saveProgress();
           }
 
+          // Always send update after possible level up
+          sendUpdateToParent(this.score, this.level);
+
+          // Remove any context menu if present (for right-click)
+          this.removeAllContextMenus();
+
           // Set new target after a short delay
           setTimeout(() => {
             button.classList.remove("clicked");
             this.setNewTarget();
-            this.updateDisplay();
-          }, 600);
+            this.inputLocked = false;
+          }, leveledUp ? 1000 : 400);
         }
 
         handleIncorrectClick(button) {
@@ -971,12 +1015,18 @@
             button.style.background = "";
           }, 200);
 
-          this.score = Math.max(0, this.score - 2); // Optionally penalize
+          this.score = Math.max(0, this.score - 5);
           this.checkLevelDemotion();
-          this.showMessage("Try the colorful button! 🌈", false);
+          this.showMessage("-5", false, button);
+
+          // NEW: Send update
+          sendUpdateToParent(this.score, this.level);
         }
 
         showCelebration() {
+          // Always remove any existing celebration emoji before adding a new one
+          document.querySelectorAll('.celebration').forEach(el => el.remove());
+
           const celebration = document.createElement("div");
           celebration.className = "celebration";
           celebration.textContent =
@@ -997,7 +1047,7 @@
           }, 1000);
         }
 
-        showMessage(message, isPositive) {
+        showMessage(message, isPositive, button) {
           const messageEl = document.createElement("div");
           messageEl.style.cssText = `
                     position: fixed;
@@ -1042,13 +1092,18 @@
         // Add this helper to check and demote level if needed
         checkLevelDemotion() {
           // Player should be at least level 1
+          let demoted = false;
           while (this.level > 1 && this.score < (this.level - 1) * 100) {
             this.level--;
-            this.hasTimer = this.level >= 5;
+            // Always update hasTimer after demotion
+            this.hasTimer = this.level >= 3;
             this.contextMenuChance = Math.min(0.6, 0.2 + this.level * 0.1);
             this.showMessage(`Dropped to Level ${this.level}!`, false);
             this.saveProgress();
-            this.updateInstructions();
+            demoted = true;
+          }
+          if (demoted) {
+            sendUpdateToParent(this.score, this.level);
           }
         }
       }
@@ -1071,8 +1126,41 @@
       // Initialize the game
       const game = new MousePracticeGame();
 
+      // Post message to parent with current level and score on load
+      sendUpdateToParent(game.score, game.level);
+
+      // --- Keep posting GAME_UPDATE until we get an acknowledgement ---
+      let ackReceived = false;
+      let postInterval = setInterval(() => {
+        if (!ackReceived) {
+          sendUpdateToParent(game.score, game.level);
+        }
+      }, 200);
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'GAME_UPDATE_ACK') {
+          ackReceived = true;
+          clearInterval(postInterval);
+        }
+        if (event.data && event.data.type === 'REQUEST_GAME_STATE') {
+          sendUpdateToParent(game.score, game.level);
+        }
+      });
+
       // Add some encouraging sounds (visual feedback instead)
       console.log("🎮 Mouse Practice Game Started! Have fun! 🎮");
+
+      // NEW: Function to send updates to the parent React app
+      function sendUpdateToParent(newScore, newLevel) {
+        if (window.parent) {
+          window.parent.postMessage({
+            type: 'GAME_UPDATE',
+            payload: {
+              score: newScore,
+              level: newLevel
+            }
+          }, '*'); // Use a specific origin in production for security
+        }
+      }
     </script>
   </body>
 </html>
