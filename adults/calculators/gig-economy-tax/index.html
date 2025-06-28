@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gig Economy Tax - Financial Calculator</title>
+    <link rel="icon" href="../common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="../common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/gig-economy-tax/">
+    <meta property="og:title" content="Gig Economy Tax - Financial Calculator">
+    <meta property="og:description" content="Calculate taxes for gig economy income including deductions, quarterly payments, and self-employment tax.">
+    <meta property="og:site_name" content="Gig Economy Tax">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Gig Economy Tax - Financial Calculator">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/gig-economy-tax/">
+    <meta property="twitter:title" content="Gig Economy Tax - Financial Calculator">
+    <meta property="twitter:description" content="Calculate taxes for gig economy income including deductions, quarterly payments, and self-employment tax.">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Calculate taxes for gig economy income including deductions, quarterly payments, and self-employment tax.">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="gig economy-tax, financial calculator, gig economy tax, financial planning">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="Gig Economy Tax">
+    <meta name="apple-mobile-web-app-title" content="Gig Economy Tax">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Gig Economy Tax",
+        "description": "Calculate taxes for gig economy income including deductions, quarterly payments, and self-employment tax.",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/gig-economy-tax/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Financial Analysis",
+            "Data Visualization",
+            "Customizable Inputs",
+            "Detailed Results",
+            "Mobile Responsive"
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles and Scripts -->
+    <link rel="stylesheet" href="../common/calculator-base.css">
+    <script src="../common/calculator-base.js"></script>
+    
+    <!-- Calculator-specific styles and scripts -->
+    <link rel="stylesheet" href="gig-economy-tax.css">
+    <script src="gig-economy-tax.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Gig Economy Tax</h1>
+            <button class="hamburger-menu" id="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+            <button class="tab active" data-tab="basic">
+                <i class="fas fa-info-circle"></i> Basic Info
+            </button>
+            <button class="tab" data-tab="details">
+                <i class="fas fa-calculator"></i> Details
+            </button>
+            <button class="tab" data-tab="results">
+                <i class="fas fa-chart-line"></i> Results
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul class="tab-list">
+                <li><a href="#" class="tab active" data-tab="basic"><i class="fas fa-info-circle"></i> Basic Info</a></li>
+                <li><a href="#" class="tab" data-tab="details"><i class="fas fa-calculator"></i> Details</a></li>
+                <li><a href="#" class="tab" data-tab="results"><i class="fas fa-chart-line"></i> Results</a></li>
+            </ul>
+        </nav>
+
+        <!-- Tab Contents -->
+        <div id="basic" class="tab-content">
+            <div class="card">
+                <h2>Basic Information</h2>
+                <p>Enter the basic information to get started with your gig economy tax calculation.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="input1">Input 1</label>
+                        <input type="number" id="input1" placeholder="Enter value">
+                    </div>
+                    <div class="form-group">
+                        <label for="input2">Input 2</label>
+                        <input type="number" id="input2" placeholder="Enter value">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="details" class="tab-content hidden">
+            <div class="card">
+                <h2>Additional Details</h2>
+                <p>Provide additional details for more accurate calculations.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="input3">Input 3</label>
+                        <input type="number" id="input3" placeholder="Enter value">
+                    </div>
+                    <div class="form-group">
+                        <label for="input4">Input 4</label>
+                        <input type="number" id="input4" placeholder="Enter value">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content hidden">
+            <div class="card">
+                <h2>Calculation Results</h2>
+                <p>Here are your calculated results for gig economy tax.</p>
+                
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="result1">₹0</div>
+                        <div class="result-label">Result 1</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="result2">₹0</div>
+                        <div class="result-label">Result 2</div>
+                    </div>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Analysis</h3>
+                    <canvas id="analysis-chart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-prev" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-next">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Initialize Calculator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the calculator
+            window.calculator = new GigEconomyTaxCalculator({
+                calculatorName: 'Gig Economy Tax',
+                tabOrder: ['basic', 'details', 'results'],
+                localStorageKey: 'gig-economy-taxData'
+            });
+        });
+    </script>
+</body>
+</html>

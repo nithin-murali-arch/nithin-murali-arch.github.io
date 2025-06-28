@@ -4,6 +4,7 @@ let currentActiveTabIndex = 0;
 window.fireData = null;
 let chartInstances = {};
 const LOCAL_STORAGE_KEY = 'fireCalculatorData_v6';
+let isInitialized = false;
 
 // --- Application State Management ---
 class FIREStateManager {
@@ -80,14 +81,24 @@ class FIREStateManager {
 
   // Send state to analytics (subtle)
   sendToAnalytics(eventName = 'app_state_update') {
-    if (typeof gtag !== 'undefined') {
-      const analyticsData = this.getAnalyticsState();
+    try {
+      if (typeof gtag !== 'undefined') {
+        const analyticsData = this.getAnalyticsState();
+        
+        gtag('event', eventName, {
+          event_category: 'FIRE Calculator',
+          event_label: 'State Update',
+          custom_map: analyticsData
+        });
+      }
       
-      gtag('event', eventName, {
-        event_category: 'FIRE Calculator',
-        event_label: 'State Update',
-        custom_map: analyticsData
-      });
+      // Check if New Relic is available before using it
+      if (typeof window !== 'undefined' && window.newrelic && typeof window.newrelic.addPageAction === 'function') {
+        const analyticsData = this.getAnalyticsState();
+        window.newrelic.addPageAction(eventName, analyticsData);
+      }
+    } catch (error) {
+      console.warn('Analytics error:', error);
     }
   }
 }
@@ -97,172 +108,266 @@ const stateManager = new FIREStateManager();
 
 // --- Mobile Navigation ---
 function toggleMobileNav() {
-    const mobileNav = document.getElementById('mobile-nav');
-    const overlay = document.getElementById('nav-overlay');
-    const hamburger = document.getElementById('hamburger-menu');
-    
-    if (mobileNav.classList.contains('active')) {
-        mobileNav.classList.remove('active');
-        overlay.classList.remove('active');
-        hamburger.classList.remove('active');
-    } else {
-        mobileNav.classList.add('active');
-        overlay.classList.add('active');
-        hamburger.classList.add('active');
+    try {
+        const mobileNav = document.getElementById('mobile-nav');
+        const overlay = document.getElementById('nav-overlay');
+        const hamburger = document.getElementById('hamburger-menu');
+        
+        if (mobileNav && overlay && hamburger) {
+            if (mobileNav.classList.contains('active')) {
+                mobileNav.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburger.classList.remove('active');
+            } else {
+                mobileNav.classList.add('active');
+                overlay.classList.add('active');
+                hamburger.classList.add('active');
+            }
+        }
+    } catch (error) {
+        console.error('Error toggling mobile navigation:', error);
     }
 }
 
 // --- Navigation Logic ---
 function goToNextTab() {
-    const currentTab = document.querySelector('.tab.active');
-    const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
-    if (currentIndex < tabOrder.length - 1) {
-        showTab(tabOrder[currentIndex + 1]);
+    try {
+        const currentTab = document.querySelector('.tab.active');
+        if (currentTab && currentTab.dataset.tab) {
+            const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
+            if (currentIndex < tabOrder.length - 1) {
+                showTab(tabOrder[currentIndex + 1]);
+            }
+        }
+    } catch (error) {
+        console.error('Error going to next tab:', error);
     }
 }
 
 function goToPreviousTab() {
-    const currentTab = document.querySelector('.tab.active');
-    const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
-    if (currentIndex > 0) {
-        showTab(tabOrder[currentIndex - 1]);
+    try {
+        const currentTab = document.querySelector('.tab.active');
+        if (currentTab && currentTab.dataset.tab) {
+            const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
+            if (currentIndex > 0) {
+                showTab(tabOrder[currentIndex - 1]);
+            }
+        }
+    } catch (error) {
+        console.error('Error going to previous tab:', error);
     }
 }
 
 function showTab(tabId) {
-    // Validate current tab before proceeding
-    if (currentActiveTabIndex < tabOrder.indexOf('results')) {
-        if (!validateTab(tabOrder[currentActiveTabIndex])) return;
-    }
-
-    currentActiveTabIndex = tabOrder.indexOf(tabId);
-
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Show selected tab content
-    const selectedContent = document.getElementById(tabId);
-    if (selectedContent) {
-        selectedContent.classList.remove('hidden');
-    }
-    
-    // Add active class to selected tab
-    const selectedTab = document.querySelector(`[data-tab="${tabId}"]`);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-    
-    // Handle results tab
-    if (tabId === 'results') {
-        calculateFIRE();
-        if (window.fireData) {
-            document.getElementById('initial-results-message').classList.add('hidden');
-            document.getElementById('actual-results-content').classList.remove('hidden');
-            updateUIAndCharts(window.fireData);
-        } else {
-            document.getElementById('initial-results-message').classList.remove('hidden');
-            document.getElementById('actual-results-content').classList.add('hidden');
+    try {
+        // Validate current tab before proceeding
+        if (currentActiveTabIndex < tabOrder.indexOf('results')) {
+            if (!validateTab(tabOrder[currentActiveTabIndex])) return;
         }
+
+        currentActiveTabIndex = tabOrder.indexOf(tabId);
+
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        const selectedContent = document.getElementById(tabId);
+        if (selectedContent) {
+            selectedContent.classList.remove('hidden');
+        }
+        
+        // Add active class to selected tab
+        const selectedTab = document.querySelector(`[data-tab="${tabId}"]`);
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+        }
+        
+        // Handle results tab
+        if (tabId === 'results') {
+            calculateFIRE();
+            const initialMessage = document.getElementById('initial-results-message');
+            const actualContent = document.getElementById('actual-results-content');
+            
+            if (window.fireData) {
+                if (initialMessage) initialMessage.classList.add('hidden');
+                if (actualContent) actualContent.classList.remove('hidden');
+                updateUIAndCharts(window.fireData);
+            } else {
+                if (initialMessage) initialMessage.classList.remove('hidden');
+                if (actualContent) actualContent.classList.add('hidden');
+            }
+        }
+        
+        // Close mobile nav if open
+        const mobileNav = document.getElementById('mobile-nav');
+        const overlay = document.getElementById('nav-overlay');
+        const hamburger = document.getElementById('hamburger-menu');
+        if (mobileNav && mobileNav.classList.contains('active')) {
+            mobileNav.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
+        }
+        
+        // Track tab visit
+        stateManager.trackTab(tabId);
+        
+        // Update state and send to analytics
+        stateManager.updateState({ current_tab: tabId });
+        stateManager.sendToAnalytics('tab_visit');
+        
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('Error showing tab:', tabId, error);
     }
-    
-    // Close mobile nav if open
-    const mobileNav = document.getElementById('mobile-nav');
-    const overlay = document.getElementById('nav-overlay');
-    const hamburger = document.getElementById('hamburger-menu');
-    if (mobileNav.classList.contains('active')) {
-        mobileNav.classList.remove('active');
-        overlay.classList.remove('active');
-        hamburger.classList.remove('active');
-    }
-    
-    // Track tab visit
-    stateManager.trackTab(tabId);
-    
-    // Update state and send to analytics
-    stateManager.updateState({ current_tab: tabId });
-    stateManager.sendToAnalytics('tab_visit');
-    
-    // Scroll to top smoothly
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', () => {
-    // Track initial page load
-    stateManager.sendToAnalytics('page_view');
+    if (isInitialized) {
+        console.log('FIRE Calculator: Already initialized, skipping');
+        return;
+    }
     
-    // Set up navigation event listeners
-    const hamburgerBtn = document.getElementById('hamburger-menu');
-    const navOverlay = document.getElementById('nav-overlay');
-    const allNavLinks = document.querySelectorAll('.desktop-nav .tab, .mobile-nav .tab');
+    console.log('FIRE Calculator: DOM Content Loaded');
     
-    hamburgerBtn.addEventListener('click', toggleMobileNav);
-    navOverlay.addEventListener('click', toggleMobileNav);
-    
-    allNavLinks.forEach(tab => {
-        tab.addEventListener('click', (event) => {
-            event.preventDefault();
-            const targetTabId = event.currentTarget.getAttribute('data-tab');
-            showTab(targetTabId);
-            const mobileNav = document.getElementById('mobile-nav');
-            if (mobileNav.classList.contains('active')) {
+    try {
+        isInitialized = true;
+        
+        // Track initial page load
+        console.log('FIRE Calculator: Sending page view analytics');
+        stateManager.sendToAnalytics('page_view');
+        
+        // Set up navigation event listeners
+        const hamburgerBtn = document.getElementById('hamburger-menu');
+        const navOverlay = document.getElementById('nav-overlay');
+        const allNavLinks = document.querySelectorAll('.desktop-nav .tab, .mobile-nav .tab');
+        
+        console.log('FIRE Calculator: Setting up navigation listeners');
+        
+        if (hamburgerBtn) {
+            hamburgerBtn.addEventListener('click', toggleMobileNav);
+        }
+        if (navOverlay) {
+            navOverlay.addEventListener('click', toggleMobileNav);
+        }
+        
+        allNavLinks.forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                event.preventDefault();
+                const targetTabId = event.currentTarget.getAttribute('data-tab');
+                showTab(targetTabId);
+                const mobileNav = document.getElementById('mobile-nav');
+                if (mobileNav && mobileNav.classList.contains('active')) {
+                    toggleMobileNav();
+                }
+            });
+        });
+        
+        // Set up mobile action buttons
+        const mobileScrollToBottom = document.getElementById('mobile-scroll-to-bottom');
+        const mobileFeedback = document.getElementById('mobile-feedback');
+        
+        if (mobileScrollToBottom) {
+            mobileScrollToBottom.addEventListener('click', (event) => {
+                event.preventDefault();
+                // Scroll to the bottom of the current content
+                const currentTabContent = document.querySelector('.tab-content:not(.hidden)');
+                if (currentTabContent) {
+                    // Scroll to the bottom of the current tab content
+                    const rect = currentTabContent.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const targetScroll = scrollTop + rect.bottom - window.innerHeight + 20; // Add 20px padding
+                    
+                    window.scrollTo({
+                        top: targetScroll,
+                        behavior: 'smooth'
+                    });
+                }
+                // Close mobile nav
                 toggleMobileNav();
-            }
+            });
+        }
+        
+        if (mobileFeedback) {
+            mobileFeedback.addEventListener('click', (event) => {
+                event.preventDefault();
+                // Trigger feedback modal
+                const feedbackFab = document.getElementById('feedback-fab');
+                if (feedbackFab) {
+                    feedbackFab.click();
+                }
+                // Close mobile nav
+                toggleMobileNav();
+            });
+        }
+        
+        // Set up share button event listener
+        const shareButton = document.getElementById('share-screenshot-btn');
+        if (shareButton) {
+            shareButton.addEventListener('click', shareResults);
+        }
+        
+        // Set up share modal event listeners
+        const shareModal = document.getElementById('share-modal-overlay');
+        const closeShareModal = document.getElementById('close-share-modal');
+        const sharePlatformBtns = document.querySelectorAll('.share-platform-btn');
+        
+        if (closeShareModal) {
+            closeShareModal.addEventListener('click', () => {
+                if (shareModal) {
+                    shareModal.classList.add('hidden');
+                }
+            });
+        }
+        
+        if (shareModal) {
+            shareModal.addEventListener('click', (e) => {
+                if (e.target === shareModal) {
+                    shareModal.classList.add('hidden');
+                }
+            });
+        }
+        
+        sharePlatformBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const platform = btn.dataset.platform;
+                const blobUrl = shareModal?.dataset.screenshotBlob;
+                if (blobUrl) {
+                    fetch(blobUrl)
+                        .then(res => res.blob())
+                        .then(blob => shareToPlatform(platform, blob))
+                        .catch(error => console.error('Error sharing to platform:', error));
+                }
+            });
         });
-    });
-    
-    // Set up share button event listener
-    const shareButton = document.getElementById('share-screenshot-btn');
-    if (shareButton) {
-        shareButton.addEventListener('click', shareResults);
+        
+        // Initialize with assumptions tab as default
+        console.log('FIRE Calculator: Showing assumptions tab');
+        showTab('assumptions');
+        
+        // Load saved form data
+        console.log('FIRE Calculator: Loading form data');
+        loadFormData();
+        
+        // Initialize expense displays
+        console.log('FIRE Calculator: Initializing expense displays');
+        updateExpenseDisplays();
+        
+        console.log('FIRE Calculator: Initialization complete');
+        
+    } catch (error) {
+        console.error('Error initializing FIRE calculator:', error);
+        isInitialized = false; // Reset flag on error
     }
-    
-    // Set up share modal event listeners
-    const shareModal = document.getElementById('share-modal-overlay');
-    const closeShareModal = document.getElementById('close-share-modal');
-    const sharePlatformBtns = document.querySelectorAll('.share-platform-btn');
-    
-    if (closeShareModal) {
-        closeShareModal.addEventListener('click', () => {
-            shareModal.classList.add('hidden');
-        });
-    }
-    
-    if (shareModal) {
-        shareModal.addEventListener('click', (e) => {
-            if (e.target === shareModal) {
-                shareModal.classList.add('hidden');
-            }
-        });
-    }
-    
-    sharePlatformBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const platform = btn.dataset.platform;
-            const blobUrl = shareModal.dataset.screenshotBlob;
-            if (blobUrl) {
-                fetch(blobUrl)
-                    .then(res => res.blob())
-                    .then(blob => shareToPlatform(platform, blob));
-            }
-        });
-    });
-    
-    // Initialize with assumptions tab as default
-    showTab('assumptions');
-    
-    // Load saved form data
-    loadFormData();
-    
-    // Initialize expense displays
-    updateExpenseDisplays();
 });
 
 // --- Validation ---
@@ -273,9 +378,17 @@ function validateTab(tabId) {
         const isNumericInput = input.type === 'number';
         if (isNumericInput) {
             const val = parseFloat(input.value);
+            // Allow empty "years left" fields (expense-years-input and goal-years)
+            const isYearsField = input.classList.contains('expense-years-input') || input.classList.contains('goal-years');
+            
             if (input.value.trim() === '' || isNaN(val) || val < 0) {
-                input.classList.add('invalid');
-                isValid = false;
+                // Don't mark years fields as invalid if they're empty
+                if (!isYearsField || input.value.trim() !== '') {
+                    input.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('invalid');
+                }
             } else {
                 input.classList.remove('invalid');
             }
@@ -333,7 +446,7 @@ function getInputs() {
         const amountInput = row.querySelector('.expense-input');
         const yearsInput = row.querySelector('.expense-years-input');
         const amount = parseFloat(amountInput.value) || 0;
-        const yearsLeft = yearsInput ? (parseFloat(yearsInput.value) || 99) : 99;
+        const yearsLeft = yearsInput ? (parseFloat(yearsInput.value) || 0) : 0;
         if (amount > 0) {
             monthlyExpensesList.push({ amount, yearsLeft });
         }
@@ -345,7 +458,7 @@ function getInputs() {
         const amountInput = row.querySelector('.annual-expense-input');
         const yearsInput = row.querySelector('.expense-years-input');
         const amount = parseFloat(amountInput.value) || 0;
-        const yearsLeft = yearsInput ? (parseFloat(yearsInput.value) || 99) : 99;
+        const yearsLeft = yearsInput ? (parseFloat(yearsInput.value) || 0) : 0;
         if (amount > 0) {
             annualExpensesList.push({ amount, yearsLeft });
         }
@@ -617,7 +730,8 @@ function updateUIAndCharts(data) {
       annual_expenses: data.annualExpenses,
       portfolio_data: data.portfolio,
       final_allocation: data.finalAllocation,
-      portfolio_history: data.portfolioHistory
+      portfolio_history: data.portfolioHistory,
+      user_name: data.userName || ''
     });
     
     // Send completion event to analytics
@@ -650,6 +764,9 @@ function updateUIAndCharts(data) {
 
     document.getElementById('monthly-expenses-total-result').textContent = formatCurrency(data.monthlyExpenses);
     document.getElementById('annual-expenses-result').textContent = formatCurrency(data.annualExpenses);
+
+    // Update FIRE Progress Bar
+    updateFireProgressBar(data);
 
     Object.values(chartInstances).forEach(chart => chart.destroy());
 
@@ -865,6 +982,83 @@ function updateUIAndCharts(data) {
     });
 }
 
+// --- FIRE Progress Bar Update ---
+function updateFireProgressBar(data) {
+    const currentAge = data.currentAge || 0;
+    const fireAge = data.fireAge || 0; // Use calculated FIRE age (earliest possible)
+    const targetAge = data.targetAge || 0; // Keep target age for reference
+    
+    // Update progress bar elements
+    document.getElementById('progress-current-age').textContent = currentAge;
+    document.getElementById('progress-target-age').textContent = fireAge || targetAge;
+    
+    // Calculate progress percentage
+    let progressPercentage = 0;
+    let yearsCompleted = 0;
+    let yearsRemaining = 0;
+    
+    if (fireAge > currentAge && fireAge > 0) {
+        // Calculate progress based on corpus accumulation toward earliest FIRE age
+        const totalYears = fireAge - currentAge;
+        yearsCompleted = 0; // Since we're measuring progress toward FIRE, not age progress
+        yearsRemaining = totalYears;
+        
+        // Progress based on corpus accumulation toward FIRE goal
+        const currentCorpus = Object.values(data.portfolio || {}).reduce((sum, asset) => sum + (asset.value || 0), 0);
+        const targetCorpus = data.inflatedFireNumber || 0;
+        
+        if (targetCorpus > 0) {
+            progressPercentage = Math.min((currentCorpus / targetCorpus) * 100, 100);
+        }
+    } else if (fireAge <= currentAge && fireAge > 0) {
+        // User has already reached or passed their calculated FIRE age
+        progressPercentage = 100;
+        yearsCompleted = Math.abs(fireAge - currentAge);
+        yearsRemaining = 0;
+    } else if (fireAge === 0 && targetAge > currentAge) {
+        // FIRE not achievable with current inputs, but target age is set
+        const totalYears = targetAge - currentAge;
+        yearsCompleted = 0;
+        yearsRemaining = totalYears;
+        
+        // Show progress based on corpus accumulation
+        const currentCorpus = Object.values(data.portfolio || {}).reduce((sum, asset) => sum + (asset.value || 0), 0);
+        const targetCorpus = data.inflatedFireNumber || 0;
+        
+        if (targetCorpus > 0) {
+            progressPercentage = Math.min((currentCorpus / targetCorpus) * 100, 100);
+        }
+    }
+    
+    // Update progress bar fill
+    const progressFill = document.getElementById('fire-progress-fill');
+    if (progressFill) {
+        progressFill.style.width = `${progressPercentage}%`;
+    }
+    
+    // Update percentage display
+    const percentageEl = document.getElementById('fire-progress-percentage');
+    if (percentageEl) {
+        percentageEl.textContent = `${Math.round(progressPercentage)}%`;
+    }
+    
+    // Update stats
+    document.getElementById('progress-years-completed').textContent = yearsCompleted;
+    document.getElementById('progress-years-remaining').textContent = yearsRemaining;
+    
+    // Add visual feedback based on progress
+    if (progressPercentage >= 100) {
+        progressFill.style.background = 'var(--success-green)';
+        percentageEl.style.color = 'var(--success-green)';
+    } else if (progressPercentage >= 75) {
+        progressFill.style.background = 'var(--fire-orange)';
+        percentageEl.style.color = 'var(--fire-orange)';
+    } else {
+        progressFill.style.background = 'var(--gradient-fire)';
+        percentageEl.style.color = 'var(--fire-orange)';
+    }
+}
+
 function saveFormData() {
     const formData = {};
     document.querySelectorAll('input[id], select[id]').forEach(input => formData[input.id] = input.value);
@@ -897,6 +1091,12 @@ function loadFormData() {
             goalsContainer.innerHTML = ''; // Clear default/existing
             savedData.goals.forEach(goal => addGoalRow(goal));
         }
+        
+        // Track username if it was loaded from saved data
+        if (savedData['user-name'] && savedData['user-name'].trim()) {
+            stateManager.updateState({ user_name: savedData['user-name'].trim() });
+            stateManager.sendToAnalytics('username_loaded');
+        }
     } catch (e) {
         console.error("Failed to load or parse form data from localStorage", e);
         localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -917,6 +1117,13 @@ document.querySelectorAll('#basic input, #basic select, #cashflow input, #advanc
         }
         if (input.closest('.asset-allocation-form')) updateTotalCorpus();
         saveFormData();
+        
+        // Track username changes specifically
+        if (input.id === 'user-name') {
+            const userName = input.value.trim();
+            stateManager.updateState({ user_name: userName });
+            stateManager.sendToAnalytics('username_updated');
+        }
     });
 });
 
@@ -1006,7 +1213,8 @@ function triggerResultUpdate() {
                     results_recalculated: true,
                     fire_achievable: window.fireData.corpusShortfall <= 0,
                     final_corpus: window.fireData.finalCorpus,
-                    corpus_shortfall: window.fireData.corpusShortfall
+                    corpus_shortfall: window.fireData.corpusShortfall,
+                    user_name: window.fireData.userName || ''
                 });
                 stateManager.sendToAnalytics('results_recalculation');
             }
@@ -1264,3 +1472,37 @@ function copyToClipboard(url, shareText) {
     document.body.removeChild(tempInput);
     showMessage('Link copied to clipboard!', 'info');
 }
+
+// --- Mobile tap tooltip for .chart-info[data-tooltip] ---
+(function() {
+    function isMobile() {
+        return window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth <= 800;
+    }
+    function showMobileTooltip(e) {
+        if (!isMobile()) return;
+        e.stopPropagation();
+        e.preventDefault(); // Prevent focus transfer to input
+        // Remove other open tooltips
+        document.querySelectorAll('.chart-info.mobile-tooltip-active').forEach(el => {
+            if (el !== e.currentTarget) el.classList.remove('mobile-tooltip-active');
+        });
+        // Toggle this one
+        e.currentTarget.classList.toggle('mobile-tooltip-active');
+    }
+    function hideAllMobileTooltips() {
+        document.querySelectorAll('.chart-info.mobile-tooltip-active').forEach(el => {
+            el.classList.remove('mobile-tooltip-active');
+        });
+    }
+    function attachMobileTooltipHandlers() {
+        if (!isMobile()) return;
+        document.querySelectorAll('.chart-info[data-tooltip]').forEach(el => {
+            el.removeEventListener('click', showMobileTooltip);
+            el.addEventListener('click', showMobileTooltip);
+        });
+        document.removeEventListener('click', hideAllMobileTooltips);
+        document.addEventListener('click', hideAllMobileTooltips);
+    }
+    document.addEventListener('DOMContentLoaded', attachMobileTooltipHandlers);
+    window.addEventListener('resize', attachMobileTooltipHandlers);
+})();

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobby Item Calculator - Financial Calculator</title>
+    <link rel="icon" href="../common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="../common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/hobby-item/">
+    <meta property="og:title" content="Hobby Item Calculator - Financial Calculator">
+    <meta property="og:description" content="Calculate the true cost of your hobbies and determine if they're worth the investment. Track ongoing expenses, time commitment, and potential returns.">
+    <meta property="og:site_name" content="Hobby Item Calculator">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Hobby Item Calculator - Financial Calculator">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/hobby-item/">
+    <meta property="twitter:title" content="Hobby Item Calculator - Financial Calculator">
+    <meta property="twitter:description" content="Calculate the true cost of your hobbies and determine if they're worth the investment. Track ongoing expenses, time commitment, and potential returns.">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Calculate the true cost of your hobbies and determine if they're worth the investment. Track ongoing expenses, time commitment, and potential returns.">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="hobby calculator, hobby cost, hobby investment, hobby expenses, hobby ROI, hobby budgeting, hobby financial planning">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="Hobby Item Calculator">
+    <meta name="apple-mobile-web-app-title" content="Hobby Item Calculator">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Hobby Item Calculator",
+        "description": "Calculate the true cost of your hobbies and determine if they're worth the investment. Track ongoing expenses, time commitment, and potential returns.",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/hobby-item/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Hobby Cost Analysis",
+            "Ongoing Expense Tracking",
+            "Time Investment Calculator",
+            "ROI Analysis",
+            "Budget Planning"
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- Google Ads -->
+    <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371" crossorigin="anonymous"></script>
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles and Scripts -->
+    <link rel="stylesheet" href="../common/calculator-base.css">
+    <link rel="stylesheet" href="../common/feedback.css">
+    <script src="../common/calculator-base.js"></script>
+    <script src="../common/feedback.js"></script>
+    <script src="../common/google-ads.js"></script>
+    
+    <!-- Calculator-specific styles and scripts -->
+    <link rel="stylesheet" href="hobby-item.css">
+    <script src="hobby-item.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Hobby Item Calculator</h1>
+            <button class="hamburger-menu" id="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Header Ad -->
+        <div id="header-ad" style="text-align: center; margin: 20px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+            <div>
+                <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <br>Advertisement Space
+            </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+            <button class="tab active" data-tab="basic">
+                <i class="fas fa-info-circle"></i> Basic Info
+            </button>
+            <button class="tab" data-tab="expenses">
+                <i class="fas fa-coins"></i> Expenses
+            </button>
+            <button class="tab" data-tab="time">
+                <i class="fas fa-clock"></i> Time Investment
+            </button>
+            <button class="tab" data-tab="results">
+                <i class="fas fa-chart-line"></i> Results
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul class="tab-list">
+                <li><a href="#" class="tab active" data-tab="basic"><i class="fas fa-info-circle"></i> Basic Info</a></li>
+                <li><a href="#" class="tab" data-tab="expenses"><i class="fas fa-coins"></i> Expenses</a></li>
+                <li><a href="#" class="tab" data-tab="time"><i class="fas fa-clock"></i> Time Investment</a></li>
+                <li><a href="#" class="tab" data-tab="results"><i class="fas fa-chart-line"></i> Results</a></li>
+            </ul>
+        </nav>
+
+        <!-- Tab Contents -->
+        <div id="basic" class="tab-content">
+            <div class="card">
+                <h2>Basic Information</h2>
+                <p>Start by providing basic details about your hobby to calculate its true cost.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hobby-name">Hobby Name</label>
+                        <input type="text" id="hobby-name" placeholder="e.g., Photography, Gaming, Gardening">
+                    </div>
+                    <div class="form-group">
+                        <label for="hobby-category">Category</label>
+                        <select id="hobby-category">
+                            <option value="">Select Category</option>
+                            <option value="creative">Creative Arts</option>
+                            <option value="sports">Sports & Fitness</option>
+                            <option value="tech">Technology</option>
+                            <option value="outdoor">Outdoor Activities</option>
+                            <option value="collecting">Collecting</option>
+                            <option value="crafting">Crafting</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="initial-investment">Initial Investment <span class="chart-info" data-tooltip="One-time setup costs like equipment, tools, or initial supplies">?</span></label>
+                        <input type="number" id="initial-investment" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="monthly-budget">Monthly Budget</label>
+                        <input type="number" id="monthly-budget" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="frequency">How often do you engage?</label>
+                        <select id="frequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">How long have you been doing this?</label>
+                        <select id="duration">
+                            <option value="less-than-1">Less than 1 year</option>
+                            <option value="1-2">1-2 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="5-10">5-10 years</option>
+                            <option value="10-plus">10+ years</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="expenses" class="tab-content hidden">
+            <div class="card">
+                <h2>Expense Breakdown</h2>
+                <p>Break down your hobby expenses to get a complete picture of costs.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-cost">Equipment & Tools</label>
+                        <input type="number" id="equipment-cost" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="supplies-cost">Supplies & Materials</label>
+                        <input type="number" id="supplies-cost" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="membership-cost">Memberships & Subscriptions</label>
+                        <input type="number" id="membership-cost" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="travel-cost">Travel & Transportation</label>
+                        <input type="number" id="travel-cost" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="education-cost">Education & Training</label>
+                        <input type="number" id="education-cost" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="other-cost">Other Expenses</label>
+                        <input type="number" id="other-cost" placeholder="0" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="time" class="tab-content hidden">
+            <div class="card">
+                <h2>Time Investment</h2>
+                <p>Calculate the time value of your hobby investment.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hours-per-session">Hours per Session</label>
+                        <input type="number" id="hours-per-session" placeholder="0" min="0" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="sessions-per-month">Sessions per Month</label>
+                        <input type="number" id="sessions-per-month" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hourly-rate">Your Hourly Rate <span class="chart-info" data-tooltip="What you could earn per hour if you worked instead">?</span></label>
+                        <input type="number" id="hourly-rate" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="learning-hours">Learning Hours per Month</label>
+                        <input type="number" id="learning-hours" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="resale-value">Potential Resale Value</label>
+                        <input type="number" id="resale-value" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="income-potential">Income Potential per Month</label>
+                        <input type="number" id="income-potential" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="enjoyment-level">Enjoyment Level (1-10)</label>
+                        <input type="range" id="enjoyment-level" min="1" max="10" value="7" step="1">
+                        <div class="range-labels">
+                            <span>1 - Not Enjoyable</span>
+                            <span>10 - Very Enjoyable</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="opportunity-cost">Opportunity Cost</label>
+                        <select id="opportunity-cost">
+                            <option value="work">Work/Income</option>
+                            <option value="family">Family Time</option>
+                            <option value="other-hobbies">Other Hobbies</option>
+                            <option value="none">No Opportunity Cost</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content hidden">
+            <div class="card">
+                <h2>Hobby Cost Analysis</h2>
+                <p>Here's a comprehensive breakdown of your hobby investment.</p>
+                
+                <div class="results-grid">
+                    <div class="result-item">
+                        <h3>Total Investment</h3>
+                        <div class="result-value" id="total-investment">₹0</div>
+                        <p>Combined initial and ongoing costs</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Monthly Cost</h3>
+                        <div class="result-value" id="monthly-cost">₹0</div>
+                        <p>Average monthly expenditure</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Time Value</h3>
+                        <div class="result-value" id="time-value">₹0</div>
+                        <p>Opportunity cost of time spent</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Total Cost</h3>
+                        <div class="result-value" id="total-cost">₹0</div>
+                        <p>Financial + time investment</p>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3>Cost Breakdown</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>Recommendations</h3>
+                    <div id="recommendations-list">
+                        <p>Complete the form to see personalized recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Ad -->
+        <div id="results-ad" style="text-align: center; margin: 20px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+            <div>
+                <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <br>Advertisement Space
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-prev" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-next">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Ad -->
+    <div id="footer-ad" style="text-align: center; margin: 40px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+        <div>
+            <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+            <br>Advertisement Space
+        </div>
+    </div>
+
+    <!-- Feedback Floating Action Button -->
+    <button class="feedback-fab" id="feedback-fab" title="Share Feedback">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Scroll to Bottom Bubble -->
+    <button class="scroll-to-bottom" id="scroll-to-bottom" title="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <h2 class="feedback-title">Share Your Feedback</h2>
+                <button class="close-feedback" id="close-feedback">&times;</button>
+            </div>
+
+            <!-- Sign In Section (shown when not signed in) -->
+            <div id="signin-section" class="signin-section">
+                <p class="signin-text">Sign in to submit feedback and help us improve!</p>
+                <div id="g_id_onload"
+                     data-client_id="1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <!-- User Info & Feedback Form (shown after login) -->
+            <div id="feedback-form-section" style="display:none;">
+                <div id="user-info" class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="User Avatar">
+                    <div class="user-details">
+                        <p id="user-name" class="user-name"></p>
+                        <p id="user-email" class="user-email"></p>
+                    </div>
+                </div>
+                <div class="feedback-body">
+                    <form id="feedback-form" class="feedback-form">
+                        <div class="feedback-section">
+                            <label class="feedback-label">How would you rate your experience?</label>
+                            <div class="rating-stars" id="rating-stars">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">What type of feedback is this?</label>
+                            <select id="feedback-type" class="feedback-select" required>
+                                <option value="">Select feedback type</option>
+                                <option value="bug" class="feedback-type-option">🐛 Bug Report</option>
+                                <option value="feature" class="feedback-type-option">💡 Feature Request</option>
+                                <option value="improvement" class="feedback-type-option">⚡ Improvement Suggestion</option>
+                                <option value="calculation" class="feedback-type-option">🧮 Calculation Issue</option>
+                                <option value="ui" class="feedback-type-option">🎨 UI/UX Feedback</option>
+                                <option value="general" class="feedback-type-option">💬 General Feedback</option>
+                                <option value="praise" class="feedback-type-option">👏 Praise/Compliment</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">Your feedback message</label>
+                            <textarea id="feedback-message" class="feedback-textarea" 
+                                      placeholder="Tell us about your experience, suggestions, or any issues you encountered..." 
+                                      required></textarea>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label">Which section were you using?</label>
+                            <select id="feedback-section" class="feedback-select">
+                                <option value="">Select section (optional)</option>
+                                <option value="basic">👤 Basic Information</option>
+                                <option value="expenses">💰 Expense Breakdown</option>
+                                <option value="time">⏰ Time Investment</option>
+                                <option value="results">📊 Results</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-buttons">
+                            <button type="button" class="feedback-btn feedback-cancel" id="cancel-feedback">Cancel</button>
+                            <button type="submit" class="feedback-btn feedback-submit" id="submit-feedback">Submit Feedback</button>
+                        </div>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="feedback-success" class="feedback-success" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Thank you for your feedback!</h3>
+                        <p>Your input helps us improve the Hobby Item Calculator for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Calculator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize feedback system
+            window.feedbackSystem = new FeedbackSystem({
+                calculatorName: 'Hobby Item Calculator',
+                googleClientId: '1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com'
+            });
+
+            // Initialize Google Ads
+            window.initializeGoogleAds({
+                calculatorName: 'Hobby Item Calculator',
+                publisherId: 'ca-pub-8268518333873371'
+            });
+
+            // Initialize the specific calculator
+            if (window.HobbyCalculator) {
+                window.calculator = new window.HobbyCalculator({
+                    calculatorName: 'Hobby Item Calculator',
+                    tabOrder: ['basic', 'expenses', 'time', 'results'],
+                    localStorageKey: 'hobbyItemData'
+                });
+            }
+
+            // Track page view
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'page_view', {
+                    page_title: 'Hobby Item Calculator',
+                    page_location: window.location.href
+                });
+            }
+
+            // Track with New Relic
+            if (window.NREUM && window.NREUM.customTracking) {
+                window.NREUM.customTracking.trackCalculatorUsage(
+                    'Hobby Item Calculator',
+                    'page_view',
+                    {
+                        page_title: 'Hobby Item Calculator',
+                        calculator_slug: 'hobby-item'
+                    }
+                );
+            }
+        });
+    </script>
+</body>
+</html> 

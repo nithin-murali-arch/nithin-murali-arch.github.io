@@ -1,0 +1,297 @@
+/* Hobby Item Calculator Specific Styles */
+
+/* Custom color variables for hobby theme */
+:root {
+    --hobby-green: #4CAF50;
+    --hobby-blue: #2196F3;
+    --hobby-purple: #9C27B0;
+    --hobby-orange: #FF9800;
+}
+
+/* Enhanced form styling for hobby inputs */
+.form-group input[type="number"] {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="number"]:focus {
+    border-color: var(--hobby-green);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Enhanced select styling */
+.form-group select {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.form-group select:focus {
+    border-color: var(--hobby-green);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Enhanced text input styling */
+.form-group input[type="text"] {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus {
+    border-color: var(--hobby-green);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Range input styling */
+.form-group input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+.form-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--hobby-green), var(--hobby-blue));
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.form-group input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--hobby-green), var(--hobby-blue));
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+/* Results styling with hobby theme */
+.result-item {
+    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(76, 175, 80, 0.1) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--hobby-green), var(--hobby-blue));
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.result-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--hobby-green), var(--hobby-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.result-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Chart container styling */
+.card canvas {
+    max-height: 300px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Recommendations styling */
+#recommendations {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(33, 150, 243, 0.1) 100%);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid var(--hobby-green);
+}
+
+#recommendations h4 {
+    color: var(--hobby-green);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+#recommendations ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#recommendations li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+#recommendations li:last-child {
+    border-bottom: none;
+}
+
+#recommendations li::before {
+    content: '✓';
+    color: var(--hobby-green);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Enhanced card styling */
+.card {
+    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Tab styling with hobby theme */
+.desktop-nav .tab.active {
+    background: linear-gradient(45deg, var(--hobby-green), var(--hobby-blue));
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.desktop-nav .tab:hover {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--hobby-green);
+}
+
+/* Button styling with hobby theme */
+.btn {
+    background: linear-gradient(45deg, var(--hobby-green), var(--hobby-blue));
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    background: linear-gradient(45deg, #45a049, #1976d2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+}
+
+.btn.prev {
+    background: linear-gradient(45deg, var(--text-muted), #6c757d);
+}
+
+.btn.prev:hover {
+    background: linear-gradient(45deg, #5a6268, #545b62);
+}
+
+/* Mobile responsive enhancements */
+@media (max-width: 768px) {
+    .result-value {
+        font-size: 1.8rem;
+    }
+    
+    .card {
+        padding: 20px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 12px 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .result-value {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animation for results */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-item {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.result-item:nth-child(1) { animation-delay: 0.1s; }
+.result-item:nth-child(2) { animation-delay: 0.2s; }
+.result-item:nth-child(3) { animation-delay: 0.3s; }
+.result-item:nth-child(4) { animation-delay: 0.4s; } 

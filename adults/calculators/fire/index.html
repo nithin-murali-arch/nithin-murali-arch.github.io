@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIRE Calculator - Financial Independence Calculator</title>
-
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script type="text/javascript" src="newrelic.js"></script>
+        
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/">
@@ -66,12 +68,8 @@
             "Financial Independence Calculator"
         ]
     }
-    </script>
-
+    </script>   
     <link rel="preload" href="fire.css" as="style">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371"
-        crossorigin="anonymous"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -79,13 +77,426 @@
 
         gtag('config', 'G-X7566Q6TZM');
     </script>
-    <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/2da28526622cf.js" data-cmp-host="a.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
-
+        
+        
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="fire.css">
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371"
+    crossorigin="anonymous"></script>
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Feedback Modal Styles -->
+    <style>
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feedback-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            animation: slideIn 0.4s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-50px) scale(0.95);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .feedback-header {
+            background: linear-gradient(135deg, #FF6B35 0%, #e55a2b 100%);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+        }
+
+        .feedback-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-title::before {
+            content: "💬";
+            font-size: 24px;
+        }
+
+        .close-feedback {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .close-feedback:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .feedback-body {
+            padding: 30px;
+        }
+
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .feedback-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feedback-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-label.required::after {
+            content: "*";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .feedback-input, .feedback-textarea, .feedback-select {
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .feedback-input:focus, .feedback-textarea:focus, .feedback-select:focus {
+            outline: none;
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .feedback-textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 8px;
+            font-size: 28px;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.2s;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .star:hover {
+            color: #FFD700;
+            transform: scale(1.2);
+        }
+
+        .star.active {
+            color: #FFD700;
+            animation: starPop 0.3s ease-out;
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .feedback-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-submit {
+            background: linear-gradient(135deg, #FF6B35 0%, #e55a2b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .feedback-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .feedback-submit:active {
+            transform: translateY(0);
+        }
+
+        .feedback-cancel {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .feedback-cancel:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .signin-section {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+        }
+
+        .signin-text {
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .feedback-success {
+            text-align: center;
+            padding: 40px 20px;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .feedback-success i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #28a745;
+        }
+
+        .feedback-success h3 {
+            margin: 0 0 15px 0;
+            font-size: 24px;
+        }
+
+        .feedback-success p {
+            margin: 0;
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        /* Enhanced dropdown styling */
+        .feedback-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+
+        /* Scroll to bottom bubble */
+        .scroll-to-bottom {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B35 0%, #e55a2b 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+            display: none;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-to-bottom:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .scroll-to-bottom.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Feedback type icons */
+        .feedback-type-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .feedback-type-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .feedback-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B35 0%, #e55a2b 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .feedback-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .feedback-fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -116,6 +527,9 @@
                 <li><a href="#" class="tab" data-tab="goals"><i class="fas fa-bullseye"></i> Your Goals</a></li>
                 <li><a href="#" class="tab" data-tab="advanced"><i class="fas fa-sitemap"></i> Portfolio</a></li>
                 <li><a href="#" class="tab" data-tab="results"><i class="fas fa-chart-pie"></i> Your Results</a></li>
+                <li class="mobile-nav-divider"></li>
+                <li><a href="#" class="mobile-action" id="mobile-scroll-to-bottom"><i class="fas fa-arrow-down"></i> Scroll to Bottom</a></li>
+                <li><a href="#" class="mobile-action" id="mobile-feedback"><i class="fas fa-comment"></i> Share Feedback</a></li>
             </ul>
         </nav>
 
@@ -447,7 +861,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="user-name">Your Name <span class="chart-info"
-                                data-tooltip="Your name will be added to the result image when you share your FIRE journey">?</span></label>
+                                data-tooltip="Optional: Your name will be added to the result image when you share your FIRE journey">?</span></label>
                         <input type="text" id="user-name" placeholder="e.g., John Doe" value="">
                     </div>
                 </div>
@@ -499,14 +913,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Short Term (%) <span class="chart-info"
-                                        data-tooltip="Typically applies to holdings < 1 year">?</span></label>
-                                <input type="number" id="tax-equity-short-current" placeholder="e.g., 15" value="15"
+                                        data-tooltip="Equity holdings ≤ 12 months (20% if STT paid)">?</span></label>
+                                <input type="number" id="tax-equity-short-current" placeholder="e.g., 20" value="20"
                                     step="0.1">
                             </div>
                             <div class="form-group">
                                 <label>Long Term (%) <span class="chart-info"
-                                        data-tooltip="Typically applies to holdings ≥ 1 year">?</span></label>
-                                <input type="number" id="tax-equity-long-current" placeholder="e.g., 10" value="10"
+                                        data-tooltip="Equity holdings > 12 months (12.5% with ₹1.25L exemption)">?</span></label>
+                                <input type="number" id="tax-equity-long-current" placeholder="e.g., 12.5" value="12.5"
                                     step="0.1">
                             </div>
                         </div>
@@ -516,14 +930,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Short Term (%) <span class="chart-info"
-                                        data-tooltip="Typically applies to holdings < 3 years">?</span></label>
+                                        data-tooltip="Debt holdings ≤ 24 months (as per income slab)">?</span></label>
                                 <input type="number" id="tax-debt-short-current" placeholder="e.g., 30" value="30"
                                     step="0.1">
                             </div>
                             <div class="form-group">
                                 <label>Long Term (%) <span class="chart-info"
-                                        data-tooltip="Typically applies to holdings ≥ 3 years">?</span></label>
-                                <input type="number" id="tax-debt-long-current" placeholder="e.g., 30" value="30"
+                                        data-tooltip="Debt holdings > 24 months (12.5% with ₹1.25L exemption)">?</span></label>
+                                <input type="number" id="tax-debt-long-current" placeholder="e.g., 12.5" value="12.5"
                                     step="0.1">
                             </div>
                         </div>
@@ -536,14 +950,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Short Term (%) <span class="chart-info"
-                                        data-tooltip="Tax rate for equity holdings < 1 year after retirement">?</span></label>
-                                <input type="number" id="tax-equity-short-retire" placeholder="e.g., 15" value="15"
+                                        data-tooltip="Equity holdings ≤ 12 months after retirement">?</span></label>
+                                <input type="number" id="tax-equity-short-retire" placeholder="e.g., 20" value="20"
                                     step="0.1">
                             </div>
                             <div class="form-group">
                                 <label>Long Term (%) <span class="chart-info"
-                                        data-tooltip="Tax rate for equity holdings ≥ 1 year after retirement">?</span></label>
-                                <input type="number" id="tax-equity-long-retire" placeholder="e.g., 10" value="10"
+                                        data-tooltip="Equity holdings > 12 months after retirement">?</span></label>
+                                <input type="number" id="tax-equity-long-retire" placeholder="e.g., 12.5" value="12.5"
                                     step="0.1">
                             </div>
                         </div>
@@ -553,14 +967,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Short Term (%) <span class="chart-info"
-                                        data-tooltip="Tax rate for debt holdings < 3 years after retirement">?</span></label>
+                                        data-tooltip="Debt holdings ≤ 24 months after retirement">?</span></label>
                                 <input type="number" id="tax-debt-short-retire" placeholder="e.g., 30" value="30"
                                     step="0.1">
                             </div>
                             <div class="form-group">
                                 <label>Long Term (%) <span class="chart-info"
-                                        data-tooltip="Tax rate for debt holdings ≥ 3 years after retirement">?</span></label>
-                                <input type="number" id="tax-debt-long-retire" placeholder="e.g., 30" value="30"
+                                        data-tooltip="Debt holdings > 24 months after retirement">?</span></label>
+                                <input type="number" id="tax-debt-long-retire" placeholder="e.g., 12.5" value="12.5"
                                     step="0.1">
                             </div>
                         </div>
@@ -1039,6 +1453,40 @@
             </div>
             <div id="actual-results-content" class="hidden">
                 <div class="user-greeting" id="user-greeting"></div>
+                
+                <!-- FIRE Progress Bar Section -->
+                <div class="fire-progress-section">
+                    <h3>Your FIRE Journey Progress</h3>
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <div class="progress-current">
+                                <span class="progress-label">Current Age</span>
+                                <span class="progress-value" id="progress-current-age">--</span>
+                            </div>
+                            <div class="progress-target">
+                                <span class="progress-label">Earliest FIRE Age</span>
+                                <span class="progress-value" id="progress-target-age">--</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fire-progress-fill"></div>
+                            </div>
+                            <div class="progress-percentage" id="fire-progress-percentage">0%</div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="progress-stat">
+                                <span class="stat-label">Years Completed</span>
+                                <span class="stat-value" id="progress-years-completed">--</span>
+                            </div>
+                            <div class="progress-stat">
+                                <span class="stat-label">Years Remaining</span>
+                                <span class="stat-value" id="progress-years-remaining">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <h2>🎉 Your FIRE Journey Results</h2>
                 <div class="results-grid">
                     <div class="result-item">
@@ -1213,9 +1661,119 @@
         </div>
     </div>
 
+    <!-- Feedback Floating Action Button -->
+    <button class="feedback-fab" id="feedback-fab" title="Share Feedback">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Scroll to Bottom Bubble -->
+    <button class="scroll-to-bottom" id="scroll-to-bottom" title="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <h2 class="feedback-title">Share Your Feedback</h2>
+                <button class="close-feedback" id="close-feedback">&times;</button>
+            </div>
+
+            <!-- Sign In Section (shown when not signed in) -->
+            <div id="signin-section" class="signin-section">
+                <p class="signin-text">Sign in to submit feedback and help us improve!</p>
+                <div id="g_id_onload"
+                     data-client_id="1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <!-- User Info & Feedback Form (shown after login) -->
+            <div id="feedback-form-section" style="display:none;">
+                <div id="user-info" class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="User Avatar">
+                    <div class="user-details">
+                        <p id="user-name" class="user-name"></p>
+                        <p id="user-email" class="user-email"></p>
+                    </div>
+                </div>
+                <div class="feedback-body">
+                    <form id="feedback-form" class="feedback-form">
+                        <div class="feedback-section">
+                            <label class="feedback-label">How would you rate your experience?</label>
+                            <div class="rating-stars" id="rating-stars">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">What type of feedback is this?</label>
+                            <select id="feedback-type" class="feedback-select" required>
+                                <option value="">Select feedback type</option>
+                                <option value="bug" class="feedback-type-option">🐛 Bug Report</option>
+                                <option value="feature" class="feedback-type-option">💡 Feature Request</option>
+                                <option value="improvement" class="feedback-type-option">⚡ Improvement Suggestion</option>
+                                <option value="calculation" class="feedback-type-option">🧮 Calculation Issue</option>
+                                <option value="ui" class="feedback-type-option">🎨 UI/UX Feedback</option>
+                                <option value="general" class="feedback-type-option">💬 General Feedback</option>
+                                <option value="praise" class="feedback-type-option">👏 Praise/Compliment</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">Your feedback message</label>
+                            <textarea id="feedback-message" class="feedback-textarea" 
+                                      placeholder="Tell us about your experience, suggestions, or any issues you encountered..." 
+                                      required></textarea>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label">Which section were you using?</label>
+                            <select id="feedback-section" class="feedback-select">
+                                <option value="">Select section (optional)</option>
+                                <option value="assumptions">📊 Assumptions & Methodology</option>
+                                <option value="basic">👤 Your Details</option>
+                                <option value="cashflow">💰 Cashflow</option>
+                                <option value="goals">🎯 Your Goals</option>
+                                <option value="advanced">📈 Portfolio</option>
+                                <option value="results">📊 Results</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-buttons">
+                            <button type="button" class="feedback-btn feedback-cancel" id="cancel-feedback">Cancel</button>
+                            <button type="submit" class="feedback-btn feedback-submit" id="submit-feedback">Submit Feedback</button>
+                        </div>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="feedback-success" class="feedback-success" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Thank you for your feedback!</h3>
+                        <p>Your input helps us improve the FIRE calculator for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="fire.js">
 
     </script>
+    <script src="feedback.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 

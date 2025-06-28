@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Ownership Cost - Financial Calculator</title>
+    <link rel="icon" href="../common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="../common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/pet-ownership/">
+    <meta property="og:title" content="Pet Ownership Cost - Financial Calculator">
+    <meta property="og:description" content="Calculate the true cost of pet ownership including food, healthcare, grooming, and unexpected expenses. Plan your pet budget wisely.">
+    <meta property="og:site_name" content="Pet Ownership Cost">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Pet Ownership Cost - Financial Calculator">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/pet-ownership/">
+    <meta property="twitter:title" content="Pet Ownership Cost - Financial Calculator">
+    <meta property="twitter:description" content="Calculate the true cost of pet ownership including food, healthcare, grooming, and unexpected expenses. Plan your pet budget wisely.">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Calculate the true cost of pet ownership including food, healthcare, grooming, and unexpected expenses. Plan your pet budget wisely.">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="pet ownership cost, pet expenses, pet budget, pet care costs, pet insurance, pet healthcare, pet grooming">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="Pet Ownership Cost">
+    <meta name="apple-mobile-web-app-title" content="Pet Ownership Cost">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Pet Ownership Cost",
+        "description": "Calculate the true cost of pet ownership including food, healthcare, grooming, and unexpected expenses. Plan your pet budget wisely.",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/pet-ownership/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Pet Cost Analysis",
+            "Healthcare Expense Tracking",
+            "Grooming & Care Costs",
+            "Emergency Fund Planning",
+            "Lifetime Cost Calculator"
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles and Scripts -->
+    <link rel="stylesheet" href="../common/calculator-base.css">
+    <script src="../common/calculator-base.js"></script>
+    
+    <!-- Calculator-specific styles and scripts -->
+    <link rel="stylesheet" href="pet-ownership.css">
+    <script src="pet-ownership.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Pet Ownership Cost</h1>
+            <button class="hamburger-menu" id="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+            <button class="tab active" data-tab="pet-info">
+                <i class="fas fa-paw"></i> Pet Info
+            </button>
+            <button class="tab" data-tab="basic-care">
+                <i class="fas fa-heart"></i> Basic Care
+            </button>
+            <button class="tab" data-tab="healthcare">
+                <i class="fas fa-stethoscope"></i> Healthcare
+            </button>
+            <button class="tab" data-tab="results">
+                <i class="fas fa-chart-line"></i> Results
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul class="tab-list">
+                <li><a href="#" class="tab active" data-tab="pet-info"><i class="fas fa-paw"></i> Pet Info</a></li>
+                <li><a href="#" class="tab" data-tab="basic-care"><i class="fas fa-heart"></i> Basic Care</a></li>
+                <li><a href="#" class="tab" data-tab="healthcare"><i class="fas fa-stethoscope"></i> Healthcare</a></li>
+                <li><a href="#" class="tab" data-tab="results"><i class="fas fa-chart-line"></i> Results</a></li>
+            </ul>
+        </nav>
+
+        <!-- Tab Contents -->
+        <div id="pet-info" class="tab-content">
+            <div class="card">
+                <h2>Pet Information</h2>
+                <p>Start by providing basic information about your pet to calculate ownership costs.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pet-name">Pet Name</label>
+                        <input type="text" id="pet-name" placeholder="e.g., Max, Luna">
+                    </div>
+                    <div class="form-group">
+                        <label for="pet-type">Pet Type</label>
+                        <select id="pet-type">
+                            <option value="">Select Pet Type</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="bird">Bird</option>
+                            <option value="fish">Fish</option>
+                            <option value="rabbit">Rabbit</option>
+                            <option value="hamster">Hamster</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pet-age">Pet Age (Years)</label>
+                        <input type="number" id="pet-age" placeholder="2" min="0" max="30" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="pet-size">Pet Size</label>
+                        <select id="pet-size">
+                            <option value="">Select Size</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="giant">Giant</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="breed">Breed (Optional)</label>
+                        <input type="text" id="breed" placeholder="e.g., Golden Retriever, Persian">
+                    </div>
+                    <div class="form-group">
+                        <label for="life-expectancy">Expected Lifespan (Years)</label>
+                        <input type="number" id="life-expectancy" placeholder="12" min="1" max="30">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="basic-care" class="tab-content hidden">
+            <div class="card">
+                <h2>Basic Care Costs</h2>
+                <p>Calculate the ongoing costs of basic pet care and maintenance.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="food-cost">Monthly Food Cost</label>
+                        <input type="number" id="food-cost" placeholder="2000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="treats-cost">Monthly Treats Cost</label>
+                        <input type="number" id="treats-cost" placeholder="500" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="grooming-cost">Monthly Grooming Cost</label>
+                        <input type="number" id="grooming-cost" placeholder="1000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="toys-cost">Monthly Toys & Accessories</label>
+                        <input type="number" id="toys-cost" placeholder="300" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="litter-cost">Monthly Litter/Substrate <span class="chart-info" data-tooltip="For cats, birds, or other pets that need litter or substrate">?</span></label>
+                        <input type="number" id="litter-cost" placeholder="800" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="boarding-cost">Monthly Boarding/Pet Sitting</label>
+                        <input type="number" id="boarding-cost" placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="training-cost">Training Costs (One-time)</label>
+                        <input type="number" id="training-cost" placeholder="5000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-cost">Initial Equipment Cost</label>
+                        <input type="number" id="equipment-cost" placeholder="10000" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="healthcare" class="tab-content hidden">
+            <div class="card">
+                <h2>Healthcare & Insurance</h2>
+                <p>Calculate healthcare costs including regular checkups, vaccinations, and emergency care.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="insurance-premium">Monthly Pet Insurance Premium</label>
+                        <input type="number" id="insurance-premium" placeholder="800" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="insurance-deductible">Insurance Deductible (Annual)</label>
+                        <input type="number" id="insurance-deductible" placeholder="5000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vaccination-cost">Annual Vaccination Cost</label>
+                        <input type="number" id="vaccination-cost" placeholder="2000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkup-cost">Annual Checkup Cost</label>
+                        <input type="number" id="checkup-cost" placeholder="1500" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dental-cost">Annual Dental Care Cost</label>
+                        <input type="number" id="dental-cost" placeholder="3000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="parasite-prevention">Annual Parasite Prevention</label>
+                        <input type="number" id="parasite-prevention" placeholder="1200" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="emergency-fund">Emergency Fund (Annual)</label>
+                        <input type="number" id="emergency-fund" placeholder="10000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="medication-cost">Monthly Medication Cost</label>
+                        <input type="number" id="medication-cost" placeholder="500" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="spay-neuter">Spay/Neuter Cost (One-time)</label>
+                        <input type="number" id="spay-neuter" placeholder="5000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="microchip">Microchip Cost (One-time)</label>
+                        <input type="number" id="microchip" placeholder="1000" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content hidden">
+            <div class="card">
+                <h2>Pet Ownership Cost Analysis</h2>
+                <p>Comprehensive breakdown of your pet ownership expenses.</p>
+                
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="monthly-cost">₹0</div>
+                        <div class="result-label">Monthly Cost</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="annual-cost">₹0</div>
+                        <div class="result-label">Annual Cost</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="lifetime-cost">₹0</div>
+                        <div class="result-label">Lifetime Cost</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="emergency-budget">₹0</div>
+                        <div class="result-label">Emergency Budget</div>
+                    </div>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Cost Breakdown</h3>
+                    <canvas id="cost-breakdown-chart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Recommendations</h3>
+                    <div id="recommendations">
+                        <p>Complete the form to see personalized recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-prev" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-next">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Initialize Calculator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the pet ownership calculator
+            window.calculator = new PetOwnershipCalculator({
+                calculatorName: 'Pet Ownership Cost',
+                tabOrder: ['pet-info', 'basic-care', 'healthcare', 'results'],
+                localStorageKey: 'petOwnershipData'
+            });
+        });
+    </script>
+</body>
+</html>

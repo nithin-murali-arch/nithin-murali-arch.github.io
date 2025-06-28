@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Calculators - Comprehensive Suite</title>
+    <link rel="icon" href="common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/">
+    <meta property="og:title" content="Financial Calculators - Comprehensive Suite">
+    <meta property="og:description" content="Explore our comprehensive suite of financial calculators designed to help you make informed decisions about your money, investments, and financial future.">
+    <meta property="og:site_name" content="Financial Calculators">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Financial Calculators - Comprehensive Suite">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/">
+    <meta property="twitter:title" content="Financial Calculators - Comprehensive Suite">
+    <meta property="twitter:description" content="Explore our comprehensive suite of financial calculators designed to help you make informed decisions about your money, investments, and financial future.">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Explore our comprehensive suite of financial calculators designed to help you make informed decisions about your money, investments, and financial future.">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="financial calculators, investment calculator, retirement planning, FIRE calculator, budget calculator, financial planning tools">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="Financial Calculators">
+    <meta name="apple-mobile-web-app-title" content="Financial Calculators">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Financial Calculators Suite",
+        "description": "Comprehensive suite of financial calculators for investment, retirement, and financial planning",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Investment Calculators",
+            "Retirement Planning",
+            "Budget Analysis",
+            "Financial Independence",
+            "Tax Planning",
+            "Life Planning"
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- Google Ads -->
+    <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371" crossorigin="anonymous"></script>
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- External Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="common/calculator-base.css">
+    <link rel="stylesheet" href="common/feedback.css">
+    
+    <style>
+        /* Calculator Index Specific Styles */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .calculators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B35, #F7931E, #FF6B35);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .calculator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .calculator-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .calculator-description {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .calculator-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        .calculator-features li {
+            padding: 5px 0;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .calculator-features li::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .calculator-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-framework {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .calculator-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .calculator-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            color: white;
+        }
+
+        .category-section {
+            margin-bottom: 60px;
+        }
+
+        .category-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            position: relative;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B35, #F7931E);
+            border-radius: 2px;
+        }
+
+        .ad-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8f9fa;
+            margin: 40px 0;
+        }
+
+        .ad-placeholder {
+            background: #e9ecef;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .calculators-grid {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+
+            .calculator-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Ad -->
+    <div class="ad-section">
+        <div id="header-ad" class="ad-placeholder">
+            <i class="fas fa-ad" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <br>Advertisement Space
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Financial Calculators</h1>
+            <p class="hero-subtitle">
+                Explore our comprehensive suite of financial calculators designed to help you make informed decisions about your money, investments, and financial future.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">10</span>
+                    <span class="stat-label">Calculators</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Complete</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span>
+                    <span class="stat-label">In Development</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Complete Calculators -->
+    <section class="category-section">
+        <h2 class="category-title">Complete Calculators</h2>
+        <div class="calculators-grid">
+            <!-- FIRE Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <span class="calculator-status status-complete">Complete</span>
+                <h3 class="calculator-title">FIRE Calculator</h3>
+                <p class="calculator-description">
+                    Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.
+                </p>
+                <ul class="calculator-features">
+                    <li>Portfolio growth tracking</li>
+                    <li>Asset allocation analysis</li>
+                    <li>Retirement planning</li>
+                    <li>Goal setting</li>
+                    <li>Financial independence calculator</li>
+                </ul>
+                <a href="fire/" class="calculator-link">Use Calculator</a>
+            </div>
+
+            <!-- Hobby Item Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <span class="calculator-status status-complete">Complete</span>
+                <h3 class="calculator-title">Hobby Item Calculator</h3>
+                <p class="calculator-description">
+                    Calculate the true cost of pursuing a hobby including time investment, equipment costs, and ongoing expenses to make informed decisions about your interests.
+                </p>
+                <ul class="calculator-features">
+                    <li>Basic hobby information input</li>
+                    <li>Expense tracking</li>
+                    <li>Time investment analysis</li>
+                    <li>ROI calculations</li>
+                    <li>Recommendations</li>
+                </ul>
+                <a href="hobby-item/" class="calculator-link">Use Calculator</a>
+            </div>
+
+            <!-- Remote Work Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-laptop-house"></i>
+                </div>
+                <span class="calculator-status status-complete">Complete</span>
+                <h3 class="calculator-title">Remote Work Relocation Calculator</h3>
+                <p class="calculator-description">
+                    Analyze the financial impact of relocating for remote work, including cost comparisons, relocation expenses, and break-even calculations.
+                </p>
+                <ul class="calculator-features">
+                    <li>Location cost comparison</li>
+                    <li>Relocation cost analysis</li>
+                    <li>Break-even calculations</li>
+                    <li>Quality of life considerations</li>
+                    <li>Tax implications</li>
+                </ul>
+                <a href="remote-work/" class="calculator-link">Use Calculator</a>
+            </div>
+
+            <!-- Pet Ownership Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <span class="calculator-status status-complete">Complete</span>
+                <h3 class="calculator-title">Pet Ownership Cost Calculator</h3>
+                <p class="calculator-description">
+                    Calculate the total cost of pet ownership over a lifetime, including basic care, healthcare, insurance, and emergency fund planning.
+                </p>
+                <ul class="calculator-features">
+                    <li>Pet information and type selection</li>
+                    <li>Basic care cost tracking</li>
+                    <li>Healthcare and insurance analysis</li>
+                    <li>Emergency fund planning</li>
+                    <li>Lifetime cost projections</li>
+                </ul>
+                <a href="pet-ownership/" class="calculator-link">Use Calculator</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sidebar Ad -->
+    <div class="ad-section">
+        <div id="sidebar-ad" class="ad-placeholder">
+            <i class="fas fa-ad" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <br>Advertisement Space
+        </div>
+    </div>
+
+    <!-- Framework Calculators -->
+    <section class="category-section">
+        <h2 class="category-title">Coming Soon</h2>
+        <div class="calculators-grid">
+            <!-- Gig Economy Tax Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-taxi"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Gig Economy Tax Calculator</h3>
+                <p class="calculator-description">
+                    Calculate taxes for gig economy income, including deductions, quarterly payments, and tax optimization strategies for freelancers and contractors.
+                </p>
+                <ul class="calculator-features">
+                    <li>Income tracking</li>
+                    <li>Deduction calculations</li>
+                    <li>Quarterly payment planning</li>
+                    <li>Tax optimization</li>
+                    <li>Compliance guidance</li>
+                </ul>
+                <a href="gig-economy-tax/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Home Improvement ROI Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Home Improvement ROI Calculator</h3>
+                <p class="calculator-description">
+                    Calculate return on investment for home improvements, renovations, and upgrades to make informed decisions about property investments.
+                </p>
+                <ul class="calculator-features">
+                    <li>Project cost analysis</li>
+                    <li>Value increase estimation</li>
+                    <li>ROI calculations</li>
+                    <li>Market comparison</li>
+                    <li>Financing options</li>
+                </ul>
+                <a href="home-improvement-roi/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Student Loan Refinancing Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Student Loan Refinancing Calculator</h3>
+                <p class="calculator-description">
+                    Compare student loan refinancing options, calculate savings, and determine the best strategy for managing your educational debt.
+                </p>
+                <ul class="calculator-features">
+                    <li>Current loan analysis</li>
+                    <li>Refinancing comparison</li>
+                    <li>Savings calculations</li>
+                    <li>Payment optimization</li>
+                    <li>Lender comparison</li>
+                </ul>
+                <a href="student-loan-refinancing/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Early Retirement What If Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Early Retirement What If Calculator</h3>
+                <p class="calculator-description">
+                    Explore early retirement scenarios with different variables, including savings rates, investment returns, and lifestyle choices.
+                </p>
+                <ul class="calculator-features">
+                    <li>Scenario modeling</li>
+                    <li>Variable analysis</li>
+                    <li>Risk assessment</li>
+                    <li>Lifestyle planning</li>
+                    <li>Contingency planning</li>
+                </ul>
+                <a href="early-retirement-what-if/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Car Lease vs Buy Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Car Lease vs Buy Calculator</h3>
+                <p class="calculator-description">
+                    Compare leasing vs buying a car, including total cost of ownership, depreciation, maintenance, and financing considerations.
+                </p>
+                <ul class="calculator-features">
+                    <li>Total cost comparison</li>
+                    <li>Depreciation analysis</li>
+                    <li>Maintenance costs</li>
+                    <li>Financing options</li>
+                    <li>Lifestyle considerations</li>
+                </ul>
+                <a href="car-lease-vs-buy/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Bad Habit Cost Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-smoking-ban"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Cost of Bad Habit Calculator</h3>
+                <p class="calculator-description">
+                    Calculate the financial impact of daily habits, including opportunity costs, health implications, and long-term financial consequences.
+                </p>
+                <ul class="calculator-features">
+                    <li>Habit cost tracking</li>
+                    <li>Opportunity cost analysis</li>
+                    <li>Health impact assessment</li>
+                    <li>Long-term projections</li>
+                    <li>Quitting benefits</li>
+                </ul>
+                <a href="bad-habit-cost/" class="calculator-link">Coming Soon</a>
+            </div>
+
+            <!-- Family Leave Impact Calculator -->
+            <div class="calculator-card">
+                <div class="calculator-icon">
+                    <i class="fas fa-baby"></i>
+                </div>
+                <span class="calculator-status status-framework">In Development</span>
+                <h3 class="calculator-title">Family Leave Impact Calculator</h3>
+                <p class="calculator-description">
+                    Calculate the financial impact of family leave, including lost income, benefits, career progression, and planning strategies.
+                </p>
+                <ul class="calculator-features">
+                    <li>Income impact analysis</li>
+                    <li>Benefits calculation</li>
+                    <li>Career progression impact</li>
+                    <li>Planning strategies</li>
+                    <li>Return-to-work planning</li>
+                </ul>
+                <a href="family-leave-impact/" class="calculator-link">Coming Soon</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Ad -->
+    <div class="ad-section">
+        <div id="footer-ad" class="ad-placeholder">
+            <i class="fas fa-ad" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <br>Advertisement Space
+        </div>
+    </div>
+
+    <!-- Feedback Floating Action Button -->
+    <button class="feedback-fab" id="feedback-fab" title="Share Feedback">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <h2 class="feedback-title">Share Your Feedback</h2>
+                <button class="close-feedback" id="close-feedback">&times;</button>
+            </div>
+
+            <!-- Sign In Section (shown when not signed in) -->
+            <div id="signin-section" class="signin-section">
+                <p class="signin-text">Sign in to submit feedback and help us improve!</p>
+                <div id="g_id_onload"
+                     data-client_id="1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <!-- User Info & Feedback Form (shown after login) -->
+            <div id="feedback-form-section" style="display:none;">
+                <div id="user-info" class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="User Avatar">
+                    <div class="user-details">
+                        <p id="user-name" class="user-name"></p>
+                        <p id="user-email" class="user-email"></p>
+                    </div>
+                </div>
+                <div class="feedback-body">
+                    <form id="feedback-form" class="feedback-form">
+                        <div class="feedback-section">
+                            <label class="feedback-label">How would you rate your experience?</label>
+                            <div class="rating-stars" id="rating-stars">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">What type of feedback is this?</label>
+                            <select id="feedback-type" class="feedback-select" required>
+                                <option value="">Select feedback type</option>
+                                <option value="bug" class="feedback-type-option">🐛 Bug Report</option>
+                                <option value="feature" class="feedback-type-option">💡 Feature Request</option>
+                                <option value="improvement" class="feedback-type-option">⚡ Improvement Suggestion</option>
+                                <option value="calculation" class="feedback-type-option">🧮 Calculation Issue</option>
+                                <option value="ui" class="feedback-type-option">🎨 UI/UX Feedback</option>
+                                <option value="general" class="feedback-type-option">💬 General Feedback</option>
+                                <option value="praise" class="feedback-type-option">👏 Praise/Compliment</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">Your feedback message</label>
+                            <textarea id="feedback-message" class="feedback-textarea" 
+                                      placeholder="Tell us about your experience, suggestions, or any issues you encountered..." 
+                                      required></textarea>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label">Which calculator were you using?</label>
+                            <select id="feedback-section" class="feedback-select">
+                                <option value="">Select calculator (optional)</option>
+                                <option value="fire">🔥 FIRE Calculator</option>
+                                <option value="hobby-item">🎨 Hobby Item Calculator</option>
+                                <option value="remote-work">💻 Remote Work Calculator</option>
+                                <option value="pet-ownership">🐾 Pet Ownership Calculator</option>
+                                <option value="gig-economy-tax">🚗 Gig Economy Tax Calculator</option>
+                                <option value="home-improvement-roi">🏠 Home Improvement ROI Calculator</option>
+                                <option value="student-loan-refinancing">🎓 Student Loan Refinancing Calculator</option>
+                                <option value="early-retirement-what-if">⏰ Early Retirement What If Calculator</option>
+                                <option value="car-lease-vs-buy">🚙 Car Lease vs Buy Calculator</option>
+                                <option value="bad-habit-cost">🚭 Cost of Bad Habit Calculator</option>
+                                <option value="family-leave-impact">👶 Family Leave Impact Calculator</option>
+                                <option value="index">📊 Calculator Index Page</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-buttons">
+                            <button type="button" class="feedback-btn feedback-cancel" id="cancel-feedback">Cancel</button>
+                            <button type="submit" class="feedback-btn feedback-submit" id="submit-feedback">Submit Feedback</button>
+                        </div>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="feedback-success" class="feedback-success" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Thank you for your feedback!</h3>
+                        <p>Your input helps us improve the calculator suite for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="common/calculator-base.js"></script>
+    <script src="common/feedback.js"></script>
+    <script src="common/google-ads.js"></script>
+    
+    <script>
+        // Initialize feedback system
+        document.addEventListener('DOMContentLoaded', () => {
+            window.feedbackSystem = new FeedbackSystem({
+                calculatorName: 'Calculator Index',
+                googleClientId: '1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com'
+            });
+
+            // Initialize Google Ads
+            window.initializeGoogleAds({
+                calculatorName: 'Calculator Index',
+                publisherId: 'ca-pub-8268518333873371'
+            });
+
+            // Track page view
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'page_view', {
+                    page_title: 'Financial Calculators Index',
+                    page_location: window.location.href
+                });
+            }
+
+            // Track with New Relic
+            if (window.NREUM && window.NREUM.customTracking) {
+                window.NREUM.customTracking.trackCalculatorUsage(
+                    'Calculator Index',
+                    'page_view',
+                    {
+                        page_title: 'Financial Calculators Index',
+                        calculators_count: 10,
+                        complete_calculators: 3
+                    }
+                );
+            }
+        });
+    </script>
+</body>
+</html> 

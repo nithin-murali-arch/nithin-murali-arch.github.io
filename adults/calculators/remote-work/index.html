@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Work Relocation - Financial Calculator</title>
+    <link rel="icon" href="../common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="../common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/remote-work/">
+    <meta property="og:title" content="Remote Work Relocation - Financial Calculator">
+    <meta property="og:description" content="Calculate the financial impact of relocating for remote work. Compare costs, savings, and lifestyle changes when moving to a new location.">
+    <meta property="og:site_name" content="Remote Work Relocation">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Remote Work Relocation - Financial Calculator">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/remote-work/">
+    <meta property="twitter:title" content="Remote Work Relocation - Financial Calculator">
+    <meta property="twitter:description" content="Calculate the financial impact of relocating for remote work. Compare costs, savings, and lifestyle changes when moving to a new location.">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Calculate the financial impact of relocating for remote work. Compare costs, savings, and lifestyle changes when moving to a new location.">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="remote work relocation, work from home, relocation calculator, cost of living comparison, remote work benefits, financial planning">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="Remote Work Relocation">
+    <meta name="apple-mobile-web-app-title" content="Remote Work Relocation">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Remote Work Relocation",
+        "description": "Calculate the financial impact of relocating for remote work. Compare costs, savings, and lifestyle changes when moving to a new location.",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/remote-work/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Cost of Living Comparison",
+            "Relocation Cost Analysis",
+            "Salary Adjustment Calculator",
+            "Lifestyle Impact Assessment",
+            "ROI Analysis"
+        ]
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles and Scripts -->
+    <link rel="stylesheet" href="../common/calculator-base.css">
+    <script src="../common/calculator-base.js"></script>
+    
+    <!-- Calculator-specific styles and scripts -->
+    <link rel="stylesheet" href="remote-work.css">
+    <script src="remote-work.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Remote Work Relocation</h1>
+            <button class="hamburger-menu" id="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+            <button class="tab active" data-tab="current">
+                <i class="fas fa-home"></i> Current Location
+            </button>
+            <button class="tab" data-tab="new-location">
+                <i class="fas fa-map-marker-alt"></i> New Location
+            </button>
+            <button class="tab" data-tab="relocation">
+                <i class="fas fa-truck"></i> Relocation Costs
+            </button>
+            <button class="tab" data-tab="results">
+                <i class="fas fa-chart-line"></i> Results
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul class="tab-list">
+                <li><a href="#" class="tab active" data-tab="current"><i class="fas fa-home"></i> Current Location</a></li>
+                <li><a href="#" class="tab" data-tab="new-location"><i class="fas fa-map-marker-alt"></i> New Location</a></li>
+                <li><a href="#" class="tab" data-tab="relocation"><i class="fas fa-truck"></i> Relocation Costs</a></li>
+                <li><a href="#" class="tab" data-tab="results"><i class="fas fa-chart-line"></i> Results</a></li>
+            </ul>
+        </nav>
+
+        <!-- Tab Contents -->
+        <div id="current" class="tab-content">
+            <div class="card">
+                <h2>Current Location Details</h2>
+                <p>Enter details about your current location to establish a baseline for comparison.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current-city">Current City</label>
+                        <input type="text" id="current-city" placeholder="e.g., Mumbai, Bangalore">
+                    </div>
+                    <div class="form-group">
+                        <label for="current-salary">Current Annual Salary</label>
+                        <input type="number" id="current-salary" placeholder="800000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current-rent">Monthly Rent</label>
+                        <input type="number" id="current-rent" placeholder="25000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="current-utilities">Monthly Utilities</label>
+                        <input type="number" id="current-utilities" placeholder="5000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current-transport">Monthly Transport</label>
+                        <input type="number" id="current-transport" placeholder="8000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="current-food">Monthly Food & Groceries</label>
+                        <input type="number" id="current-food" placeholder="15000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current-entertainment">Monthly Entertainment</label>
+                        <input type="number" id="current-entertainment" placeholder="10000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="current-other">Other Monthly Expenses</label>
+                        <input type="number" id="current-other" placeholder="5000" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="new-location" class="tab-content hidden">
+            <div class="card">
+                <h2>New Location Details</h2>
+                <p>Enter details about your potential new location for comparison.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-city">New City</label>
+                        <input type="text" id="new-city" placeholder="e.g., Goa, Kerala">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-salary">New Annual Salary <span class="chart-info" data-tooltip="Your salary after relocation (may be adjusted for cost of living)">?</span></label>
+                        <input type="number" id="new-salary" placeholder="750000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-rent">Monthly Rent</label>
+                        <input type="number" id="new-rent" placeholder="20000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-utilities">Monthly Utilities</label>
+                        <input type="number" id="new-utilities" placeholder="4000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-transport">Monthly Transport</label>
+                        <input type="number" id="new-transport" placeholder="3000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-food">Monthly Food & Groceries</label>
+                        <input type="number" id="new-food" placeholder="12000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-entertainment">Monthly Entertainment</label>
+                        <input type="number" id="new-entertainment" placeholder="8000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-other">Other Monthly Expenses</label>
+                        <input type="number" id="new-other" placeholder="4000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cost-of-living-index">Cost of Living Index <span class="chart-info" data-tooltip="Relative cost of living (100 = average, 80 = 20% cheaper, 120 = 20% more expensive)">?</span></label>
+                        <input type="number" id="cost-of-living-index" placeholder="85" min="50" max="200" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="quality-of-life">Quality of Life Score (1-10)</label>
+                        <select id="quality-of-life">
+                            <option value="5">5 - Neutral</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10 - Excellent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="relocation" class="tab-content hidden">
+            <div class="card">
+                <h2>Relocation Costs</h2>
+                <p>Calculate the one-time costs associated with moving to your new location.</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="moving-costs">Moving & Packing Costs</label>
+                        <input type="number" id="moving-costs" placeholder="50000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="travel-costs">Travel Costs</label>
+                        <input type="number" id="travel-costs" placeholder="15000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="deposit-costs">Security Deposits</label>
+                        <input type="number" id="deposit-costs" placeholder="40000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="setup-costs">Home Setup Costs</label>
+                        <input type="number" id="setup-costs" placeholder="30000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="legal-costs">Legal & Documentation</label>
+                        <input type="number" id="legal-costs" placeholder="10000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="other-relocation">Other Relocation Costs</label>
+                        <input type="number" id="other-relocation" placeholder="5000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="time-off">Days of Unpaid Leave</label>
+                        <input type="number" id="time-off" placeholder="5" min="0" max="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="daily-rate">Daily Rate (for unpaid leave calculation)</label>
+                        <input type="number" id="daily-rate" placeholder="3000" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content hidden">
+            <div class="card">
+                <h2>Relocation Analysis</h2>
+                <p>Comprehensive analysis of your remote work relocation decision.</p>
+                
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-value" id="monthly-savings">₹0</div>
+                        <div class="result-label">Monthly Savings</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="annual-savings">₹0</div>
+                        <div class="result-label">Annual Savings</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="total-relocation-cost">₹0</div>
+                        <div class="result-label">Total Relocation Cost</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="break-even-months">0</div>
+                        <div class="result-label">Break-even (Months)</div>
+                    </div>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Cost Comparison</h3>
+                    <canvas id="cost-comparison-chart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>Recommendations</h3>
+                    <div id="recommendations">
+                        <p>Complete the form to see personalized recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-prev" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-next">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Initialize Calculator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the remote work calculator
+            window.calculator = new RemoteWorkCalculator({
+                calculatorName: 'Remote Work Relocation',
+                tabOrder: ['current', 'new-location', 'relocation', 'results'],
+                localStorageKey: 'remoteWorkData'
+            });
+        });
+    </script>
+</body>
+</html>

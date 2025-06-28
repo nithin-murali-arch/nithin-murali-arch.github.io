@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{CALCULATOR_TITLE}} - Financial Calculator</title>
+    <link rel="icon" href="../common/favicon.ico" type="image/x-icon">
+    
+    <!-- New Relic -->
+    <script type="text/javascript" src="../common/newrelic.js"></script>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/{{CALCULATOR_SLUG}}/">
+    <meta property="og:title" content="{{CALCULATOR_TITLE}} - Financial Calculator">
+    <meta property="og:description" content="{{CALCULATOR_DESCRIPTION}}">
+    <meta property="og:site_name" content="{{CALCULATOR_TITLE}}">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="{{CALCULATOR_TITLE}} - Financial Calculator">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/{{CALCULATOR_SLUG}}/">
+    <meta property="twitter:title" content="{{CALCULATOR_TITLE}} - Financial Calculator">
+    <meta property="twitter:description" content="{{CALCULATOR_DESCRIPTION}}">
+    <meta property="twitter:creator" content="@nithin_murali">
+
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="{{CALCULATOR_DESCRIPTION}}">
+
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="{{CALCULATOR_KEYWORDS}}">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="{{CALCULATOR_TITLE}}">
+    <meta name="apple-mobile-web-app-title" content="{{CALCULATOR_TITLE}}">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "{{CALCULATOR_TITLE}}",
+        "description": "{{CALCULATOR_DESCRIPTION}}",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/{{CALCULATOR_SLUG}}/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": {{CALCULATOR_FEATURES}}
+    }
+    </script>
+
+    <!-- Google Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    
+    <!-- Google Ads -->
+    <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371" crossorigin="anonymous"></script>
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Shared Styles and Scripts -->
+    <link rel="stylesheet" href="../common/calculator-base.css">
+    <link rel="stylesheet" href="../common/feedback.css">
+    <script src="../common/calculator-base.js"></script>
+    <script src="../common/feedback.js"></script>
+    <script src="../common/google-ads.js"></script>
+    
+    <!-- Calculator-specific styles and scripts -->
+    <link rel="stylesheet" href="{{CALCULATOR_SLUG}}.css">
+    <script src="{{CALCULATOR_SLUG}}.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>{{CALCULATOR_TITLE}}</h1>
+            <button class="hamburger-menu" id="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Header Ad -->
+        <div id="header-ad" style="text-align: center; margin: 20px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+            <div>
+                <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <br>Advertisement Space
+            </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav">
+            {{NAVIGATION_TABS}}
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul class="tab-list">
+                {{MOBILE_NAVIGATION_TABS}}
+            </ul>
+        </nav>
+
+        <!-- Tab Contents -->
+        {{TAB_CONTENTS}}
+
+        <!-- Results Ad -->
+        <div id="results-ad" style="text-align: center; margin: 20px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+            <div>
+                <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <br>Advertisement Space
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button class="btn btn-prev" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button class="btn btn-next">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Ad -->
+    <div id="footer-ad" style="text-align: center; margin: 40px 0; min-height: 90px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-style: italic;">
+        <div>
+            <i class="fas fa-ad" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+            <br>Advertisement Space
+        </div>
+    </div>
+
+    <!-- Feedback Floating Action Button -->
+    <button class="feedback-fab" id="feedback-fab" title="Share Feedback">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Scroll to Bottom Bubble -->
+    <button class="scroll-to-bottom" id="scroll-to-bottom" title="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <h2 class="feedback-title">Share Your Feedback</h2>
+                <button class="close-feedback" id="close-feedback">&times;</button>
+            </div>
+
+            <!-- Sign In Section (shown when not signed in) -->
+            <div id="signin-section" class="signin-section">
+                <p class="signin-text">Sign in to submit feedback and help us improve!</p>
+                <div id="g_id_onload"
+                     data-client_id="1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <!-- User Info & Feedback Form (shown after login) -->
+            <div id="feedback-form-section" style="display:none;">
+                <div id="user-info" class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="User Avatar">
+                    <div class="user-details">
+                        <p id="user-name" class="user-name"></p>
+                        <p id="user-email" class="user-email"></p>
+                    </div>
+                </div>
+                <div class="feedback-body">
+                    <form id="feedback-form" class="feedback-form">
+                        <div class="feedback-section">
+                            <label class="feedback-label">How would you rate your experience?</label>
+                            <div class="rating-stars" id="rating-stars">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">What type of feedback is this?</label>
+                            <select id="feedback-type" class="feedback-select" required>
+                                <option value="">Select feedback type</option>
+                                <option value="bug" class="feedback-type-option">🐛 Bug Report</option>
+                                <option value="feature" class="feedback-type-option">💡 Feature Request</option>
+                                <option value="improvement" class="feedback-type-option">⚡ Improvement Suggestion</option>
+                                <option value="calculation" class="feedback-type-option">🧮 Calculation Issue</option>
+                                <option value="ui" class="feedback-type-option">🎨 UI/UX Feedback</option>
+                                <option value="general" class="feedback-type-option">💬 General Feedback</option>
+                                <option value="praise" class="feedback-type-option">👏 Praise/Compliment</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label required">Your feedback message</label>
+                            <textarea id="feedback-message" class="feedback-textarea" 
+                                      placeholder="Tell us about your experience, suggestions, or any issues you encountered..." 
+                                      required></textarea>
+                        </div>
+
+                        <div class="feedback-section">
+                            <label class="feedback-label">Which section were you using?</label>
+                            <select id="feedback-section" class="feedback-select">
+                                <option value="">Select section (optional)</option>
+                                <option value="basic">👤 Basic Information</option>
+                                <option value="advanced">📊 Advanced Options</option>
+                                <option value="results">📈 Results</option>
+                            </select>
+                        </div>
+
+                        <div class="feedback-buttons">
+                            <button type="button" class="feedback-btn feedback-cancel" id="cancel-feedback">Cancel</button>
+                            <button type="submit" class="feedback-btn feedback-submit" id="submit-feedback">Submit Feedback</button>
+                        </div>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="feedback-success" class="feedback-success" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Thank you for your feedback!</h3>
+                        <p>Your input helps us improve the {{CALCULATOR_TITLE}} for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Calculator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize feedback system
+            window.feedbackSystem = new FeedbackSystem({
+                calculatorName: '{{CALCULATOR_TITLE}}',
+                googleClientId: '1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com'
+            });
+
+            // Initialize Google Ads
+            window.initializeGoogleAds({
+                calculatorName: '{{CALCULATOR_TITLE}}',
+                publisherId: 'ca-pub-8268518333873371'
+            });
+
+            // Initialize the specific calculator
+            if (window.CalculatorClass) {
+                window.calculator = new window.CalculatorClass({
+                    calculatorName: '{{CALCULATOR_TITLE}}',
+                    tabOrder: ['basic', 'results'],
+                    localStorageKey: '{{CALCULATOR_SLUG}}Data'
+                });
+            }
+
+            // Track page view
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'page_view', {
+                    page_title: '{{CALCULATOR_TITLE}}',
+                    page_location: window.location.href
+                });
+            }
+
+            // Track with New Relic
+            if (window.NREUM && window.NREUM.customTracking) {
+                window.NREUM.customTracking.trackCalculatorUsage(
+                    '{{CALCULATOR_TITLE}}',
+                    'page_view',
+                    {
+                        page_title: '{{CALCULATOR_TITLE}}',
+                        calculator_slug: '{{CALCULATOR_SLUG}}'
+                    }
+                );
+            }
+        });
+    </script>
+</body>
+</html> 

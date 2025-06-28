@@ -1,0 +1,147 @@
+/* Pet Ownership Cost Calculator Specific Styles */
+
+/* Custom color variables for pet-ownership theme */
+:root {
+    --pet-ownership-primary: #4CAF50;
+    --pet-ownership-secondary: #2196F3;
+    --pet-ownership-accent: #9C27B0;
+}
+
+/* Enhanced form styling for pet-ownership inputs */
+.form-group input[type="number"]:focus {
+    border-color: var(--pet-ownership-primary);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.form-group select:focus {
+    border-color: var(--pet-ownership-primary);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Results styling with pet-ownership theme */
+.result-item {
+    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(76, 175, 80, 0.1) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pet-ownership-primary), var(--pet-ownership-secondary));
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.result-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--pet-ownership-primary), var(--pet-ownership-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.result-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Chart container styling */
+.card canvas {
+    max-height: 300px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Enhanced card styling */
+.card {
+    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Tab styling with pet-ownership theme */
+.desktop-nav .tab.active {
+    background: linear-gradient(45deg, var(--pet-ownership-primary), var(--pet-ownership-secondary));
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.desktop-nav .tab:hover {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--pet-ownership-primary);
+}
+
+/* Button styling with pet-ownership theme */
+.btn {
+    background: linear-gradient(45deg, var(--pet-ownership-primary), var(--pet-ownership-secondary));
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    background: linear-gradient(45deg, #45a049, #1976d2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+}
+
+.btn.prev {
+    background: linear-gradient(45deg, var(--text-muted), #6c757d);
+}
+
+.btn.prev:hover {
+    background: linear-gradient(45deg, #5a6268, #545b62);
+}
+
+/* Animation for results */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-item {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.result-item:nth-child(1) { animation-delay: 0.1s; }
+.result-item:nth-child(2) { animation-delay: 0.2s; }

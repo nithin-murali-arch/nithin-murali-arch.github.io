@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System Test</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
+    
+    <!-- New Relic -->
+    <script type="text/javascript">
+        ;window.NREUM||(NREUM={});NREUM.init={privacy:{cookies_enabled:true},ajax:{deny_list:["bam.nr-data.net"]}};
+        ;NREUM.loader_config={accountID:"6868563",trustKey:"6868563",agentID:"1103422883",licenseKey:"NRJS-6675c673671042b1b48",applicationID:"1103422883"};
+        ;NREUM.info={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",licenseKey:"NRJS-6675c673671042b1b48",applicationID:"1103422883",sa:1};
+    </script>
+    <script type="text/javascript" src="https://js-agent.newrelic.com/nr-loader-spa-1.292.0.min.js"></script>
+    
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        .test-button {
+            background-color: #FF6B35;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background-color: #e55a2b;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Include the feedback modal styles from the main file */
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .feedback-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .feedback-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .close-feedback {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .close-feedback:hover {
+            background-color: #f0f0f0;
+        }
+
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feedback-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feedback-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .feedback-input, .feedback-textarea, .feedback-select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .feedback-input:focus, .feedback-textarea:focus, .feedback-select:focus {
+            outline: none;
+            border-color: #FF6B35;
+        }
+
+        .feedback-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            font-size: 24px;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .star:hover, .star.active {
+            color: #FFD700;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feedback-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .feedback-submit {
+            background-color: #FF6B35;
+            color: white;
+        }
+
+        .feedback-submit:hover {
+            background-color: #e55a2b;
+            transform: translateY(-2px);
+        }
+
+        .feedback-cancel {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .feedback-cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
+
+        .signin-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .signin-text {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .feedback-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #FF6B35;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .feedback-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .feedback-success {
+            text-align: center;
+            padding: 20px;
+            color: #28a745;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Feedback System Test Page</h1>
+        
+        <div class="test-section">
+            <h3>Analytics Integration Test</h3>
+            <button class="test-button" onclick="testGoogleAnalytics()">Test Google Analytics</button>
+            <button class="test-button" onclick="testNewRelic()">Test New Relic</button>
+            <div id="analytics-status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Google Sign-In Test</h3>
+            <button class="test-button" onclick="testGoogleSignIn()">Test Google Sign-In</button>
+            <div id="signin-status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Feedback Modal Test</h3>
+            <button class="test-button" onclick="testFeedbackModal()">Open Feedback Modal</button>
+            <div id="feedback-status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Complete Integration Test</h3>
+            <button class="test-button" onclick="runCompleteTest()">Run Complete Test</button>
+            <div id="complete-test-status"></div>
+        </div>
+    </div>
+
+    <!-- Feedback Floating Action Button -->
+    <button class="feedback-fab" id="feedback-fab" title="Share Feedback">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+        <div class="feedback-content">
+            <div class="feedback-header">
+                <h2 class="feedback-title">Share Your Feedback</h2>
+                <button class="close-feedback" id="close-feedback">&times;</button>
+            </div>
+            
+            <!-- User Info Section (shown when signed in) -->
+            <div id="user-info" class="user-info" style="display: none;">
+                <img id="user-avatar" class="user-avatar" src="" alt="User Avatar">
+                <div class="user-details">
+                    <p id="user-name" class="user-name"></p>
+                    <p id="user-email" class="user-email"></p>
+                </div>
+            </div>
+
+            <!-- Sign In Section (shown when not signed in) -->
+            <div id="signin-section" class="signin-section">
+                <p class="signin-text">Sign in to submit feedback and help us improve!</p>
+                <div id="g_id_onload"
+                     data-client_id="1007036765292-j0mpklubv5sek38hf15213u8csvsmh2j.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <form id="feedback-form" class="feedback-form">
+                <div class="feedback-section">
+                    <label class="feedback-label">How would you rate your experience?</label>
+                    <div class="rating-stars" id="rating-stars">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                </div>
+
+                <div class="feedback-section">
+                    <label class="feedback-label">What type of feedback is this?</label>
+                    <select id="feedback-type" class="feedback-select" required>
+                        <option value="">Select feedback type</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="improvement">Improvement Suggestion</option>
+                        <option value="general">General Feedback</option>
+                        <option value="praise">Praise/Compliment</option>
+                    </select>
+                </div>
+
+                <div class="feedback-section">
+                    <label class="feedback-label">Your feedback message</label>
+                    <textarea id="feedback-message" class="feedback-textarea" 
+                              placeholder="Tell us about your experience, suggestions, or any issues you encountered..." 
+                              required></textarea>
+                </div>
+
+                <div class="feedback-section">
+                    <label class="feedback-label">Which section were you using?</label>
+                    <select id="feedback-section" class="feedback-select">
+                        <option value="">Select section (optional)</option>
+                        <option value="assumptions">Assumptions & Methodology</option>
+                        <option value="basic">Your Details</option>
+                        <option value="cashflow">Cashflow</option>
+                        <option value="goals">Your Goals</option>
+                        <option value="advanced">Portfolio</option>
+                        <option value="results">Results</option>
+                    </select>
+                </div>
+
+                <div class="feedback-buttons">
+                    <button type="button" class="feedback-btn feedback-cancel" id="cancel-feedback">Cancel</button>
+                    <button type="submit" class="feedback-btn feedback-submit" id="submit-feedback">Submit Feedback</button>
+                </div>
+            </form>
+
+            <!-- Success Message -->
+            <div id="feedback-success" class="feedback-success" style="display: none;">
+                <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <h3>Thank you for your feedback!</h3>
+                <p>Your input helps us improve the FIRE calculator for everyone.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="feedback.js"></script>
+    
+    <script>
+        // Test functions
+        function testGoogleAnalytics() {
+            const statusDiv = document.getElementById('analytics-status');
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'test_event', {
+                    event_category: 'Test',
+                    event_label: 'Analytics Test',
+                    value: 1
+                });
+                statusDiv.innerHTML = '<div class="status success">✓ Google Analytics test event sent successfully!</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status error">✗ Google Analytics not loaded</div>';
+            }
+        }
+        
+        function testNewRelic() {
+            const statusDiv = document.getElementById('analytics-status');
+            
+            if (typeof newrelic !== 'undefined') {
+                newrelic.addPageAction('test_action', {
+                    test_type: 'newrelic_test',
+                    timestamp: new Date().toISOString()
+                });
+                statusDiv.innerHTML = '<div class="status success">✓ New Relic test action sent successfully!</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status error">✗ New Relic not loaded</div>';
+            }
+        }
+        
+        function testGoogleSignIn() {
+            const statusDiv = document.getElementById('signin-status');
+            
+            if (typeof google !== 'undefined' && google.accounts) {
+                statusDiv.innerHTML = '<div class="status success">✓ Google Sign-In SDK loaded successfully!</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status error">✗ Google Sign-In SDK not loaded</div>';
+            }
+        }
+        
+        function testFeedbackModal() {
+            const statusDiv = document.getElementById('feedback-status');
+            
+            if (window.feedbackSystem) {
+                window.feedbackSystem.openFeedbackModal();
+                statusDiv.innerHTML = '<div class="status success">✓ Feedback modal opened successfully!</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status error">✗ Feedback system not initialized</div>';
+            }
+        }
+        
+        function runCompleteTest() {
+            const statusDiv = document.getElementById('complete-test-status');
+            let results = [];
+            
+            // Test Google Analytics
+            if (typeof gtag !== 'undefined') {
+                results.push('✓ Google Analytics');
+            } else {
+                results.push('✗ Google Analytics');
+            }
+            
+            // Test New Relic
+            if (typeof newrelic !== 'undefined') {
+                results.push('✓ New Relic');
+            } else {
+                results.push('✗ New Relic');
+            }
+            
+            // Test Google Sign-In
+            if (typeof google !== 'undefined' && google.accounts) {
+                results.push('✓ Google Sign-In');
+            } else {
+                results.push('✗ Google Sign-In');
+            }
+            
+            // Test Feedback System
+            if (window.feedbackSystem) {
+                results.push('✓ Feedback System');
+            } else {
+                results.push('✗ Feedback System');
+            }
+            
+            const allPassed = results.every(result => result.startsWith('✓'));
+            const statusClass = allPassed ? 'success' : 'error';
+            
+            statusDiv.innerHTML = `<div class="status ${statusClass}">
+                <strong>Complete Test Results:</strong><br>
+                ${results.join('<br>')}
+            </div>`;
+        }
+        
+        // Run initial test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runCompleteTest, 1000);
+        });
+    </script>
+</body>
+</html> 
