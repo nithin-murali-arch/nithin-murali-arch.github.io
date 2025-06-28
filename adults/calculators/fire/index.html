@@ -5,36 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIRE Calculator - Financial Independence Calculator</title>
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/">
     <meta property="og:title" content="FIRE Calculator - Financial Independence Calculator">
-    <meta property="og:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
+    <meta property="og:description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
     <meta property="og:site_name" content="FIRE Calculator">
     <meta property="og:locale" content="en_US">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="FIRE Calculator - Financial Independence Calculator">
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary">
     <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/">
     <meta property="twitter:title" content="FIRE Calculator - Financial Independence Calculator">
-    <meta property="twitter:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
+    <meta property="twitter:description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
     <meta property="twitter:creator" content="@nithin_murali">
-    
+
     <!-- LinkedIn -->
     <meta property="linkedin:owner" content="nithin-murali-arch">
     <meta name="author" content="Nithin Murali">
-    <meta name="description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
-    
+    <meta name="description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator. Plan your retirement, track portfolio growth, and achieve financial freedom.">
+
     <!-- Additional Meta Tags -->
-    <meta name="keywords" content="FIRE calculator, financial independence, retire early, retirement planning, investment calculator, portfolio growth, financial freedom">
+    <meta name="keywords"
+        content="FIRE calculator, financial independence, retire early, retirement planning, investment calculator, portfolio growth, financial freedom">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#FF6B35">
     <meta name="application-name" content="FIRE Calculator">
     <meta name="apple-mobile-web-app-title" content="FIRE Calculator">
-    
+
     <!-- Structured Data for LinkedIn -->
     <script type="application/ld+json">
     {
@@ -63,19 +67,17 @@
         ]
     }
     </script>
-    
+
     <link rel="preload" href="fire.css" as="style">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8268518333873371"
-     crossorigin="anonymous"></script>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"
-    ></script>
+        crossorigin="anonymous"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-X7566Q6TZM');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-X7566Q6TZM');
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
@@ -105,7 +107,8 @@
         <div class="nav-overlay" id="nav-overlay"></div>
         <nav class="mobile-nav" id="mobile-nav">
             <ul class="tab-list">
-                <li><a href="#" class="tab" data-tab="assumptions"><i class="fas fa-info-circle"></i> Assumptions & Methodology</a></li>
+                <li><a href="#" class="tab" data-tab="assumptions"><i class="fas fa-info-circle"></i> Assumptions &
+                        Methodology</a></li>
                 <li><a href="#" class="tab" data-tab="basic"><i class="fas fa-user-circle"></i> Your Details</a></li>
                 <li><a href="#" class="tab" data-tab="cashflow"><i class="fas fa-wallet"></i> Cashflow</a></li>
                 <li><a href="#" class="tab" data-tab="goals"><i class="fas fa-bullseye"></i> Your Goals</a></li>
@@ -119,20 +122,22 @@
         <div class="tab-content" id="assumptions" role="tabpanel">
             <div class="card">
                 <h2>Assumptions & Methodology</h2>
-                
+
                 <div class="methodology-intro">
                     <div class="intro-card">
                         <div class="intro-icon">🎯</div>
                         <div class="intro-content">
                             <h3>Core FIRE Principles</h3>
-                            <p><strong>FIRE (Financial Independence, Retire Early)</strong> is achieved when your investment corpus can sustain your lifestyle indefinitely through passive income, typically using the 4% rule or similar withdrawal strategies.</p>
+                            <p><strong>FIRE (Financial Independence, Retire Early)</strong> is achieved when your
+                                investment corpus can sustain your lifestyle indefinitely through passive income,
+                                typically using the 4% rule or similar withdrawal strategies.</p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="methodology-section">
                     <h3 class="section-title">📊 Key Calculations & Formulas</h3>
-                    
+
                     <div class="formula-cards">
                         <div class="formula-card">
                             <div class="formula-header">
@@ -141,19 +146,27 @@
                             </div>
                             <div class="formula-content">
                                 <ul>
-                                    <li><strong>Retirement Expenses:</strong> Current monthly expenses × Lifestyle multiplier (post-retirement)</li>
-                                    <li><strong>Annual Retirement Expenses:</strong> Monthly retirement expenses × 12</li>
-                                    <li><strong>Inflation-Adjusted Expenses:</strong> Annual retirement expenses × (1 + Inflation Rate)^Years to FIRE</li>
-                                    <li><strong>Future Goals Value:</strong> Sum of all goal values × (1 + Goal Inflation)^Goal Years</li>
-                                    <li><strong>Healthcare Buffer:</strong> Healthcare value × (1 + Healthcare Inflation)^Years to Healthcare Age</li>
-                                    <li><strong>FIRE Number:</strong> (Inflation-adjusted expenses ÷ Withdrawal Rate) + Future Goals + Healthcare Buffer</li>
+                                    <li><strong>Retirement Expenses:</strong> Current monthly expenses × Lifestyle
+                                        multiplier (post-retirement)</li>
+                                    <li><strong>Annual Retirement Expenses:</strong> Monthly retirement expenses × 12
+                                    </li>
+                                    <li><strong>Inflation-Adjusted Expenses:</strong> Annual retirement expenses × (1 +
+                                        Inflation Rate)^Years to FIRE</li>
+                                    <li><strong>Future Goals Value:</strong> Sum of all goal values × (1 + Goal
+                                        Inflation)^Goal Years</li>
+                                    <li><strong>Healthcare Buffer:</strong> Healthcare value × (1 + Healthcare
+                                        Inflation)^Years to Healthcare Age</li>
+                                    <li><strong>FIRE Number:</strong> (Inflation-adjusted expenses ÷ Withdrawal Rate) +
+                                        Future Goals + Healthcare Buffer</li>
                                 </ul>
                                 <div class="formula-example">
-                                    <strong>Example:</strong> ₹30K monthly × 1.0 lifestyle × 12 = ₹3.6L annual. With 6% inflation over 15 years: ₹3.6L × (1.06)^15 = ₹8.6L. FIRE Number = ₹8.6L ÷ 4% = ₹2.15Cr
+                                    <strong>Example:</strong> ₹30K monthly × 1.0 lifestyle × 12 = ₹3.6L annual. With 6%
+                                    inflation over 15 years: ₹3.6L × (1.06)^15 = ₹8.6L. FIRE Number = ₹8.6L ÷ 4% =
+                                    ₹2.15Cr
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="formula-card">
                             <div class="formula-header">
                                 <span class="formula-number">2</span>
@@ -161,16 +174,22 @@
                             </div>
                             <div class="formula-content">
                                 <ul>
-                                    <li><strong>Monthly Simulation:</strong> Portfolio is recalculated month by month until retirement</li>
-                                    <li><strong>Monthly Contributions:</strong> Added at the beginning of each month</li>
-                                    <li><strong>Annual Step-up:</strong> Contributions increase by step-up percentage each year</li>
-                                    <li><strong>Monthly Returns:</strong> Each asset class grows at (Annual Return ÷ 12) per month</li>
-                                    <li><strong>STP Transfers:</strong> Fixed amount transferred from debt to equity at specified frequency</li>
-                                    <li><strong>Formula:</strong> Asset Value = (Previous Value + Monthly Contribution) × (1 + Monthly Return)</li>
+                                    <li><strong>Monthly Simulation:</strong> Portfolio is recalculated month by month
+                                        until retirement</li>
+                                    <li><strong>Monthly Contributions:</strong> Added at the beginning of each month
+                                    </li>
+                                    <li><strong>Annual Step-up:</strong> Contributions increase by step-up percentage
+                                        each year</li>
+                                    <li><strong>Monthly Returns:</strong> Each asset class grows at (Annual Return ÷ 12)
+                                        per month</li>
+                                    <li><strong>STP Transfers:</strong> Fixed amount transferred from debt to equity at
+                                        specified frequency</li>
+                                    <li><strong>Formula:</strong> Asset Value = (Previous Value + Monthly Contribution)
+                                        × (1 + Monthly Return)</li>
                                 </ul>
                             </div>
                         </div>
-                        
+
                         <div class="formula-card">
                             <div class="formula-header">
                                 <span class="formula-number">3</span>
@@ -178,16 +197,21 @@
                             </div>
                             <div class="formula-content">
                                 <ul>
-                                    <li><strong>Current Expenses:</strong> Sum of all monthly expenses (permanent + temporary)</li>
-                                    <li><strong>Lifestyle Adjustment:</strong> Current expenses × Lifestyle multiplier (post-retirement)</li>
-                                    <li><strong>Inflation Adjustment:</strong> Expenses grow at the specified inflation rate</li>
-                                    <li><strong>Temporary Expenses:</strong> Only included if they extend beyond retirement age</li>
+                                    <li><strong>Current Expenses:</strong> Sum of all monthly expenses (permanent +
+                                        temporary)</li>
+                                    <li><strong>Lifestyle Adjustment:</strong> Current expenses × Lifestyle multiplier
+                                        (post-retirement)</li>
+                                    <li><strong>Inflation Adjustment:</strong> Expenses grow at the specified inflation
+                                        rate</li>
+                                    <li><strong>Temporary Expenses:</strong> Only included if they extend beyond
+                                        retirement age</li>
                                     <li><strong>Goals:</strong> One-time expenses with their own inflation rates</li>
-                                    <li><strong>Healthcare Buffer:</strong> Additional corpus for healthcare expenses at specified age</li>
+                                    <li><strong>Healthcare Buffer:</strong> Additional corpus for healthcare expenses at
+                                        specified age</li>
                                 </ul>
                             </div>
                         </div>
-                        
+
                         <div class="formula-card">
                             <div class="formula-header">
                                 <span class="formula-number">4</span>
@@ -195,19 +219,23 @@
                             </div>
                             <div class="formula-content">
                                 <ul>
-                                    <li><strong>Purpose:</strong> Gradually transfer from debt to equity to reduce risk</li>
-                                    <li><strong>Frequency:</strong> Daily (22 transfers/month), Weekly (4 transfers/month), or Monthly (1 transfer/month)</li>
-                                    <li><strong>Amount:</strong> Fixed amount per transfer (limited by available debt balance)</li>
-                                    <li><strong>Impact:</strong> Reduces debt allocation, increases equity allocation over time</li>
+                                    <li><strong>Purpose:</strong> Gradually transfer from debt to equity to reduce risk
+                                    </li>
+                                    <li><strong>Frequency:</strong> Daily (22 transfers/month), Weekly (4
+                                        transfers/month), or Monthly (1 transfer/month)</li>
+                                    <li><strong>Amount:</strong> Fixed amount per transfer (limited by available debt
+                                        balance)</li>
+                                    <li><strong>Impact:</strong> Reduces debt allocation, increases equity allocation
+                                        over time</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="methodology-section">
                     <h3 class="section-title">📈 Chart Explanations</h3>
-                    
+
                     <div class="chart-cards">
                         <div class="chart-card">
                             <div class="chart-icon">📊</div>
@@ -219,7 +247,7 @@
                                 <li>Helps visualize wealth accumulation journey</li>
                             </ul>
                         </div>
-                        
+
                         <div class="chart-card">
                             <div class="chart-icon">🥧</div>
                             <h4>Final Asset Allocation</h4>
@@ -229,7 +257,7 @@
                                 <li>Helps assess risk exposure at retirement</li>
                             </ul>
                         </div>
-                        
+
                         <div class="chart-card">
                             <div class="chart-icon">🔄</div>
                             <h4>STP - Debt to Equity Transfer</h4>
@@ -240,7 +268,7 @@
                                 <li>Only appears if STP is enabled</li>
                             </ul>
                         </div>
-                        
+
                         <div class="chart-card">
                             <div class="chart-icon">📉</div>
                             <h4>Burn Down Charts</h4>
@@ -253,10 +281,10 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="methodology-section">
                     <h3 class="section-title">⚠️ Important Assumptions & Limitations</h3>
-                    
+
                     <div class="assumption-cards">
                         <div class="assumption-card warning">
                             <div class="assumption-header">
@@ -264,28 +292,34 @@
                                 <h4>Investment Assumptions</h4>
                             </div>
                             <ul>
-                                <li><strong>Constant Returns:</strong> Returns remain constant throughout the period</li>
-                                <li><strong>No Rebalancing:</strong> Asset allocation is not rebalanced automatically</li>
-                                <li><strong>No Market Volatility:</strong> Returns are assumed to be smooth and consistent</li>
+                                <li><strong>Constant Returns:</strong> Returns remain constant throughout the period
+                                </li>
+                                <li><strong>No Rebalancing:</strong> Asset allocation is not rebalanced automatically
+                                </li>
+                                <li><strong>No Market Volatility:</strong> Returns are assumed to be smooth and
+                                    consistent</li>
                                 <li><strong>No Transaction Costs:</strong> Buying/selling costs are not included</li>
                                 <li><strong>No Fund Management Fees:</strong> Expense ratios are not deducted</li>
                                 <li><strong>Monthly Compounding:</strong> Returns are compounded monthly, not daily</li>
                             </ul>
                         </div>
-                        
+
                         <div class="assumption-card warning">
                             <div class="assumption-header">
                                 <span class="assumption-icon">💰</span>
                                 <h4>Tax Assumptions</h4>
                             </div>
                             <ul>
-                                <li><strong>No Tax Modeling:</strong> Tax rates are collected but not used in calculations</li>
-                                <li><strong>No Tax Loss Harvesting:</strong> Tax optimization strategies are not modeled</li>
-                                <li><strong>No Tax-Deferred Accounts:</strong> Special tax treatment (like EPF, NPS) is simplified</li>
+                                <li><strong>No Tax Modeling:</strong> Tax rates are collected but not used in
+                                    calculations</li>
+                                <li><strong>No Tax Loss Harvesting:</strong> Tax optimization strategies are not modeled
+                                </li>
+                                <li><strong>No Tax-Deferred Accounts:</strong> Special tax treatment (like EPF, NPS) is
+                                    simplified</li>
                                 <li><strong>No Estate Tax:</strong> Inheritance tax implications are not considered</li>
                             </ul>
                         </div>
-                        
+
                         <div class="assumption-card warning">
                             <div class="assumption-header">
                                 <span class="assumption-icon">🏠</span>
@@ -294,30 +328,35 @@
                             <ul>
                                 <li><strong>Constant Inflation:</strong> Inflation rate remains constant</li>
                                 <li><strong>No Lifestyle Changes:</strong> Major life events are not modeled</li>
-                                <li><strong>No Healthcare Inflation:</strong> Medical costs may inflate faster than general inflation</li>
-                                <li><strong>No One-time Expenses:</strong> Large purchases (cars, home repairs) are not included</li>
-                                <li><strong>Fixed Lifestyle Multiplier:</strong> Lifestyle multiplier remains constant post-retirement</li>
+                                <li><strong>No Healthcare Inflation:</strong> Medical costs may inflate faster than
+                                    general inflation</li>
+                                <li><strong>No One-time Expenses:</strong> Large purchases (cars, home repairs) are not
+                                    included</li>
+                                <li><strong>Fixed Lifestyle Multiplier:</strong> Lifestyle multiplier remains constant
+                                    post-retirement</li>
                             </ul>
                         </div>
-                        
+
                         <div class="assumption-card warning">
                             <div class="assumption-header">
                                 <span class="assumption-icon">🎯</span>
                                 <h4>Post-Retirement Assumptions</h4>
                             </div>
                             <ul>
-                                <li><strong>No Post-Retirement Modeling:</strong> Calculator stops at retirement age</li>
+                                <li><strong>No Post-Retirement Modeling:</strong> Calculator stops at retirement age
+                                </li>
                                 <li><strong>No Withdrawal Strategy:</strong> How you withdraw money is not modeled</li>
-                                <li><strong>No Asset Allocation Changes:</strong> Portfolio composition remains static</li>
+                                <li><strong>No Asset Allocation Changes:</strong> Portfolio composition remains static
+                                </li>
                                 <li><strong>No Social Security:</strong> Government benefits are not included</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="methodology-section">
                     <h3 class="section-title">🔧 Methodology Details</h3>
-                    
+
                     <div class="methodology-details">
                         <div class="detail-card">
                             <div class="detail-header">
@@ -325,44 +364,52 @@
                                 <h4>Calculation Process</h4>
                             </div>
                             <ol>
-                                <li><strong>Expense Calculation:</strong> Total monthly and annual expenses are computed</li>
-                                <li><strong>FIRE Number:</strong> Target corpus is calculated with inflation adjustment</li>
-                                <li><strong>Portfolio Projection:</strong> Each asset class is projected month by month to retirement age</li>
-                                <li><strong>Corpus Comparison:</strong> Projected corpus is compared with target corpus</li>
+                                <li><strong>Expense Calculation:</strong> Total monthly and annual expenses are computed
+                                </li>
+                                <li><strong>FIRE Number:</strong> Target corpus is calculated with inflation adjustment
+                                </li>
+                                <li><strong>Portfolio Projection:</strong> Each asset class is projected month by month
+                                    to retirement age</li>
+                                <li><strong>Corpus Comparison:</strong> Projected corpus is compared with target corpus
+                                </li>
                                 <li><strong>Shortfall Analysis:</strong> Additional investment needed is calculated</li>
                             </ol>
                         </div>
-                        
+
                         <div class="detail-card">
                             <div class="detail-header">
                                 <span class="detail-icon">⚠️</span>
                                 <h4>Risk Considerations</h4>
                             </div>
                             <ul>
-                                <li><strong>Sequence of Returns Risk:</strong> Not explicitly modeled but affects real outcomes</li>
+                                <li><strong>Sequence of Returns Risk:</strong> Not explicitly modeled but affects real
+                                    outcomes</li>
                                 <li><strong>Longevity Risk:</strong> Living longer than expected</li>
                                 <li><strong>Inflation Risk:</strong> Higher than expected inflation</li>
                                 <li><strong>Market Risk:</strong> Poor market performance</li>
                                 <li><strong>Liquidity Risk:</strong> Need for cash during market downturns</li>
                             </ul>
                         </div>
-                        
+
                         <div class="detail-card">
                             <div class="detail-header">
                                 <span class="detail-icon">💡</span>
                                 <h4>Recommendations</h4>
                             </div>
                             <ul>
-                                <li><strong>Conservative Estimates:</strong> Use conservative return and inflation assumptions</li>
-                                <li><strong>Regular Reviews:</strong> Recalculate annually or when circumstances change</li>
+                                <li><strong>Conservative Estimates:</strong> Use conservative return and inflation
+                                    assumptions</li>
+                                <li><strong>Regular Reviews:</strong> Recalculate annually or when circumstances change
+                                </li>
                                 <li><strong>Multiple Scenarios:</strong> Test different market conditions</li>
-                                <li><strong>Professional Advice:</strong> Consult financial advisors for complex situations</li>
+                                <li><strong>Professional Advice:</strong> Consult financial advisors for complex
+                                    situations</li>
                                 <li><strong>Emergency Planning:</strong> Maintain adequate emergency funds</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="methodology-section">
                     <h3 class="section-title">📚 Additional Resources</h3>
                     <div class="resources-card">
@@ -376,14 +423,18 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="disclaimer-card">
                     <div class="disclaimer-icon">ℹ️</div>
-                    <p><strong>Note:</strong> This calculator provides estimates for educational purposes. Actual results may vary significantly due to market conditions, tax law changes, and personal circumstances. Always consult with qualified financial professionals for personalized advice.</p>
+                    <p><strong>Note:</strong> This calculator provides estimates for educational purposes. Actual
+                        results may vary significantly due to market conditions, tax law changes, and personal
+                        circumstances. Always consult with qualified financial professionals for personalized advice.
+                    </p>
                 </div>
-                
+
                 <div class="navigation-buttons">
-                    <button class="btn next" onclick="goToNextTab()">Get Started <i class="fas fa-arrow-right"></i></button>
+                    <button class="btn next" onclick="goToNextTab()">Get Started <i
+                            class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
@@ -393,7 +444,8 @@
                 <h2>Your Details</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="user-name">Your Name <span class="chart-info" data-tooltip="Your name will be added to the result image when you share your FIRE journey">?</span></label>
+                        <label for="user-name">Your Name <span class="chart-info"
+                                data-tooltip="Your name will be added to the result image when you share your FIRE journey">?</span></label>
                         <input type="text" id="user-name" placeholder="e.g., John Doe" value="">
                     </div>
                 </div>
@@ -436,19 +488,24 @@
 
             <div class="card">
                 <h2>Tax Considerations</h2>
-                <p>Specify the tax rates that apply to your investments now and after retirement. These affect your net returns.</p>
+                <p>Specify the tax rates that apply to your investments now and after retirement. These affect your net
+                    returns.</p>
                 <div class="tax-section">
                     <h3>Current Tax Rates</h3>
                     <div class="tax-group">
                         <strong>Equity</strong>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Short Term (%) <span class="chart-info" data-tooltip="Typically applies to holdings < 1 year">?</span></label>
-                                <input type="number" id="tax-equity-short-current" placeholder="e.g., 15" value="15" step="0.1">
+                                <label>Short Term (%) <span class="chart-info"
+                                        data-tooltip="Typically applies to holdings < 1 year">?</span></label>
+                                <input type="number" id="tax-equity-short-current" placeholder="e.g., 15" value="15"
+                                    step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>Long Term (%) <span class="chart-info" data-tooltip="Typically applies to holdings ≥ 1 year">?</span></label>
-                                <input type="number" id="tax-equity-long-current" placeholder="e.g., 10" value="10" step="0.1">
+                                <label>Long Term (%) <span class="chart-info"
+                                        data-tooltip="Typically applies to holdings ≥ 1 year">?</span></label>
+                                <input type="number" id="tax-equity-long-current" placeholder="e.g., 10" value="10"
+                                    step="0.1">
                             </div>
                         </div>
                     </div>
@@ -456,12 +513,16 @@
                         <strong>Debt</strong>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Short Term (%) <span class="chart-info" data-tooltip="Typically applies to holdings < 3 years">?</span></label>
-                                <input type="number" id="tax-debt-short-current" placeholder="e.g., 30" value="30" step="0.1">
+                                <label>Short Term (%) <span class="chart-info"
+                                        data-tooltip="Typically applies to holdings < 3 years">?</span></label>
+                                <input type="number" id="tax-debt-short-current" placeholder="e.g., 30" value="30"
+                                    step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>Long Term (%) <span class="chart-info" data-tooltip="Typically applies to holdings ≥ 3 years">?</span></label>
-                                <input type="number" id="tax-debt-long-current" placeholder="e.g., 30" value="30" step="0.1">
+                                <label>Long Term (%) <span class="chart-info"
+                                        data-tooltip="Typically applies to holdings ≥ 3 years">?</span></label>
+                                <input type="number" id="tax-debt-long-current" placeholder="e.g., 30" value="30"
+                                    step="0.1">
                             </div>
                         </div>
                     </div>
@@ -472,12 +533,16 @@
                         <strong>Equity</strong>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Short Term (%) <span class="chart-info" data-tooltip="Tax rate for equity holdings < 1 year after retirement">?</span></label>
-                                <input type="number" id="tax-equity-short-retire" placeholder="e.g., 15" value="15" step="0.1">
+                                <label>Short Term (%) <span class="chart-info"
+                                        data-tooltip="Tax rate for equity holdings < 1 year after retirement">?</span></label>
+                                <input type="number" id="tax-equity-short-retire" placeholder="e.g., 15" value="15"
+                                    step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>Long Term (%) <span class="chart-info" data-tooltip="Tax rate for equity holdings ≥ 1 year after retirement">?</span></label>
-                                <input type="number" id="tax-equity-long-retire" placeholder="e.g., 10" value="10" step="0.1">
+                                <label>Long Term (%) <span class="chart-info"
+                                        data-tooltip="Tax rate for equity holdings ≥ 1 year after retirement">?</span></label>
+                                <input type="number" id="tax-equity-long-retire" placeholder="e.g., 10" value="10"
+                                    step="0.1">
                             </div>
                         </div>
                     </div>
@@ -485,12 +550,16 @@
                         <strong>Debt</strong>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Short Term (%) <span class="chart-info" data-tooltip="Tax rate for debt holdings < 3 years after retirement">?</span></label>
-                                <input type="number" id="tax-debt-short-retire" placeholder="e.g., 30" value="30" step="0.1">
+                                <label>Short Term (%) <span class="chart-info"
+                                        data-tooltip="Tax rate for debt holdings < 3 years after retirement">?</span></label>
+                                <input type="number" id="tax-debt-short-retire" placeholder="e.g., 30" value="30"
+                                    step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>Long Term (%) <span class="chart-info" data-tooltip="Tax rate for debt holdings ≥ 3 years after retirement">?</span></label>
-                                <input type="number" id="tax-debt-long-retire" placeholder="e.g., 30" value="30" step="0.1">
+                                <label>Long Term (%) <span class="chart-info"
+                                        data-tooltip="Tax rate for debt holdings ≥ 3 years after retirement">?</span></label>
+                                <input type="number" id="tax-debt-long-retire" placeholder="e.g., 30" value="30"
+                                    step="0.1">
                             </div>
                         </div>
                     </div>
@@ -569,7 +638,8 @@
                 </div>
 
                 <h3>Detailed Monthly Expenses</h3>
-                <p>For temporary expenses (like EMIs), please provide the period (in years) in the field next to the value.</p>
+                <p>For temporary expenses (like EMIs), please provide the period (in years) in the field next to the
+                    value.</p>
                 <div class="expense-table">
                     <div class="expense-row">
                         <label for="exp-rent">Rent/Mortgage</label>
@@ -579,11 +649,13 @@
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-emi">EMIs (Loan Repayments)</label>
-                                <input type="number" id="exp-emi" class="expense-input" value="25000" placeholder="Amount (₹)">
+                                <input type="number" id="exp-emi" class="expense-input" value="25000"
+                                    placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
                                 <label class="mobile-only-label" for="exp-emi-years">period (yrs)</label>
-                                <input type="number" id="exp-emi-years" class="expense-years-input" placeholder="Years Left">
+                                <input type="number" id="exp-emi-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -628,17 +700,20 @@
             </div>
             <div class="card">
                 <h3>Annual Expenses</h3>
-                <p>Enter expenses that you pay once a year, like insurance premiums or school fees. For temporary annual expenses, please provide the period (in years) in the field next to the value.</p>
+                <p>Enter expenses that you pay once a year, like insurance premiums or school fees. For temporary annual
+                    expenses, please provide the period (in years) in the field next to the value.</p>
                 <div class="expense-table">
                     <div class="annual-expense-row temporary-expense">
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-education-annual">Education Fees</label>
-                                <input type="number" id="exp-education-annual" class="annual-expense-input" value="120000" placeholder="Amount (₹)">
+                                <input type="number" id="exp-education-annual" class="annual-expense-input"
+                                    value="120000" placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
                                 <label class="mobile-only-label" for="exp-education-annual-years">period (yrs)</label>
-                                <input type="number" id="exp-education-annual-years" class="expense-years-input" placeholder="Years Left">
+                                <input type="number" id="exp-education-annual-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -646,11 +721,14 @@
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-health-insurance-annual">Health Insurance Premium</label>
-                                <input type="number" id="exp-health-insurance-annual" class="annual-expense-input" value="24000" placeholder="Amount (₹)">
+                                <input type="number" id="exp-health-insurance-annual" class="annual-expense-input"
+                                    value="24000" placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
-                                <label class="mobile-only-label" for="exp-health-insurance-annual-years">period (yrs)</label>
-                                <input type="number" id="exp-health-insurance-annual-years" class="expense-years-input" placeholder="Years Left">
+                                <label class="mobile-only-label" for="exp-health-insurance-annual-years">period
+                                    (yrs)</label>
+                                <input type="number" id="exp-health-insurance-annual-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -658,11 +736,14 @@
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-life-insurance-annual">Life Insurance Premium</label>
-                                <input type="number" id="exp-life-insurance-annual" class="annual-expense-input" value="60000" placeholder="Amount (₹)">
+                                <input type="number" id="exp-life-insurance-annual" class="annual-expense-input"
+                                    value="60000" placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
-                                <label class="mobile-only-label" for="exp-life-insurance-annual-years">period (yrs)</label>
-                                <input type="number" id="exp-life-insurance-annual-years" class="expense-years-input" placeholder="Years Left">
+                                <label class="mobile-only-label" for="exp-life-insurance-annual-years">period
+                                    (yrs)</label>
+                                <input type="number" id="exp-life-insurance-annual-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -670,11 +751,14 @@
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-car-insurance-annual">Car Insurance Premium</label>
-                                <input type="number" id="exp-car-insurance-annual" class="annual-expense-input" value="18000" placeholder="Amount (₹)">
+                                <input type="number" id="exp-car-insurance-annual" class="annual-expense-input"
+                                    value="18000" placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
-                                <label class="mobile-only-label" for="exp-car-insurance-annual-years">period (yrs)</label>
-                                <input type="number" id="exp-car-insurance-annual-years" class="expense-years-input" placeholder="Years Left">
+                                <label class="mobile-only-label" for="exp-car-insurance-annual-years">period
+                                    (yrs)</label>
+                                <input type="number" id="exp-car-insurance-annual-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -682,11 +766,14 @@
                         <div class="input-group">
                             <div class="input-label-group">
                                 <label for="exp-bike-insurance-annual">Bike Insurance Premium</label>
-                                <input type="number" id="exp-bike-insurance-annual" class="annual-expense-input" value="2400" placeholder="Amount (₹)">
+                                <input type="number" id="exp-bike-insurance-annual" class="annual-expense-input"
+                                    value="2400" placeholder="Amount (₹)">
                             </div>
                             <div class="input-label-group">
-                                <label class="mobile-only-label" for="exp-bike-insurance-annual-years">period (yrs)</label>
-                                <input type="number" id="exp-bike-insurance-annual-years" class="expense-years-input" placeholder="Years Left">
+                                <label class="mobile-only-label" for="exp-bike-insurance-annual-years">period
+                                    (yrs)</label>
+                                <input type="number" id="exp-bike-insurance-annual-years" class="expense-years-input"
+                                    placeholder="Years Left">
                             </div>
                         </div>
                     </div>
@@ -699,8 +786,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="healthcare-buffer-value">Buffer Amount (Today's Value, ₹)</label>
-                        <input type="number" id="healthcare-buffer-value" placeholder="e.g., 5000000"
-                            value="5000000">
+                        <input type="number" id="healthcare-buffer-value" placeholder="e.g., 5000000" value="5000000">
                     </div>
                     <div class="form-group">
                         <label for="healthcare-buffer-age">Age Needed By</label>
@@ -768,15 +854,18 @@
                     <div class="asset-inputs three-cols">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-equity-in">Current Value</label>
-                            <input type="number" id="value-equity-in" class="value-input" placeholder="Current Value (₹)" value="1000000">
+                            <input type="number" id="value-equity-in" class="value-input"
+                                placeholder="Current Value (₹)" value="1000000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-equity-in">Monthly Contribution</label>
-                            <input type="number" id="contribution-equity-in" class="contribution-input" placeholder="Monthly SIP (₹)" value="0">
+                            <input type="number" id="contribution-equity-in" class="contribution-input"
+                                placeholder="Monthly SIP (₹)" value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-equity-in">Expected Return (%)</label>
-                            <input type="number" id="return-equity-in" class="return-input" placeholder="Expected Return %" value="12">
+                            <input type="number" id="return-equity-in" class="return-input"
+                                placeholder="Expected Return %" value="12">
                         </div>
                     </div>
                 </div>
@@ -785,15 +874,18 @@
                     <div class="asset-inputs three-cols">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-equity-gl">Current Value</label>
-                            <input type="number" id="value-equity-gl" class="value-input" placeholder="Current Value (₹)" value="200000">
+                            <input type="number" id="value-equity-gl" class="value-input"
+                                placeholder="Current Value (₹)" value="200000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-equity-gl">Monthly Contribution</label>
-                            <input type="number" id="contribution-equity-gl" class="contribution-input" placeholder="Monthly SIP (₹)" value="0">
+                            <input type="number" id="contribution-equity-gl" class="contribution-input"
+                                placeholder="Monthly SIP (₹)" value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-equity-gl">Expected Return (%)</label>
-                            <input type="number" id="return-equity-gl" class="return-input" placeholder="Expected Return %" value="11">
+                            <input type="number" id="return-equity-gl" class="return-input"
+                                placeholder="Expected Return %" value="11">
                         </div>
                     </div>
                 </div>
@@ -802,15 +894,18 @@
                     <div class="asset-inputs three-cols">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-debt">Current Value</label>
-                            <input type="number" id="value-debt" class="value-input" placeholder="Current Value (₹)" value="300000">
+                            <input type="number" id="value-debt" class="value-input" placeholder="Current Value (₹)"
+                                value="300000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-debt">Monthly Contribution</label>
-                            <input type="number" id="contribution-debt" class="contribution-input" placeholder="Monthly SIP (₹)" value="0">
+                            <input type="number" id="contribution-debt" class="contribution-input"
+                                placeholder="Monthly SIP (₹)" value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-debt">Expected Return (%)</label>
-                            <input type="number" id="return-debt" class="return-input" placeholder="Expected Return %" value="7">
+                            <input type="number" id="return-debt" class="return-input" placeholder="Expected Return %"
+                                value="7">
                         </div>
                     </div>
                 </div>
@@ -819,15 +914,19 @@
                     <div class="asset-inputs three-cols">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-real-estate">Current Value</label>
-                            <input type="number" id="value-real-estate" class="value-input" placeholder="Current Value (₹)" value="5000000">
+                            <input type="number" id="value-real-estate" class="value-input"
+                                placeholder="Current Value (₹)" value="5000000">
                         </div>
                         <div class="input-with-tooltip">
-                            <label class="mobile-inline-label" for="contribution-real-estate">Monthly Contribution</label>
-                            <input type="number" id="contribution-real-estate" class="contribution-input" placeholder="Monthly Input (₹)" value="0">
+                            <label class="mobile-inline-label" for="contribution-real-estate">Monthly
+                                Contribution</label>
+                            <input type="number" id="contribution-real-estate" class="contribution-input"
+                                placeholder="Monthly Input (₹)" value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-real-estate">Expected Return (%)</label>
-                            <input type="number" id="return-real-estate" class="return-input" placeholder="Expected Return %" value="5">
+                            <input type="number" id="return-real-estate" class="return-input"
+                                placeholder="Expected Return %" value="5">
                         </div>
                     </div>
                 </div>
@@ -836,15 +935,18 @@
                     <div class="asset-inputs pf-nps">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-epf">Current Value</label>
-                            <input type="number" id="value-epf" class="value-input" placeholder="Current Value (₹)" value="800000">
+                            <input type="number" id="value-epf" class="value-input" placeholder="Current Value (₹)"
+                                value="800000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-epf">Monthly Contribution</label>
-                            <input type="number" id="contribution-epf" class="contribution-input" placeholder="Monthly Input (₹)" value="15000">
+                            <input type="number" id="contribution-epf" class="contribution-input"
+                                placeholder="Monthly Input (₹)" value="15000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-epf">Return (%)</label>
-                            <input type="number" id="return-epf" class="return-input" placeholder="Return %" value="8.5">
+                            <input type="number" id="return-epf" class="return-input" placeholder="Return %"
+                                value="8.5">
                         </div>
                     </div>
                 </div>
@@ -853,11 +955,13 @@
                     <div class="asset-inputs pf-nps">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-nps">Current Value</label>
-                            <input type="number" id="value-nps" class="value-input" placeholder="Current Value (₹)" value="500000">
+                            <input type="number" id="value-nps" class="value-input" placeholder="Current Value (₹)"
+                                value="500000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-nps">Monthly Contribution</label>
-                            <input type="number" id="contribution-nps" class="contribution-input" placeholder="Monthly Input (₹)" value="5000">
+                            <input type="number" id="contribution-nps" class="contribution-input"
+                                placeholder="Monthly Input (₹)" value="5000">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-nps">Return (%)</label>
@@ -870,15 +974,18 @@
                     <div class="asset-inputs three-cols">
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="value-other">Current Value</label>
-                            <input type="number" id="value-other" class="value-input" placeholder="Current Value (₹)" value="0">
+                            <input type="number" id="value-other" class="value-input" placeholder="Current Value (₹)"
+                                value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="contribution-other">Monthly Contribution</label>
-                            <input type="number" id="contribution-other" class="contribution-input" placeholder="Monthly Input (₹)" value="0">
+                            <input type="number" id="contribution-other" class="contribution-input"
+                                placeholder="Monthly Input (₹)" value="0">
                         </div>
                         <div class="input-with-tooltip">
                             <label class="mobile-inline-label" for="return-other">Return (%)</label>
-                            <input type="number" id="return-other" class="return-input" placeholder="Return %" value="0">
+                            <input type="number" id="return-other" class="return-input" placeholder="Return %"
+                                value="0">
                         </div>
                     </div>
                 </div>
@@ -971,34 +1078,45 @@
                 </div>
                 <div class="charts-container">
                     <div class="chart-section">
-                        <h3>Portfolio Growth & Asset Allocation <span class="chart-info" data-tooltip="Shows how your portfolio grows and how your asset allocation changes each year until retirement.">?</span></h3>
+                        <h3>Portfolio Growth & Asset Allocation <span class="chart-info"
+                                data-tooltip="Shows how your portfolio grows and how your asset allocation changes each year until retirement.">?</span>
+                        </h3>
                         <div class="chart-wrapper">
                             <canvas id="portfolioGrowthChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-row">
                         <div class="chart-section half-width">
-                            <h3>Final Asset Allocation <span class="chart-info" data-tooltip="Shows your asset allocation at the moment of retirement (your FIRE age).">?</span></h3>
-                            <span id="asset-allocation-retirement-age" style="display:block;color:var(--text-muted);font-size:0.95rem;margin-bottom:8px"></span>
+                            <h3>Final Asset Allocation <span class="chart-info"
+                                    data-tooltip="Shows your asset allocation at the moment of retirement (your FIRE age).">?</span>
+                            </h3>
+                            <span id="asset-allocation-retirement-age"
+                                style="display:block;color:var(--text-muted);font-size:0.95rem;margin-bottom:8px"></span>
                             <div class="chart-wrapper">
                                 <canvas id="assetAllocationChart"></canvas>
                             </div>
                         </div>
                         <div class="chart-section half-width" id="stp-chart-container">
-                            <h3>STP - Debt to Equity Transfer <span class="chart-info" data-tooltip="Shows the effect of Systematic Transfer Plan (STP) from Debt to Equity if enabled.">?</span></h3>
+                            <h3>STP - Debt to Equity Transfer <span class="chart-info"
+                                    data-tooltip="Shows the effect of Systematic Transfer Plan (STP) from Debt to Equity if enabled.">?</span>
+                            </h3>
                             <div class="chart-wrapper">
                                 <canvas id="stpChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="chart-section">
-                        <h3>Burn Down of Corpus Post Retirement <span class="chart-info" data-tooltip="Shows how your retirement corpus changes each year after retirement, in future rupees (not adjusted for inflation).">?</span></h3>
+                        <h3>Burn Down of Corpus Post Retirement <span class="chart-info"
+                                data-tooltip="Shows how your retirement corpus changes each year after retirement, in future rupees (not adjusted for inflation).">?</span>
+                        </h3>
                         <div class="chart-wrapper">
                             <canvas id="burnDownChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-section">
-                        <h3>Burn Down of Corpus (Today's Value) <span class="chart-info" data-tooltip="Shows how your retirement corpus changes each year after retirement, adjusted for inflation to show today's value.">?</span></h3>
+                        <h3>Burn Down of Corpus (Today's Value) <span class="chart-info"
+                                data-tooltip="Shows how your retirement corpus changes each year after retirement, adjusted for inflation to show today's value.">?</span>
+                        </h3>
                         <div class="chart-wrapper">
                             <canvas id="burnDownChartToday"></canvas>
                         </div>
@@ -1007,7 +1125,8 @@
                 <div class="navigation-buttons">
                     <button class="btn prev" onclick="goToPreviousTab()"><i class="fas fa-arrow-left"></i> Back to
                         Inputs</button>
-                    <button id="share-screenshot-btn" class="btn next"><i class="fas fa-share-alt"></i> Share Your Results</button>
+                    <button id="share-screenshot-btn" class="btn next"><i class="fas fa-share-alt"></i> Share Your
+                        Results</button>
                 </div>
             </div>
         </div>
@@ -1028,55 +1147,63 @@
             <div class="share-platforms">
                 <button class="share-platform-btn whatsapp" data-platform="whatsapp">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                     </svg>
                     WhatsApp
                 </button>
                 <button class="share-platform-btn facebook" data-platform="facebook">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        <path
+                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                     Facebook
                 </button>
                 <button class="share-platform-btn twitter" data-platform="twitter">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        <path
+                            d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                     </svg>
                     Twitter
                 </button>
                 <button class="share-platform-btn linkedin" data-platform="linkedin">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        <path
+                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                     </svg>
                     LinkedIn
                 </button>
                 <button class="share-platform-btn linkedin-alt" data-platform="linkedin-alt">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        <path
+                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                     </svg>
                     LinkedIn (Alt)
                 </button>
                 <button class="share-platform-btn telegram" data-platform="telegram">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.347.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        <path
+                            d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.347.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
                     </svg>
                     Telegram
                 </button>
                 <button class="share-platform-btn email" data-platform="email">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/>
+                        <path
+                            d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z" />
                     </svg>
                     Email
                 </button>
                 <button class="share-platform-btn download" data-platform="download">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                     </svg>
                     Download Image
                 </button>
                 <button class="share-platform-btn copy" data-platform="copy">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        <path
+                            d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                     </svg>
                     Copy Link
                 </button>

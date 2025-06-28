@@ -1,42 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIRE Calculator - Financial Independence Calculator</title>
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html">
     <meta property="og:title" content="FIRE Calculator - Financial Independence Calculator">
-    <meta property="og:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+    <meta property="og:description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
     <meta property="og:site_name" content="FIRE Calculator">
     <meta property="og:locale" content="en_US">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="FIRE Calculator - Financial Independence Calculator">
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html">
     <meta property="twitter:title" content="FIRE Calculator - Financial Independence Calculator">
-    <meta property="twitter:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
-    
+    <meta property="twitter:description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+
     <!-- LinkedIn -->
     <meta property="linkedin:owner" content="nithin-murali-arch">
     <meta name="author" content="Nithin Murali">
-    <meta name="description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
-    
+    <meta name="description"
+        content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+
     <!-- Additional Meta Tags -->
-    <meta name="keywords" content="FIRE calculator, financial independence, retire early, retirement planning, investment calculator, portfolio growth, financial freedom">
+    <meta name="keywords"
+        content="FIRE calculator, financial independence, retire early, retirement planning, investment calculator, portfolio growth, financial freedom">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#FF6B35">
     <meta name="application-name" content="FIRE Calculator">
     <meta name="apple-mobile-web-app-title" content="FIRE Calculator">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-X7566Q6TZM');
+    </script>
     <!-- Structured Data for LinkedIn -->
     <script type="application/ld+json">
     {
@@ -71,12 +83,12 @@
         }
     }
     </script>
-    
+
     <style>
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -89,7 +101,7 @@
             justify-content: center;
             overflow-x: hidden;
         }
-        
+
         .preview-container {
             text-align: center;
             padding: 40px 20px;
@@ -102,13 +114,13 @@
             max-width: 800px;
             margin: 20px;
         }
-        
+
         .fire-icon {
             font-size: 3rem;
             margin-bottom: 15px;
             display: block;
         }
-        
+
         h1 {
             font-size: 2.5rem;
             font-weight: 800;
@@ -118,21 +130,21 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .subtitle {
             font-size: 1.2rem;
             color: #cccccc;
             margin-bottom: 25px;
             font-weight: 400;
         }
-        
+
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 25px 0;
         }
-        
+
         .result-item {
             background: rgba(255, 107, 53, 0.1);
             border: 1px solid rgba(255, 107, 53, 0.2);
@@ -140,20 +152,20 @@
             padding: 15px;
             text-align: center;
         }
-        
+
         .result-value {
             font-size: 1.5rem;
             font-weight: 700;
             color: #FF6B35;
             margin-bottom: 5px;
         }
-        
+
         .result-label {
             font-size: 0.85rem;
             color: #cccccc;
             font-weight: 500;
         }
-        
+
         .user-greeting {
             background: rgba(255, 107, 53, 0.1);
             border: 1px solid rgba(255, 107, 53, 0.2);
@@ -161,21 +173,21 @@
             padding: 20px;
             margin-bottom: 25px;
         }
-        
+
         .user-greeting h3 {
             margin: 0 0 8px 0;
             color: #FF6B35;
             font-size: 1.3rem;
             font-weight: 600;
         }
-        
+
         .user-greeting p {
             margin: 0;
             color: #cccccc;
             font-size: 1rem;
             line-height: 1.4;
         }
-        
+
         .features {
             display: flex;
             justify-content: center;
@@ -183,7 +195,7 @@
             margin-top: 30px;
             flex-wrap: wrap;
         }
-        
+
         .feature {
             text-align: center;
             padding: 15px;
@@ -192,19 +204,19 @@
             border: 1px solid rgba(255, 107, 53, 0.2);
             min-width: 120px;
         }
-        
+
         .feature-icon {
             font-size: 1.5rem;
             margin-bottom: 8px;
             display: block;
         }
-        
+
         .feature-text {
             font-size: 0.9rem;
             color: #cccccc;
             font-weight: 500;
         }
-        
+
         .url {
             position: fixed;
             bottom: 20px;
@@ -216,7 +228,7 @@
             padding: 5px 10px;
             border-radius: 5px;
         }
-        
+
         .cta-button {
             display: inline-block;
             background: linear-gradient(135deg, #FF6B35 0%, #FFD700 100%);
@@ -229,11 +241,11 @@
             margin-top: 20px;
             transition: transform 0.2s ease;
         }
-        
+
         .cta-button:hover {
             transform: translateY(-2px);
         }
-        
+
         .message-box {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -242,21 +254,21 @@
             margin: 20px 0;
             text-align: left;
         }
-        
+
         .message-box h4 {
             margin: 0 0 10px 0;
             color: #FF6B35;
             font-size: 1.1rem;
             font-weight: 600;
         }
-        
+
         .message-box p {
             margin: 0;
             color: #cccccc;
             font-size: 0.95rem;
             line-height: 1.5;
         }
-        
+
         .chart-container {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -266,7 +278,7 @@
             height: 300px;
             position: relative;
         }
-        
+
         .chart-title {
             color: #FF6B35;
             font-size: 1.1rem;
@@ -274,35 +286,35 @@
             margin-bottom: 15px;
             text-align: center;
         }
-        
+
         @media (max-width: 768px) {
             .preview-container {
                 padding: 30px 15px;
                 margin: 10px;
             }
-            
+
             h1 {
                 font-size: 2rem;
             }
-            
+
             .subtitle {
                 font-size: 1rem;
             }
-            
+
             .results-grid {
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            
+
             .features {
                 gap: 15px;
             }
-            
+
             .feature {
                 min-width: 100px;
                 padding: 12px;
             }
-            
+
             .chart-container {
                 height: 250px;
                 padding: 15px;
@@ -310,39 +322,43 @@
         }
     </style>
 </head>
+
 <body>
     <div class="preview-container">
         <span class="fire-icon">🔥</span>
         <h1>FIRE Calculator</h1>
         <div class="subtitle">Financial Independence, Retire Early</div>
-        
+
         <div id="user-results" style="display: none;">
             <div class="user-greeting" id="user-greeting">
                 <h3>🎉 Congratulations!</h3>
                 <p>You've calculated your path to financial independence!</p>
             </div>
-            
+
             <div class="results-grid" id="results-grid">
                 <!-- Results will be populated by JavaScript -->
             </div>
-            
+
             <div class="chart-container" id="portfolio-chart-container">
                 <div class="chart-title">Portfolio Growth Over Time</div>
                 <canvas id="portfolio-chart"></canvas>
             </div>
-            
+
             <div class="message-box">
                 <h4>💡 What This Means</h4>
-                <p>Based on your financial inputs, you can achieve financial independence and retire early! This calculator considers your current savings, monthly investments, expected returns, and living expenses to project your FIRE journey.</p>
+                <p>Based on your financial inputs, you can achieve financial independence and retire early! This
+                    calculator considers your current savings, monthly investments, expected returns, and living
+                    expenses to project your FIRE journey.</p>
             </div>
         </div>
-        
+
         <div id="default-content">
             <div class="message-box">
                 <h4>🚀 Start Your FIRE Journey</h4>
-                <p>Calculate your path to financial independence with our comprehensive FIRE calculator. Input your current financial situation and discover when you can achieve financial freedom!</p>
+                <p>Calculate your path to financial independence with our comprehensive FIRE calculator. Input your
+                    current financial situation and discover when you can achieve financial freedom!</p>
             </div>
-            
+
             <div class="features">
                 <div class="feature">
                     <span class="feature-icon">📊</span>
@@ -358,23 +374,23 @@
                 </div>
             </div>
         </div>
-        
+
         <a href="https://nithin-murali-arch.github.io/adults/calculators/fire/" class="cta-button">
             Calculate Your FIRE Journey →
         </a>
     </div>
-    
+
     <div class="url">nithin-murali-arch.github.io</div>
 
     <script>
         // Debug: log URL parameters
         console.log('Preview page loaded');
         console.log('Current URL:', window.location.href);
-        
+
         // Parse URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         console.log('URL parameters:', Object.fromEntries(urlParams.entries()));
-        
+
         // Check if we have FIRE results data
         const fireAge = decodeURIComponent(urlParams.get('fireAge') || '');
         const yearsToFire = decodeURIComponent(urlParams.get('yearsToFire') || '');
@@ -382,15 +398,15 @@
         const fireNumber = decodeURIComponent(urlParams.get('fireNumber') || '');
         const userName = decodeURIComponent(urlParams.get('userName') || '');
         const chartData = decodeURIComponent(urlParams.get('chartData') || '');
-        
+
         console.log('Parsed data:', { fireAge, yearsToFire, finalCorpus, fireNumber, userName, chartData });
-        
+
         if (fireAge && yearsToFire && fireAge !== '--' && yearsToFire !== '--') {
             console.log('Showing personalized results');
             // Show results
             document.getElementById('default-content').style.display = 'none';
             document.getElementById('user-results').style.display = 'block';
-            
+
             // Update user greeting
             if (userName && userName !== 'User') {
                 document.getElementById('user-greeting').innerHTML = `
@@ -403,7 +419,7 @@
                     <p>You can achieve financial independence at age ${fireAge} in ${yearsToFire} years!</p>
                 `;
             }
-            
+
             // Populate results grid
             const resultsGrid = document.getElementById('results-grid');
             resultsGrid.innerHTML = `
@@ -420,7 +436,7 @@
                     <div class="result-label">Projected Corpus</div>
                 </div>
             `;
-            
+
             // Render chart if data is available
             if (chartData) {
                 try {
@@ -435,22 +451,22 @@
                 // Hide chart container if no data
                 document.getElementById('portfolio-chart-container').style.display = 'none';
             }
-            
+
             // Update meta tags for social sharing
             const displayName = userName && userName !== 'User' ? userName : 'User';
             const shareText = `${displayName} can achieve financial independence at age ${fireAge} in ${yearsToFire} years! Calculate your own FIRE journey.`;
             const pageTitle = `${displayName}'s FIRE Journey - Age ${fireAge}`;
-            
+
             // Update all meta tags
             document.querySelector('meta[property="og:title"]').setAttribute('content', pageTitle);
             document.querySelector('meta[property="og:description"]').setAttribute('content', shareText);
             document.querySelector('meta[property="twitter:title"]').setAttribute('content', pageTitle);
             document.querySelector('meta[property="twitter:description"]').setAttribute('content', shareText);
             document.querySelector('meta[name="description"]').setAttribute('content', shareText);
-            
+
             // Update page title
             document.title = pageTitle;
-            
+
             // Update structured data
             const structuredData = {
                 "@context": "https://schema.org",
@@ -483,28 +499,28 @@
                     "name": "FIRE Calculator"
                 }
             };
-            
+
             // Update the structured data script
             const scriptElement = document.querySelector('script[type="application/ld+json"]');
             if (scriptElement) {
                 scriptElement.textContent = JSON.stringify(structuredData, null, 2);
             }
-            
+
         } else {
             console.log('Showing default content - no valid data found');
             // Show default content if no valid data
             document.getElementById('default-content').style.display = 'block';
             document.getElementById('user-results').style.display = 'none';
         }
-        
+
         // Function to render portfolio chart
         function renderPortfolioChart(chartData) {
             const ctx = document.getElementById('portfolio-chart').getContext('2d');
-            
+
             // Configure Chart.js for dark theme
             Chart.defaults.color = '#cccccc';
             Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-            
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -557,7 +573,7 @@
                             },
                             ticks: {
                                 color: '#cccccc',
-                                callback: function(value) {
+                                callback: function (value) {
                                     return '₹' + (value / 100000).toFixed(1) + 'L';
                                 }
                             }
@@ -572,4 +588,5 @@
         }
     </script>
 </body>
-</html> 
+
+</html>
