@@ -3,64 +3,163 @@ const tabOrder = ['assumptions', 'basic', 'cashflow', 'goals', 'advanced', 'resu
 let currentActiveTabIndex = 0;
 window.fireData = null;
 let chartInstances = {};
-const LOCAL_STORAGE_KEY = 'fireCalculatorData_v7'; // Changed key for new structure
+const LOCAL_STORAGE_KEY = 'fireCalculatorData_v6';
 
-// --- Navigation Logic ---
-const hamburgerBtn = document.getElementById('hamburger-menu');
-const mobileNav = document.getElementById('mobile-nav');
-const navOverlay = document.getElementById('nav-overlay');
-const allNavLinks = document.querySelectorAll('.desktop-nav .tab, .mobile-nav .tab');
+// --- Application State Management ---
+class FIREStateManager {
+  constructor() {
+    this.state = {};
+    this.sessionStartTime = Date.now();
+    this.tabsVisited = new Set();
+  }
 
-function toggleMobileNav() {
-    const isOpen = mobileNav.classList.toggle('is-open');
-    navOverlay.classList.toggle('is-open', isOpen);
-    document.body.classList.toggle('nav-open', isOpen);
-    hamburgerBtn.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+  // Update state with new data
+  updateState(newData) {
+    this.state = { ...this.state, ...newData };
+  }
+
+  // Format numbers in Indian currency format
+  formatIndianCurrency(amount) {
+    if (amount === 0) return '0';
+    if (amount < 1000) return Math.round(amount).toString();
+    if (amount < 100000) return Math.round(amount / 1000) + 'K';
+    if (amount < 10000000) return Math.round(amount / 100000) + 'L';
+    return Math.round(amount / 10000000) + 'Cr';
+  }
+
+  // Flatten nested objects for analytics
+  flattenObject(obj, prefix = '') {
+    const flattened = {};
+    
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const newKey = prefix ? `${prefix}_${key}` : key;
+        
+        if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+          Object.assign(flattened, this.flattenObject(obj[key], newKey));
+        } else if (Array.isArray(obj[key])) {
+          flattened[`${newKey}_count`] = obj[key].length;
+        } else {
+          // Format numbers appropriately
+          if (typeof obj[key] === 'number') {
+            if (key.includes('age') || key.includes('years') || key.includes('count') || key.includes('percent')) {
+              flattened[newKey] = Math.round(obj[key]);
+            } else if (key.includes('rate') || key.includes('factor')) {
+              flattened[newKey] = Math.round(obj[key] * 100);
+            } else if (key.includes('value') || key.includes('amount') || key.includes('income') || key.includes('expense') || key.includes('corpus') || key.includes('number')) {
+              flattened[newKey] = this.formatIndianCurrency(obj[key]);
+            } else {
+              flattened[newKey] = Math.round(obj[key]);
+            }
+          } else {
+            flattened[newKey] = obj[key];
+          }
+        }
+      }
+    }
+    
+    return flattened;
+  }
+
+  // Get current state for analytics
+  getAnalyticsState() {
+    const baseState = {
+      session_duration: Math.round((Date.now() - this.sessionStartTime) / 1000),
+      tabs_visited: this.tabsVisited.size,
+      timestamp: new Date().toISOString()
+    };
+
+    const flattenedState = this.flattenObject(this.state);
+    return { ...baseState, ...flattenedState };
+  }
+
+  // Track tab visit
+  trackTab(tabId) {
+    this.tabsVisited.add(tabId);
+  }
+
+  // Send state to analytics (subtle)
+  sendToAnalytics(eventName = 'app_state_update') {
+    if (typeof gtag !== 'undefined') {
+      const analyticsData = this.getAnalyticsState();
+      
+      gtag('event', eventName, {
+        event_category: 'FIRE Calculator',
+        event_label: 'State Update',
+        custom_map: analyticsData
+      });
+    }
+  }
 }
 
-hamburgerBtn.addEventListener('click', toggleMobileNav);
-navOverlay.addEventListener('click', toggleMobileNav);
+// Initialize state manager
+const stateManager = new FIREStateManager();
 
-allNavLinks.forEach(tab => {
-    tab.addEventListener('click', (event) => {
-        event.preventDefault();
-        const targetTabId = event.currentTarget.getAttribute('data-tab');
-        showTab(targetTabId);
-        if (mobileNav.classList.contains('is-open')) {
-            toggleMobileNav();
-        }
-    });
-});
+// --- Mobile Navigation ---
+function toggleMobileNav() {
+    const mobileNav = document.getElementById('mobile-nav');
+    const overlay = document.getElementById('nav-overlay');
+    const hamburger = document.getElementById('hamburger-menu');
+    
+    if (mobileNav.classList.contains('active')) {
+        mobileNav.classList.remove('active');
+        overlay.classList.remove('active');
+        hamburger.classList.remove('active');
+    } else {
+        mobileNav.classList.add('active');
+        overlay.classList.add('active');
+        hamburger.classList.add('active');
+    }
+}
 
+// --- Navigation Logic ---
 function goToNextTab() {
-    if (currentActiveTabIndex < tabOrder.length - 1) {
-        showTab(tabOrder[currentActiveTabIndex + 1]);
+    const currentTab = document.querySelector('.tab.active');
+    const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
+    if (currentIndex < tabOrder.length - 1) {
+        showTab(tabOrder[currentIndex + 1]);
     }
 }
 
 function goToPreviousTab() {
-    if (currentActiveTabIndex > 0) {
-        showTab(tabOrder[currentActiveTabIndex - 1]);
+    const currentTab = document.querySelector('.tab.active');
+    const currentIndex = tabOrder.indexOf(currentTab.dataset.tab);
+    if (currentIndex > 0) {
+        showTab(tabOrder[currentIndex - 1]);
     }
 }
 
 function showTab(tabId) {
+    // Validate current tab before proceeding
     if (currentActiveTabIndex < tabOrder.indexOf('results')) {
         if (!validateTab(tabOrder[currentActiveTabIndex])) return;
     }
 
     currentActiveTabIndex = tabOrder.indexOf(tabId);
 
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-    document.getElementById(tabId)?.classList.remove('hidden');
-
-    allNavLinks.forEach(t => {
-        t.classList.toggle('active', t.getAttribute('data-tab') === tabId);
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
     });
-
-    // Scroll to top when changing tabs
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(tabId);
+    if (selectedContent) {
+        selectedContent.classList.remove('hidden');
+    }
+    
+    // Add active class to selected tab
+    const selectedTab = document.querySelector(`[data-tab="${tabId}"]`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Handle results tab
     if (tabId === 'results') {
         calculateFIRE();
         if (window.fireData) {
@@ -72,7 +171,68 @@ function showTab(tabId) {
             document.getElementById('actual-results-content').classList.add('hidden');
         }
     }
+    
+    // Close mobile nav if open
+    const mobileNav = document.getElementById('mobile-nav');
+    const overlay = document.getElementById('nav-overlay');
+    const hamburger = document.getElementById('hamburger-menu');
+    if (mobileNav.classList.contains('active')) {
+        mobileNav.classList.remove('active');
+        overlay.classList.remove('active');
+        hamburger.classList.remove('active');
+    }
+    
+    // Track tab visit
+    stateManager.trackTab(tabId);
+    
+    // Update state and send to analytics
+    stateManager.updateState({ current_tab: tabId });
+    stateManager.sendToAnalytics('tab_visit');
+    
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Initialize application
+document.addEventListener('DOMContentLoaded', () => {
+    // Track initial page load
+    stateManager.sendToAnalytics('page_view');
+    
+    // Set up navigation event listeners
+    const hamburgerBtn = document.getElementById('hamburger-menu');
+    const navOverlay = document.getElementById('nav-overlay');
+    const allNavLinks = document.querySelectorAll('.desktop-nav .tab, .mobile-nav .tab');
+    
+    hamburgerBtn.addEventListener('click', toggleMobileNav);
+    navOverlay.addEventListener('click', toggleMobileNav);
+    
+    allNavLinks.forEach(tab => {
+        tab.addEventListener('click', (event) => {
+            event.preventDefault();
+            const targetTabId = event.currentTarget.getAttribute('data-tab');
+            showTab(targetTabId);
+            const mobileNav = document.getElementById('mobile-nav');
+            if (mobileNav.classList.contains('active')) {
+                toggleMobileNav();
+            }
+        });
+    });
+    
+    // Set up share button event listener
+    const shareButton = document.getElementById('share-screenshot-btn');
+    if (shareButton) {
+        shareButton.addEventListener('click', shareResults);
+    }
+    
+    // Initialize with assumptions tab as default
+    showTab('assumptions');
+    
+    // Load saved form data
+    loadFormData();
+    
+    // Initialize expense displays
+    updateExpenseDisplays();
+});
 
 // --- Validation ---
 function validateTab(tabId) {
@@ -276,6 +436,15 @@ function updateTotalExpenses() {
     return totalMonthlyExpenses;
 }
 
+function updateExpenseDisplays() {
+    const totalMonthly = updateTotalExpenses();
+    const totalAnnual = totalMonthly * 12;
+    const monthlyDisplay = document.getElementById('monthly-expenses-total-display');
+    const annualDisplay = document.getElementById('annual-expenses-display');
+    if (monthlyDisplay) monthlyDisplay.textContent = `Total Monthly Expenses: ${formatCurrency(totalMonthly)}`;
+    if (annualDisplay) annualDisplay.textContent = `Total Annual Expenses: ${formatCurrency(totalAnnual)}`;
+}
+
 function checkExpenseToIncomeRatio() {
     const monthlyIncome = parseFloat(document.getElementById('monthly-income').value) || 0;
     // Use the calculated total monthly expenses
@@ -402,6 +571,27 @@ function calculateFIRE() {
 
 // --- UI Updates & Persistence ---
 function updateUIAndCharts(data) {
+    // Update state with results data
+    stateManager.updateState({
+      results_generated: true,
+      fire_achievable: data.corpusShortfall <= 0,
+      fire_age: data.fireAge,
+      years_to_fire: data.yearsToFire,
+      retirement_duration: data.retirementDuration,
+      inflated_fire_number: data.inflatedFireNumber,
+      final_corpus: data.finalCorpus,
+      corpus_shortfall: data.corpusShortfall,
+      unutilized_monthly_investment: data.unutilizedMonthlyInvestment,
+      monthly_expenses: data.monthlyExpenses,
+      annual_expenses: data.annualExpenses,
+      portfolio_data: data.portfolio,
+      final_allocation: data.finalAllocation,
+      portfolio_history: data.portfolioHistory
+    });
+    
+    // Send completion event to analytics
+    stateManager.sendToAnalytics('results_completion');
+    
     // Display user greeting if name is provided
     const userGreetingEl = document.getElementById('user-greeting');
     if (userGreetingEl) {
@@ -778,245 +968,119 @@ function triggerResultUpdate() {
             window.fireData) {
             // Recalculate with current inputs
             calculateFIRE();
+            
+            // Update state with new results
+            if (window.fireData) {
+                stateManager.updateState({
+                    results_recalculated: true,
+                    fire_achievable: window.fireData.corpusShortfall <= 0,
+                    final_corpus: window.fireData.finalCorpus,
+                    corpus_shortfall: window.fireData.corpusShortfall
+                });
+                stateManager.sendToAnalytics('results_recalculation');
+            }
         }
     }, 500); // 500ms delay
 }
 
-// --- Init ---
-document.addEventListener('DOMContentLoaded', () => {
-    loadFormData();
-    showTab('assumptions');
-    
-    // Add event listeners for all portfolio value, contribution, and return inputs
-    [
-        'value-equity-in','contribution-equity-in','return-equity-in',
-        'value-equity-gl','contribution-equity-gl','return-equity-gl',
-        'value-debt','contribution-debt','return-debt',
-        'value-real-estate','contribution-real-estate','return-real-estate',
-        'value-epf','contribution-epf','return-epf',
-        'value-nps','contribution-nps','return-nps',
-        'value-other','contribution-other','return-other' // Add other investments
-    ].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', updateTotalCorpus);
-            el.addEventListener('input', triggerResultUpdate);
-        }
-    });
-    
-    // Add event listeners for all basic inputs
-    [
-        'user-name', 'current-age', 'target-age', 'withdrawal-rate', 'inflation-rate',
-        'life-expectancy', 'emergency-fund', 'buffer-percentage',
-        'monthly-income', 'sip-stepup-percent', 'stp-amount', 'stp-frequency'
-    ].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', triggerResultUpdate);
-    });
-    
-    // Add event listeners for select elements
-    [
-        'lifestyle-factor-now', 'lifestyle-factor-retire',
-        'risk-tolerance-now', 'risk-tolerance-retire',
-        'stp-frequency'
-    ].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', triggerResultUpdate);
-    });
-    
-    // Add event listeners for tax inputs
-    [
-        'tax-equity-short-current', 'tax-equity-long-current',
-        'tax-debt-short-current', 'tax-debt-long-current',
-        'tax-equity-short-retire', 'tax-equity-long-retire',
-        'tax-debt-short-retire', 'tax-debt-long-retire'
-    ].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', triggerResultUpdate);
-    });
-    
-    // Add event listeners for healthcare buffer inputs
-    [
-        'healthcare-buffer-value', 'healthcare-buffer-age', 'healthcare-buffer-inflation'
-    ].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', triggerResultUpdate);
-    });
-    
-    // Add event listeners for expense inputs
-    document.querySelectorAll('.expense-input, .annual-expense-input, .expense-years-input').forEach(input => {
-        input.addEventListener('input', updateExpenseDisplays);
-        input.addEventListener('input', triggerResultUpdate);
-    });
-    
-    // Add event listeners for goal inputs
-    document.querySelectorAll('.goal-name, .goal-value, .goal-years, .goal-inflation').forEach(input => {
-        input.addEventListener('input', triggerResultUpdate);
-    });
-    
-    updateTotalCorpus();
-});
+// --- Share Functionality ---
+function shareResults() {
+    // Capture screenshot of results
+    const resultsContent = document.getElementById('actual-results-content');
+    if (!resultsContent) {
+        showMessage('No results to share. Please calculate your FIRE journey first.', 'error');
+        return;
+    }
 
-function updateExpenseDisplays() {
-    const totalMonthly = updateTotalExpenses();
-    const totalAnnual = totalMonthly * 12;
-    const monthlyDisplay = document.getElementById('monthly-expenses-total-display');
-    const annualDisplay = document.getElementById('annual-expenses-display');
-    if (monthlyDisplay) monthlyDisplay.textContent = `Total Monthly Expenses: ${formatCurrency(totalMonthly)}`;
-    if (annualDisplay) annualDisplay.textContent = `Total Annual Expenses: ${formatCurrency(totalAnnual)}`;
-}
+    // Show loading message
+    showMessage('Preparing your results for sharing...', 'info');
 
-// Update displays on input change
-['.expense-input', '.annual-expense-input', '.expense-years-input'].forEach(cls => {
-    document.querySelectorAll(cls).forEach(input => {
-        input.addEventListener('input', updateExpenseDisplays);
-        input.addEventListener('input', triggerResultUpdate);
-    });
-});
+    // Create a temporary container with dark background for better screenshot
+    const tempContainer = document.createElement('div');
+    tempContainer.style.cssText = `
+        position: fixed;
+        top: -9999px;
+        left: -9999px;
+        width: 800px;
+        background: #1a1a1a;
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        font-family: 'Inter', sans-serif;
+        z-index: -1;
+    `;
 
-document.addEventListener('DOMContentLoaded', updateExpenseDisplays);
+    // Clone the results content
+    const clonedContent = resultsContent.cloneNode(true);
+    
+    // Remove navigation buttons from clone
+    const navButtons = clonedContent.querySelector('.navigation-buttons');
+    if (navButtons) navButtons.remove();
 
-document.addEventListener('DOMContentLoaded', function() {
-  const shareBtn = document.getElementById('share-screenshot-btn');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', async function() {
-      const resultsContent = document.getElementById('actual-results-content');
-      if (!resultsContent) return;
-      shareBtn.disabled = true;
-      const originalBtnText = shareBtn.textContent;
-      shareBtn.textContent = 'Preparing screenshot...';
-      
-      // Get user name for personalized sharing
-      const userName = document.getElementById('user-name')?.value?.trim() || '';
-      const personalizedTitle = userName ? `${userName}'s FIRE Journey Results` : 'My FIRE Calculator Results';
-      const personalizedText = userName ? 
-        `Check out ${userName}'s FIRE journey results! 🚀` : 
-        'Check out my FIRE journey results! 🚀';
-      
-      // Save original background
-      const originalBg = resultsContent.style.backgroundColor;
-      
-      try {
-        // Set a solid dark background for screenshot
-        resultsContent.style.backgroundColor = '#181825';
-        
-        // Wait a moment for the background to apply
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Capture screenshot
-        const canvas = await html2canvas(resultsContent, { 
-          scale: 2, 
-          useCORS: true, 
-          backgroundColor: '#181825',
-          width: resultsContent.offsetWidth
-        });
-        
-        // Restore original background
-        resultsContent.style.backgroundColor = originalBg;
-        
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'fire-results.png', { type: 'image/png' })] })) {
-          const file = new File([blob], 'fire-results.png', { type: 'image/png' });
-          await navigator.share({
-            files: [file],
-            title: personalizedTitle,
-            text: personalizedText
-          });
-        } else {
-          // Fallback: download the image and show a message
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'fire-results.png';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          showMessage('Screenshot downloaded! You can share it manually on social media.', 'info');
-        }
-      } catch (e) {
-        // Restore original background in case of error
-        resultsContent.style.backgroundColor = originalBg;
+    // Add title to the screenshot
+    const title = document.createElement('h1');
+    title.textContent = '🔥 My FIRE Journey Results';
+    title.style.cssText = `
+        text-align: center;
+        margin-bottom: 30px;
+        color: #FF6B35;
+        font-size: 2rem;
+    `;
+    
+    tempContainer.appendChild(title);
+    tempContainer.appendChild(clonedContent);
+    document.body.appendChild(tempContainer);
+
+    // Capture screenshot
+    html2canvas(tempContainer, {
+        backgroundColor: '#1a1a1a',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        width: 800,
+        height: tempContainer.scrollHeight
+    }).then(canvas => {
+        // Remove temporary container
+        document.body.removeChild(tempContainer);
+
+        // Convert to blob
+        canvas.toBlob(blob => {
+            if (blob) {
+                // Create file from blob
+                const file = new File([blob], 'fire-results.png', { type: 'image/png' });
+                
+                // Try Web Share API first
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    const userName = document.getElementById('user-name')?.value || 'User';
+                    navigator.share({
+                        title: `${userName}'s FIRE Journey Results`,
+                        text: `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${document.getElementById('fire-age')?.textContent || '--'}.`,
+                        files: [file],
+                        url: window.location.href
+                    }).catch(err => {
+                        console.log('Web Share API failed:', err);
+                        downloadImage(blob);
+                    });
+                } else {
+                    // Fallback to download
+                    downloadImage(blob);
+                }
+            }
+        }, 'image/png');
+    }).catch(err => {
+        console.error('Screenshot capture failed:', err);
         showMessage('Failed to capture screenshot. Please try again.', 'error');
-      }
-      shareBtn.textContent = originalBtnText;
-      shareBtn.disabled = false;
     });
-  }
-  
-  // Initialize tooltips
-  initializeTooltips();
-});
-
-// Tooltip functionality
-function initializeTooltips() {
-  const tooltipElements = document.querySelectorAll('.chart-info[data-tooltip]');
-  
-  tooltipElements.forEach(element => {
-    element.addEventListener('mouseenter', showTooltip);
-    element.addEventListener('mouseleave', hideTooltip);
-    element.addEventListener('focus', showTooltip);
-    element.addEventListener('blur', hideTooltip);
-  });
 }
 
-function showTooltip(event) {
-  const element = event.target;
-  const tooltipText = element.getAttribute('data-tooltip');
-  
-  // Remove existing tooltip
-  const existingTooltip = document.querySelector('.custom-tooltip');
-  if (existingTooltip) {
-    existingTooltip.remove();
-  }
-  
-  // Create tooltip
-  const tooltip = document.createElement('div');
-  tooltip.className = 'custom-tooltip';
-  tooltip.textContent = tooltipText;
-  tooltip.style.cssText = `
-    position: fixed;
-    background: var(--card-bg);
-    color: var(--text-primary);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    max-width: 250px;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    pointer-events: none;
-    white-space: normal;
-    line-height: 1.4;
-  `;
-  
-  document.body.appendChild(tooltip);
-  
-  // Get element position
-  const rect = element.getBoundingClientRect();
-  const tooltipRect = tooltip.getBoundingClientRect();
-  
-  // Calculate position relative to the ? symbol
-  let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-  let top = rect.top - tooltipRect.height - 8;
-  
-  // Adjust if tooltip goes off screen
-  if (left < 10) left = 10;
-  if (left + tooltipRect.width > window.innerWidth - 10) {
-    left = window.innerWidth - tooltipRect.width - 10;
-  }
-  if (top < 10) {
-    // Show below the element if not enough space above
-    top = rect.bottom + 8;
-  }
-  
-  tooltip.style.left = left + 'px';
-  tooltip.style.top = top + 'px';
-}
-
-function hideTooltip() {
-  const tooltip = document.querySelector('.custom-tooltip');
-  if (tooltip) {
-    tooltip.remove();
-  }
+function downloadImage(blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fire-results.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showMessage('Results image downloaded successfully!', 'info');
 }
