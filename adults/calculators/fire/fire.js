@@ -1131,6 +1131,26 @@ function shareToPlatform(platform, blob) {
     previewUrl.searchParams.set('finalCorpus', encodeURIComponent(finalCorpus));
     previewUrl.searchParams.set('fireNumber', encodeURIComponent(fireNumber));
     
+    // Add chart data for portfolio growth chart
+    if (chartInstances.portfolioGrowthChart && chartInstances.portfolioGrowthChart.data) {
+        // Create a total portfolio value chart from the stacked area data
+        const chartData = chartInstances.portfolioGrowthChart.data;
+        const totalPortfolioData = chartData.labels.map((label, index) => {
+            // Sum all asset values for each year
+            return chartData.datasets.reduce((total, dataset) => {
+                return total + (dataset.data[index] || 0);
+            }, 0);
+        });
+        
+        const simplifiedChartData = {
+            labels: chartData.labels,
+            datasets: [{
+                data: totalPortfolioData
+            }]
+        };
+        previewUrl.searchParams.set('chartData', encodeURIComponent(JSON.stringify(simplifiedChartData)));
+    }
+    
     // Add a timestamp to ensure unique URLs
     previewUrl.searchParams.set('t', Date.now().toString());
     
@@ -1145,17 +1165,17 @@ function shareToPlatform(platform, blob) {
         case 'whatsapp':
             // For WhatsApp, we'll share text + preview URL
             shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`;
-            showMessage('WhatsApp opened! The preview will show your actual FIRE results.', 'info');
+            showMessage('WhatsApp opened! The preview will show your actual FIRE results with charts.', 'info');
             break;
         case 'facebook':
             // Facebook sharing - will use the preview page's meta tags
             shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
-            showMessage('Facebook opened! The preview will show your actual FIRE results.', 'info');
+            showMessage('Facebook opened! The preview will show your actual FIRE results with charts.', 'info');
             break;
         case 'twitter':
             // Twitter sharing with preview URL
             shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
-            showMessage('Twitter opened! The preview will show your actual FIRE results.', 'info');
+            showMessage('Twitter opened! The preview will show your actual FIRE results with charts.', 'info');
             break;
         case 'linkedin':
             // Try multiple LinkedIn sharing methods
@@ -1193,13 +1213,13 @@ function shareToPlatform(platform, blob) {
         case 'telegram':
             // Telegram sharing with preview URL
             shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`;
-            showMessage('Telegram opened! The preview will show your actual FIRE results.', 'info');
+            showMessage('Telegram opened! The preview will show your actual FIRE results with charts.', 'info');
             break;
         case 'email':
             const subject = `${userName}'s FIRE Journey Results`;
             const body = `${shareText}\n\nCheck out my results: ${url}`;
             shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            showMessage('Email client opened! The preview will show your actual FIRE results.', 'info');
+            showMessage('Email client opened! The preview will show your actual FIRE results with charts.', 'info');
             break;
         case 'download':
             downloadImage(blob);
