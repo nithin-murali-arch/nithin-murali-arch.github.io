@@ -1439,6 +1439,18 @@ label span[title]:hover::before {
     font-weight: 600;
 }
 
+.share-modal-subtitle {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.share-modal-subtitle p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
 .close-modal-btn {
     background: none;
     border: none;

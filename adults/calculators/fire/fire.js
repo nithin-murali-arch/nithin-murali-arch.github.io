@@ -1117,41 +1117,89 @@ function showSocialMediaModal(blob) {
 function shareToPlatform(platform, blob) {
     const userName = document.getElementById('user-name')?.value || 'User';
     const fireAge = document.getElementById('fire-age')?.textContent || '--';
+    const yearsToFire = document.getElementById('years-to-fire')?.textContent || '--';
+    const finalCorpus = document.getElementById('final-corpus')?.textContent || '--';
+    const fireNumber = document.getElementById('inflated-fire-number')?.textContent || '--';
+    
     const shareText = `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${fireAge}.`;
-    const url = window.location.href;
+    
+    // Generate preview URL with essential results data only
+    const previewUrl = new URL('https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html');
+    previewUrl.searchParams.set('userName', encodeURIComponent(userName));
+    previewUrl.searchParams.set('fireAge', encodeURIComponent(fireAge));
+    previewUrl.searchParams.set('yearsToFire', encodeURIComponent(yearsToFire));
+    previewUrl.searchParams.set('finalCorpus', encodeURIComponent(finalCorpus));
+    previewUrl.searchParams.set('fireNumber', encodeURIComponent(fireNumber));
+    
+    // Add a timestamp to ensure unique URLs
+    previewUrl.searchParams.set('t', Date.now().toString());
+    
+    const url = previewUrl.toString();
+    
+    // Debug: log the URL to console
+    console.log('Generated preview URL:', url);
     
     let shareUrl = '';
     
     switch (platform) {
         case 'whatsapp':
+            // For WhatsApp, we'll share text + preview URL
             shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`;
+            showMessage('WhatsApp opened! The preview will show your actual FIRE results.', 'info');
             break;
         case 'facebook':
+            // Facebook sharing - will use the preview page's meta tags
             shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
+            showMessage('Facebook opened! The preview will show your actual FIRE results.', 'info');
             break;
         case 'twitter':
+            // Twitter sharing with preview URL
             shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+            showMessage('Twitter opened! The preview will show your actual FIRE results.', 'info');
             break;
         case 'linkedin':
-            // Use LinkedIn's direct post URL which is more reliable
-            const linkedinText = `${shareText}\n\n${url}`;
-            shareUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${Date.now()}/?text=${encodeURIComponent(linkedinText)}`;
+            // Try multiple LinkedIn sharing methods
+            try {
+                // Method 1: Direct post with preview URL
+                const linkedinText = `${shareText}\n\n${url}`;
+                shareUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${Date.now()}/?text=${encodeURIComponent(linkedinText)}`;
+                
+                // Method 2: Standard LinkedIn sharing (fallback)
+                if (!shareUrl) {
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shareText)}`;
+                }
+                
+                // Method 3: Alternative LinkedIn sharing format
+                if (!shareUrl) {
+                    shareUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${Date.now()}/?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+                }
+            } catch (e) {
+                console.log('LinkedIn sharing error:', e);
+                // Final fallback to simple URL sharing
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            }
             
             // Show a helpful message about LinkedIn sharing
-            showMessage('LinkedIn sharing opened. If preview doesn\'t show, you can still post the text and link manually.', 'info');
+            showMessage('LinkedIn sharing opened! If preview doesn\'t show, you can still post the text and link manually.', 'info');
+            break;
+        case 'linkedin-alt':
+            // Alternative LinkedIn sharing method - direct to main calculator
+            const mainCalculatorUrl = 'https://nithin-murali-arch.github.io/adults/calculators/fire/';
+            const altLinkedinText = `${shareText}\n\nTry the calculator: ${mainCalculatorUrl}`;
+            shareUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${Date.now()}/?text=${encodeURIComponent(altLinkedinText)}`;
             
-            // Fallback to standard sharing if the above doesn't work
-            if (!shareUrl) {
-                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shareText)}`;
-            }
+            showMessage('LinkedIn alternative method opened! This should work better with LinkedIn\'s preview system.', 'info');
             break;
         case 'telegram':
+            // Telegram sharing with preview URL
             shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`;
+            showMessage('Telegram opened! The preview will show your actual FIRE results.', 'info');
             break;
         case 'email':
             const subject = `${userName}'s FIRE Journey Results`;
-            const body = `${shareText}\n\nCheck out the calculator: ${url}`;
+            const body = `${shareText}\n\nCheck out my results: ${url}`;
             shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            showMessage('Email client opened! The preview will show your actual FIRE results.', 'info');
             break;
         case 'download':
             downloadImage(blob);

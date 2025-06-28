@@ -3,7 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIRE Calculator Preview</title>
+    <title>FIRE Calculator - Financial Independence Calculator</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html">
+    <meta property="og:title" content="FIRE Calculator - Financial Independence Calculator">
+    <meta property="og:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+    <meta property="og:site_name" content="FIRE Calculator">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="FIRE Calculator - Financial Independence Calculator">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html">
+    <meta property="twitter:title" content="FIRE Calculator - Financial Independence Calculator">
+    <meta property="twitter:description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+    
+    <!-- LinkedIn -->
+    <meta property="linkedin:owner" content="nithin-murali-arch">
+    <meta name="author" content="Nithin Murali">
+    <meta name="description" content="Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="keywords" content="FIRE calculator, financial independence, retire early, retirement planning, investment calculator, portfolio growth, financial freedom">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="application-name" content="FIRE Calculator">
+    <meta name="apple-mobile-web-app-title" content="FIRE Calculator">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Structured Data for LinkedIn -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "FIRE Calculator Results",
+        "description": "Personalized FIRE (Financial Independence, Retire Early) journey results and calculator.",
+        "url": "https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html",
+        "mainEntity": {
+            "@type": "WebApplication",
+            "name": "FIRE Calculator",
+            "description": "Calculate your path to Financial Independence, Retire Early (FIRE) with our comprehensive calculator.",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web Browser",
+            "author": {
+                "@type": "Person",
+                "name": "Nithin Murali"
+            },
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            }
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Nithin Murali"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "FIRE Calculator"
+        }
+    }
+    </script>
+    
     <style>
         body {
             margin: 0;
@@ -52,6 +117,55 @@
             font-weight: 400;
         }
         
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .result-item {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FF6B35;
+            margin-bottom: 8px;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #cccccc;
+            font-weight: 500;
+        }
+        
+        .user-greeting {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .user-greeting h3 {
+            margin: 0 0 8px 0;
+            color: #FF6B35;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .user-greeting p {
+            margin: 0;
+            color: #cccccc;
+            font-size: 1rem;
+        }
+        
         .features {
             display: flex;
             justify-content: center;
@@ -87,6 +201,23 @@
             color: #888888;
             font-weight: 500;
         }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #FFD700 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -95,22 +226,112 @@
         <h1>FIRE Calculator</h1>
         <div class="subtitle">Financial Independence, Retire Early</div>
         
-        <div class="features">
-            <div class="feature">
-                <span class="feature-icon">📊</span>
-                <div class="feature-text">Portfolio Growth</div>
+        <div id="user-results" style="display: none;">
+            <div class="user-greeting" id="user-greeting">
+                <h3>🎉 Congratulations!</h3>
+                <p>You've calculated your path to financial independence!</p>
             </div>
-            <div class="feature">
-                <span class="feature-icon">🎯</span>
-                <div class="feature-text">Goal Planning</div>
-            </div>
-            <div class="feature">
-                <span class="feature-icon">📈</span>
-                <div class="feature-text">Asset Allocation</div>
+            
+            <div class="results-grid" id="results-grid">
+                <!-- Results will be populated by JavaScript -->
             </div>
         </div>
+        
+        <div id="default-content">
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon">📊</span>
+                    <div class="feature-text">Portfolio Growth</div>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🎯</span>
+                    <div class="feature-text">Goal Planning</div>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📈</span>
+                    <div class="feature-text">Asset Allocation</div>
+                </div>
+            </div>
+        </div>
+        
+        <a href="https://nithin-murali-arch.github.io/adults/calculators/fire/" class="cta-button">
+            Calculate Your FIRE Journey →
+        </a>
     </div>
     
     <div class="url">nithin-murali-arch.github.io</div>
+
+    <script>
+        // Debug: log URL parameters
+        console.log('Preview page loaded');
+        console.log('Current URL:', window.location.href);
+        
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log('URL parameters:', Object.fromEntries(urlParams.entries()));
+        
+        // Check if we have FIRE results data
+        const fireAge = decodeURIComponent(urlParams.get('fireAge') || '');
+        const yearsToFire = decodeURIComponent(urlParams.get('yearsToFire') || '');
+        const finalCorpus = decodeURIComponent(urlParams.get('finalCorpus') || '');
+        const fireNumber = decodeURIComponent(urlParams.get('fireNumber') || '');
+        const userName = decodeURIComponent(urlParams.get('userName') || '');
+        
+        console.log('Parsed data:', { fireAge, yearsToFire, finalCorpus, fireNumber, userName });
+        
+        if (fireAge && yearsToFire && fireAge !== '--' && yearsToFire !== '--') {
+            console.log('Showing personalized results');
+            // Show results
+            document.getElementById('default-content').style.display = 'none';
+            document.getElementById('user-results').style.display = 'block';
+            
+            // Update user greeting
+            if (userName && userName !== 'User') {
+                document.getElementById('user-greeting').innerHTML = `
+                    <h3>🎉 Congratulations, ${userName}!</h3>
+                    <p>You can achieve financial independence at age ${fireAge}!</p>
+                `;
+            } else {
+                document.getElementById('user-greeting').innerHTML = `
+                    <h3>🎉 Congratulations!</h3>
+                    <p>You can achieve financial independence at age ${fireAge}!</p>
+                `;
+            }
+            
+            // Populate results grid
+            const resultsGrid = document.getElementById('results-grid');
+            resultsGrid.innerHTML = `
+                <div class="result-item">
+                    <div class="result-value">${fireAge}</div>
+                    <div class="result-label">FIRE Age</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value">${yearsToFire}</div>
+                    <div class="result-label">Years to FIRE</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value">${finalCorpus || '--'}</div>
+                    <div class="result-label">Projected Corpus</div>
+                </div>
+            `;
+            
+            // Update meta tags for social sharing
+            const displayName = userName && userName !== 'User' ? userName : 'User';
+            const shareText = `${displayName} can achieve financial independence at age ${fireAge}!`;
+            document.querySelector('meta[property="og:title"]').setAttribute('content', `${displayName}'s FIRE Journey - Age ${fireAge}`);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', shareText);
+            document.querySelector('meta[property="twitter:title"]').setAttribute('content', `${displayName}'s FIRE Journey - Age ${fireAge}`);
+            document.querySelector('meta[property="twitter:description"]').setAttribute('content', shareText);
+            document.querySelector('meta[name="description"]').setAttribute('content', shareText);
+            
+            // Update page title
+            document.title = `${displayName}'s FIRE Journey - Age ${fireAge}`;
+        } else {
+            console.log('Showing default content - no valid data found');
+            // Show default content if no valid data
+            document.getElementById('default-content').style.display = 'block';
+            document.getElementById('user-results').style.display = 'none';
+        }
+    </script>
 </body>
 </html> 
