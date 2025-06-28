@@ -224,6 +224,37 @@ document.addEventListener('DOMContentLoaded', () => {
         shareButton.addEventListener('click', shareResults);
     }
     
+    // Set up share modal event listeners
+    const shareModal = document.getElementById('share-modal-overlay');
+    const closeShareModal = document.getElementById('close-share-modal');
+    const sharePlatformBtns = document.querySelectorAll('.share-platform-btn');
+    
+    if (closeShareModal) {
+        closeShareModal.addEventListener('click', () => {
+            shareModal.classList.add('hidden');
+        });
+    }
+    
+    if (shareModal) {
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                shareModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    sharePlatformBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const platform = btn.dataset.platform;
+            const blobUrl = shareModal.dataset.screenshotBlob;
+            if (blobUrl) {
+                fetch(blobUrl)
+                    .then(res => res.blob())
+                    .then(blob => shareToPlatform(platform, blob));
+            }
+        });
+    });
+    
     // Initialize with assumptions tab as default
     showTab('assumptions');
     
@@ -1059,11 +1090,11 @@ function shareResults() {
                         url: window.location.href
                     }).catch(err => {
                         console.log('Web Share API failed:', err);
-                        downloadImage(blob);
+                        showSocialMediaModal(blob);
                     });
                 } else {
-                    // Fallback to download
-                    downloadImage(blob);
+                    // Fallback to social media modal
+                    showSocialMediaModal(blob);
                 }
             }
         }, 'image/png');
@@ -1071,6 +1102,77 @@ function shareResults() {
         console.error('Screenshot capture failed:', err);
         showMessage('Failed to capture screenshot. Please try again.', 'error');
     });
+}
+
+function showSocialMediaModal(blob) {
+    const modal = document.getElementById('share-modal-overlay');
+    
+    // Store blob for later use
+    modal.dataset.screenshotBlob = URL.createObjectURL(blob);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+function shareToPlatform(platform, blob) {
+    const userName = document.getElementById('user-name')?.value || 'User';
+    const fireAge = document.getElementById('fire-age')?.textContent || '--';
+    const shareText = `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${fireAge}.`;
+    const url = window.location.href;
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+        case 'whatsapp':
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+            break;
+        case 'linkedin':
+            // Use LinkedIn's direct post URL which is more reliable
+            const linkedinText = `${shareText}\n\n${url}`;
+            shareUrl = `https://www.linkedin.com/feed/update/urn:li:activity:${Date.now()}/?text=${encodeURIComponent(linkedinText)}`;
+            
+            // Show a helpful message about LinkedIn sharing
+            showMessage('LinkedIn sharing opened. If preview doesn\'t show, you can still post the text and link manually.', 'info');
+            
+            // Fallback to standard sharing if the above doesn't work
+            if (!shareUrl) {
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shareText)}`;
+            }
+            break;
+        case 'telegram':
+            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`;
+            break;
+        case 'email':
+            const subject = `${userName}'s FIRE Journey Results`;
+            const body = `${shareText}\n\nCheck out the calculator: ${url}`;
+            shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            break;
+        case 'download':
+            downloadImage(blob);
+            document.getElementById('share-modal-overlay').classList.add('hidden');
+            return;
+        case 'copy':
+            copyToClipboard(url, shareText);
+            document.getElementById('share-modal-overlay').classList.add('hidden');
+            return;
+    }
+    
+    if (shareUrl) {
+        // Open in new window with specific dimensions
+        const popup = window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes');
+        
+        // Fallback if popup is blocked
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            // Try to open in same window as fallback
+            window.location.href = shareUrl;
+        }
+    }
 }
 
 function downloadImage(blob) {
@@ -1083,4 +1185,14 @@ function downloadImage(blob) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showMessage('Results image downloaded successfully!', 'info');
+}
+
+function copyToClipboard(url, shareText) {
+    const tempInput = document.createElement('input');
+    tempInput.value = url;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    showMessage('Link copied to clipboard!', 'info');
 }

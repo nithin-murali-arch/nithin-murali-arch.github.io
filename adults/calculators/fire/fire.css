@@ -1423,6 +1423,44 @@ label span[title]:hover::before {
     animation: slideUp 0.3s ease;
 }
 
+.share-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.share-modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-modal-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.share-platforms {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
 .share-platform-btn {
     background: var(--glass-bg);
     border: 2px solid var(--glass-border);
@@ -1437,6 +1475,14 @@ label span[title]:hover::before {
     justify-content: center;
     min-height: 80px;
     font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.share-platform-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
 }
 
 .share-platform-btn:hover {
@@ -1447,6 +1493,47 @@ label span[title]:hover::before {
 .share-platform-btn:focus {
     outline: 2px solid var(--fire-orange);
     outline-offset: 2px;
+}
+
+/* Platform-specific colors */
+.share-platform-btn.whatsapp:hover {
+    border-color: #25D366;
+    color: #25D366;
+}
+
+.share-platform-btn.facebook:hover {
+    border-color: #1877F2;
+    color: #1877F2;
+}
+
+.share-platform-btn.twitter:hover {
+    border-color: #1DA1F2;
+    color: #1DA1F2;
+}
+
+.share-platform-btn.linkedin:hover {
+    border-color: #0A66C2;
+    color: #0A66C2;
+}
+
+.share-platform-btn.telegram:hover {
+    border-color: #0088CC;
+    color: #0088CC;
+}
+
+.share-platform-btn.email:hover {
+    border-color: #EA4335;
+    color: #EA4335;
+}
+
+.share-platform-btn.download:hover {
+    border-color: var(--fire-orange);
+    color: var(--fire-orange);
+}
+
+.share-platform-btn.copy:hover {
+    border-color: #4CAF50;
+    color: #4CAF50;
 }
 
 @keyframes fadeIn {
