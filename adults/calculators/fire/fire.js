@@ -664,6 +664,97 @@ function calculateFIRE() {
     
     const inflatedFireNumber = (inflatedAnnualExpenses / inputs.withdrawalRate) + totalFutureGoalValues + healthcareBufferForRetirement;
     
+    // Calculate Coast FIRE
+    const calculateCoastFIRE = () => {
+        const currentPortfolioValue = Object.values(inputs.portfolio).reduce((sum, asset) => sum + asset.value, 0);
+        const yearsToTarget = inputs.targetAge - inputs.currentAge;
+        
+        // Calculate the required growth rate to reach FIRE number
+        // Formula: FIRE_Number = Current_Portfolio * (1 + growth_rate)^years
+        // Therefore: growth_rate = (FIRE_Number / Current_Portfolio)^(1/years) - 1
+        
+        if (currentPortfolioValue > 0 && yearsToTarget > 0) {
+            const requiredGrowthRate = Math.pow(inflatedFireNumber / currentPortfolioValue, 1 / yearsToTarget) - 1;
+            
+            // Calculate weighted average return of current portfolio
+            const totalValue = Object.values(inputs.portfolio).reduce((sum, asset) => sum + asset.value, 0);
+            const weightedReturn = Object.values(inputs.portfolio).reduce((sum, asset) => {
+                return sum + (asset.value / totalValue) * asset.return;
+            }, 0);
+            
+            // Coast FIRE is achieved if weighted return >= required growth rate
+            const coastFireAchieved = weightedReturn >= requiredGrowthRate;
+            
+            // Calculate when Coast FIRE would be achieved with current contributions
+            let coastFireAge = null;
+            let coastFireYears = null;
+            
+            if (!coastFireAchieved) {
+                // Simulate to find when Coast FIRE is achieved
+                let testPortfolio = JSON.parse(JSON.stringify(inputs.portfolio));
+                let testContributions = {};
+                for (const key in inputs.portfolio) {
+                    testContributions[key] = inputs.portfolio[key].contribution;
+                }
+                
+                for (let year = 1; year <= 30; year++) { // Check up to 30 years
+                    // Add contributions
+                    for (const key in testPortfolio) {
+                        if (testContributions[key] !== undefined) {
+                            testPortfolio[key].value += testContributions[key] * 12;
+                        }
+                    }
+                    
+                    // Apply returns
+                    for (const key in testPortfolio) {
+                        testPortfolio[key].value *= (1 + testPortfolio[key].return);
+                    }
+                    
+                    // Check if Coast FIRE achieved
+                    const testPortfolioValue = Object.values(testPortfolio).reduce((sum, asset) => sum + asset.value, 0);
+                    const testRequiredGrowthRate = Math.pow(inflatedFireNumber / testPortfolioValue, 1 / (inputs.targetAge - inputs.currentAge - year)) - 1;
+                    const testWeightedReturn = Object.values(testPortfolio).reduce((sum, asset) => {
+                        return sum + (asset.value / testPortfolioValue) * asset.return;
+                    }, 0);
+                    
+                    if (testWeightedReturn >= testRequiredGrowthRate) {
+                        coastFireAge = inputs.currentAge + year;
+                        coastFireYears = year;
+                        break;
+                    }
+                }
+            } else {
+                coastFireAge = inputs.currentAge;
+                coastFireYears = 0;
+            }
+            
+            return {
+                coastFireAchieved,
+                coastFireAge,
+                coastFireYears,
+                currentPortfolioValue,
+                requiredGrowthRate: requiredGrowthRate * 100,
+                weightedReturn: weightedReturn * 100,
+                coastFireNumber: inflatedFireNumber
+            };
+        }
+        
+        return {
+            coastFireAchieved: false,
+            coastFireAge: null,
+            coastFireYears: null,
+            currentPortfolioValue: 0,
+            requiredGrowthRate: 0,
+            weightedReturn: 0,
+            coastFireNumber: inflatedFireNumber
+        };
+    };
+    
+    const coastFireData = calculateCoastFIRE();
+    
+    // Debug Coast FIRE calculation
+    console.log('Coast FIRE Debug:', coastFireData);
+    
     // Debug FIRE number calculation
     console.log('FIRE Number Debug:', {
         monthlyRetirementExpenses: monthlyRetirementExpenses,
@@ -946,7 +1037,15 @@ function calculateFIRE() {
         unutilizedMonthlyInvestment: investibleSurplus,
         portfolioHistory,
         finalAllocation,
-        fireAchievable: finalCorpus >= inflatedFireNumber || earliestFireAge !== null
+        fireAchievable: finalCorpus >= inflatedFireNumber || earliestFireAge !== null,
+        // Coast FIRE data
+        coastFireAchieved: coastFireData.coastFireAchieved,
+        coastFireAge: coastFireData.coastFireAge,
+        coastFireYears: coastFireData.coastFireYears,
+        coastFireNumber: coastFireData.coastFireNumber,
+        currentPortfolioValue: coastFireData.currentPortfolioValue,
+        requiredGrowthRate: coastFireData.requiredGrowthRate,
+        weightedReturn: coastFireData.weightedReturn
     };
 
     saveFormData();
@@ -970,7 +1069,15 @@ function updateUIAndCharts(data) {
       portfolio_data: data.portfolio,
       final_allocation: data.finalAllocation,
       portfolio_history: data.portfolioHistory,
-      user_name: data.userName || ''
+      user_name: data.userName || '',
+      // Coast FIRE data
+      coast_fire_achieved: data.coastFireAchieved,
+      coast_fire_age: data.coastFireAge,
+      coast_fire_years: data.coastFireYears,
+      coast_fire_number: data.coastFireNumber,
+      current_portfolio_value: data.currentPortfolioValue,
+      required_growth_rate: data.requiredGrowthRate,
+      weighted_return: data.weightedReturn
     });
     
     // Send completion event to analytics
@@ -1037,6 +1144,31 @@ function updateUIAndCharts(data) {
         actualYearsEl.textContent = '--';
     } else {
         actualYearsEl.className = 'result-value actual';
+    }
+    
+    // Update Coast FIRE elements
+    const coastFireAgeEl = document.getElementById('coast-fire-age');
+    const coastFireYearsEl = document.getElementById('coast-fire-years');
+    const coastFireStatusEl = document.getElementById('coast-fire-status');
+    
+    coastFireAgeEl.textContent = data.coastFireAge ?? '--';
+    coastFireAgeEl.className = data.coastFireAchieved ? 'result-value actual' : 'result-value expected';
+    
+    coastFireYearsEl.textContent = data.coastFireYears ?? '--';
+    coastFireYearsEl.className = data.coastFireAchieved ? 'result-value actual' : 'result-value expected';
+    
+    if (data.coastFireAchieved) {
+        coastFireStatusEl.textContent = 'Achieved';
+        coastFireStatusEl.className = 'result-value actual';
+        coastFireStatusEl.style.color = 'var(--success-green)';
+    } else if (data.coastFireAge) {
+        coastFireStatusEl.textContent = `Achievable in ${data.coastFireYears} years`;
+        coastFireStatusEl.className = 'result-value extended';
+        coastFireStatusEl.style.color = 'var(--fire-orange)';
+    } else {
+        coastFireStatusEl.textContent = 'Not Achievable';
+        coastFireStatusEl.className = 'result-value unachievable';
+        coastFireStatusEl.style.color = 'var(--fire-red)';
     }
     
     document.getElementById('retirement-duration-result').textContent = data.retirementDuration ?? ((data.lifeExpectancy && data.fireAge) ? data.lifeExpectancy - data.fireAge : '--');
@@ -1156,7 +1288,183 @@ function updateUIAndCharts(data) {
         stpChartContainer.style.display = 'none';
     }
 
-    // 4. Burn Down Chart (Post Retirement Corpus)
+    // 4. Coast FIRE Chart
+    const coastFireChartContainer = document.getElementById('coast-fire-chart-container');
+    if (coastFireChartContainer) {
+        // Create Coast FIRE timeline data
+        const coastFireLabels = [];
+        const coastFireData = [];
+        const fireNumberLine = [];
+        const coastFireAchievedLine = [];
+        
+        // Generate data for 30 years or until Coast FIRE is achieved
+        const maxYears = 30;
+        let coastFireAchieved = false;
+        let coastFireYear = null;
+        
+        for (let year = 0; year <= maxYears; year++) {
+            coastFireLabels.push(`Year ${year}`);
+            
+            // Calculate portfolio value at this year (with contributions)
+            let portfolioValue = data.currentPortfolioValue || 0;
+            let weightedReturn = data.weightedReturn / 100 || 0.08; // Default 8%
+            
+            // Add contributions for each year
+            for (let y = 0; y < year; y++) {
+                // Add annual contributions (monthly contributions * 12)
+                const annualContributions = Object.values(data.portfolio || {}).reduce((sum, asset) => {
+                    return sum + (asset.contribution || 0) * 12;
+                }, 0);
+                
+                // Apply salary growth to contributions
+                const salaryGrowth = data.salaryGrowth || 0.05;
+                const growthFactor = Math.pow(1 + salaryGrowth, y);
+                const adjustedContributions = annualContributions * growthFactor;
+                
+                portfolioValue += adjustedContributions;
+                portfolioValue *= (1 + weightedReturn);
+            }
+            
+            coastFireData.push(portfolioValue);
+            
+            // Calculate required growth rate to reach FIRE number from current portfolio
+            const yearsToTarget = (data.targetAge || 45) - (data.currentAge || 32) - year;
+            const requiredGrowthRate = yearsToTarget > 0 ? 
+                Math.pow((data.inflatedFireNumber || 0) / portfolioValue, 1 / yearsToTarget) - 1 : 0;
+            
+            // Check if Coast FIRE is achieved (weighted return >= required growth rate)
+            if (!coastFireAchieved && weightedReturn >= requiredGrowthRate && yearsToTarget > 0) {
+                coastFireAchieved = true;
+                coastFireYear = year;
+            }
+            
+            // FIRE number line (constant)
+            fireNumberLine.push(data.inflatedFireNumber || 0);
+            
+            // Coast FIRE achieved line (shows when Coast FIRE is achieved)
+            if (coastFireAchieved && coastFireYear !== null) {
+                coastFireAchievedLine.push(portfolioValue);
+            } else {
+                coastFireAchievedLine.push(null);
+            }
+        }
+        
+        const coastFireChartData = {
+            labels: coastFireLabels,
+            datasets: [
+                {
+                    label: 'Portfolio Value',
+                    data: coastFireData,
+                    borderColor: '#4ECDC4',
+                    backgroundColor: '#4ECDC4',
+                    fill: false,
+                    tension: 0.4
+                },
+                {
+                    label: 'FIRE Number',
+                    data: fireNumberLine,
+                    borderColor: '#FF6B35',
+                    backgroundColor: '#FF6B35',
+                    fill: false,
+                    borderDash: [5, 5],
+                    tension: 0
+                },
+                {
+                    label: 'Coast FIRE Achieved',
+                    data: coastFireAchievedLine,
+                    borderColor: '#10B981',
+                    backgroundColor: '#10B981',
+                    fill: false,
+                    borderWidth: 3,
+                    tension: 0.4
+                }
+            ]
+        };
+        
+        chartInstances.coastFireChart = new Chart(document.getElementById('coastFireChart'), {
+            type: 'line',
+            data: coastFireChartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        labels: { color: '#6c757d' },
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                
+                                if (label === 'Portfolio Value') {
+                                    return `${label}: ${formatCurrency(value)}`;
+                                } else if (label === 'FIRE Number') {
+                                    return `${label}: ${formatCurrency(value)}`;
+                                } else if (label === 'Coast FIRE Achieved') {
+                                    return `${label}: ${formatCurrency(value)}`;
+                                }
+                                return `${label}: ${formatCurrency(value)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Years from Now',
+                            color: '#6c757d'
+                        },
+                        ticks: { color: '#6c757d' }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Portfolio Value (₹)',
+                            color: '#6c757d'
+                        },
+                        ticks: { 
+                            color: '#6c757d',
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Add annotation for Coast FIRE achievement
+        if (coastFireYear !== null) {
+            chartInstances.coastFireChart.options.plugins.annotation = {
+                annotations: {
+                    coastFirePoint: {
+                        type: 'point',
+                        xValue: coastFireYear,
+                        yValue: coastFireData[coastFireYear],
+                        backgroundColor: '#10B981',
+                        borderColor: '#10B981',
+                        borderWidth: 3,
+                        radius: 8,
+                        label: {
+                            content: `Coast FIRE\nAchieved!`,
+                            enabled: true,
+                            position: 'top',
+                            color: '#10B981',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            };
+            chartInstances.coastFireChart.update();
+        }
+    }
+
+    // 5. Burn Down Chart (Post Retirement Corpus)
     // Simulate corpus burn down using actual achieved corpus and include goal execution events
     const multipliers = { lean: 0.7, regular: 1.0, fat: 1.5 };
     const years = 50; // Simulate 50 years post retirement to catch money running out
@@ -1198,7 +1506,9 @@ function updateUIAndCharts(data) {
     // Create burndown chart data - start from retirement corpus and show depletion
     const burnDownLabels = [];
     const burnDownData = { lean: [], regular: [], fat: [] };
-    const burnDownDataToday = { lean: [], regular: [], fat: [] };
+    
+    // Get retirement age for age-based labels
+    const retirementAge = data.fireAge || data.targetAge || 0;
     
     // Calculate different starting corpus amounts for each FIRE type
     // Each FIRE type needs a different corpus based on their withdrawal needs
@@ -1209,13 +1519,13 @@ function updateUIAndCharts(data) {
     };
     
     for (let year = 0; year <= years; year++) {
-        burnDownLabels.push(`Year ${year}`);
+        const age = retirementAge + year;
+        burnDownLabels.push(`Age ${age}`);
         
         if (year === 0) {
             // Start with different corpus amounts for each FIRE type
             for (const type of ['lean', 'regular', 'fat']) {
                 burnDownData[type][year] = startingCorpus[type];
-                burnDownDataToday[type][year] = startingCorpus[type];
             }
         } else {
             // Apply withdrawals and growth for each FIRE type
@@ -1224,7 +1534,6 @@ function updateUIAndCharts(data) {
                 
                 if (prevCorpus <= 0) {
                     burnDownData[type][year] = 0;
-                    burnDownDataToday[type][year] = 0;
                 } else {
                     // Apply SWR-based withdrawal (percentage of current corpus)
                     const swrWithdrawal = prevCorpus * swr;
@@ -1247,7 +1556,6 @@ function updateUIAndCharts(data) {
                     const futureValue = afterDeductions * (1 + annualReturn);
                     
                     burnDownData[type][year] = futureValue;
-                    burnDownDataToday[type][year] = futureValue / Math.pow(1 + inflation, year);
                 }
             }
         }
@@ -1292,185 +1600,470 @@ function updateUIAndCharts(data) {
         }
     }));
     
-    chartInstances.burnDownChart = new Chart(document.getElementById('burnDownChart'), {
-        type: 'line',
-        data: {
-            labels: burnDownLabels,
-            datasets: [
-                {
-                    label: `Lean FIRE${moneyRunsOut.lean ? ` (Runs out: Year ${moneyRunsOut.lean})` : ''}`,
-                    data: burnDownData.lean,
-                    borderColor: '#10B981',
-                    fill: false,
-                    tension: 0.4
-                },
-                {
-                    label: `Regular FIRE${moneyRunsOut.regular ? ` (Runs out: Year ${moneyRunsOut.regular})` : ''}`,
-                    data: burnDownData.regular,
-                    borderColor: '#FF6B35',
-                    fill: false,
-                    tension: 0.4
-                },
-                {
-                    label: `Fat FIRE${moneyRunsOut.fat ? ` (Runs out: Year ${moneyRunsOut.fat})` : ''}`,
-                    data: burnDownData.fat,
-                    borderColor: '#8B5CF6',
-                    fill: false,
-                    tension: 0.4
-                },
-                // Goal events as scatter points (only for retirement goals)
-                ...retirementGoalEvents.map((goal, index) => ({
-                    label: `${goal.name} (Goal)`,
-                    data: burnDownLabels.map((label, idx) => {
-                        if (idx === goal.year) {
-                            return burnDownData.regular[idx] || 0;
-                        }
-                        return null;
-                    }),
-                    type: 'scatter',
-                    backgroundColor: goalColors[index % goalColors.length] + '80',
-                    borderColor: goalColors[index % goalColors.length],
-                    borderWidth: 2,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    showLine: false
-                }))
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { labels: { color: '#6c757d' } },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const value = context.parsed.y;
-                            const year = context.dataIndex;
-                            
-                            if (value <= 0) {
-                                return label + ': Money has run out';
-                            }
-                            
-                            // Add withdrawal rate info for FIRE types
-                            if (label.includes('FIRE') && !label.includes('Goal')) {
-                                const withdrawalRate = (swr * 100).toFixed(1);
-                                const withdrawalAmount = annualWithdrawals[label.toLowerCase().split(' ')[0]] || 0;
-                                const goalsThisYear = goalEvents.filter(g => g.year === year);
-                                const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
-                                
-                                let tooltipText = label + ': ' + formatCurrency(value);
-                                tooltipText += `\nWithdrawal Rate: ${withdrawalRate}%`;
-                                tooltipText += `\nAnnual Withdrawal: ${formatCurrency(withdrawalAmount)}`;
-                                
-                                if (totalGoalDeduction > 0) {
-                                    tooltipText += `\nGoal Deductions: ${formatCurrency(totalGoalDeduction)}`;
-                                }
-                                
-                                return tooltipText;
-                            }
-                            
-                            return label + ': ' + formatCurrency(value);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    position: 'left',
-                    title: { display: true, text: 'Portfolio Value (₹)', color: '#6c757d' },
-                    ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
-                },
-                x: {
-                    title: { display: true, text: 'Years After Retirement', color: '#6c757d' },
-                    ticks: { color: '#6c757d' }
-                }
-            }
-        }
+    // Determine which burndown chart to show based on FIRE achievement
+    const hasShortfall = data.corpusShortfall < 0; // True when there's a shortfall (FIRE not achieved)
+    const achievedContainer = document.getElementById('burndown-achieved-container');
+    const notAchievedContainer = document.getElementById('burndown-not-achieved-container');
+    
+    console.log('FIRE Achievement Debug:', {
+        corpusShortfall: data.corpusShortfall,
+        fireAge: data.fireAge,
+        hasShortfall: hasShortfall,
+        achievedContainer: achievedContainer,
+        notAchievedContainer: notAchievedContainer
     });
     
-    // Burn Down Chart (Today's Value)
-    chartInstances.burnDownChartToday = new Chart(document.getElementById('burnDownChartToday'), {
-        type: 'line',
-        data: {
-            labels: burnDownLabels,
-            datasets: [
-                {
-                    label: `Lean FIRE (Today's Value)${moneyRunsOut.lean ? ` (Runs out: Year ${moneyRunsOut.lean})` : ''}`,
-                    data: burnDownDataToday.lean,
-                    borderColor: '#10B981',
-                    borderDash: [8, 4],
-                    fill: false,
-                    tension: 0.4
-                },
-                {
-                    label: `Regular FIRE (Today's Value)${moneyRunsOut.regular ? ` (Runs out: Year ${moneyRunsOut.regular})` : ''}`,
-                    data: burnDownDataToday.regular,
-                    borderColor: '#FF6B35',
-                    borderDash: [8, 4],
-                    fill: false,
-                    tension: 0.4
-                },
-                {
-                    label: `Fat FIRE (Today's Value)${moneyRunsOut.fat ? ` (Runs out: Year ${moneyRunsOut.fat})` : ''}`,
-                    data: burnDownDataToday.fat,
-                    borderColor: '#8B5CF6',
-                    borderDash: [8, 4],
-                    fill: false,
-                    tension: 0.4
-                },
-                // Goal events as scatter points (Today's Value)
-                ...goalEvents.map((goal, index) => ({
-                    label: `${goal.name} (Goal)`,
-                    data: burnDownLabels.map((label, idx) => {
-                        if (idx === goal.year) {
-                            return burnDownDataToday.regular[idx] || 0;
-                        }
-                        return null;
-                    }),
-                    type: 'scatter',
-                    backgroundColor: goalColors[index % goalColors.length] + '80',
-                    borderColor: goalColors[index % goalColors.length],
-                    borderWidth: 2,
-                    pointRadius: 8,
-                    pointHoverRadius: 12,
-                    showLine: false
-                }))
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { labels: { color: '#6c757d' } },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const value = context.parsed.y;
-                            if (value <= 0) {
-                                return label + ': Money has run out';
+    if (!hasShortfall) {
+        // Show only achieved burndown chart when FIRE is achieved (no shortfall)
+        console.log('Showing FIRE Achieved chart only');
+        achievedContainer.style.display = 'flex';
+        notAchievedContainer.style.display = 'none';
+        
+        chartInstances.burnDownChartAchieved = new Chart(document.getElementById('burnDownChartAchieved'), {
+            type: 'line',
+            data: {
+                labels: burnDownLabels,
+                datasets: [
+                    {
+                        label: `Lean FIRE${moneyRunsOut.lean ? ` (Runs out: Age ${retirementAge + moneyRunsOut.lean})` : ''}`,
+                        data: burnDownData.lean,
+                        borderColor: '#10B981',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Regular FIRE${moneyRunsOut.regular ? ` (Runs out: Age ${retirementAge + moneyRunsOut.regular})` : ''}`,
+                        data: burnDownData.regular,
+                        borderColor: '#FF6B35',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Fat FIRE${moneyRunsOut.fat ? ` (Runs out: Age ${retirementAge + moneyRunsOut.fat})` : ''}`,
+                        data: burnDownData.fat,
+                        borderColor: '#8B5CF6',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    // Goal events as scatter points (only for retirement goals)
+                    ...retirementGoalEvents.map((goal, index) => ({
+                        label: `${goal.name} (Goal)`,
+                        data: burnDownLabels.map((label, idx) => {
+                            if (idx === goal.year) {
+                                return burnDownData.regular[idx] || 0;
                             }
-                            return label + ': ' + formatCurrency(value);
+                            return null;
+                        }),
+                        type: 'scatter',
+                        backgroundColor: goalColors[index % goalColors.length] + '80',
+                        borderColor: goalColors[index % goalColors.length],
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        showLine: false
+                    }))
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { labels: { color: '#6c757d' } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                const year = context.dataIndex;
+                                
+                                if (value <= 0) {
+                                    return label + ': Money has run out';
+                                }
+                                
+                                // Add withdrawal rate info for FIRE types
+                                if (label.includes('FIRE') && !label.includes('Goal')) {
+                                    const withdrawalRate = (swr * 100).toFixed(1);
+                                    const withdrawalAmount = annualWithdrawals[label.toLowerCase().split(' ')[0]] || 0;
+                                    const goalsThisYear = goalEvents.filter(g => g.year === year);
+                                    const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                                    
+                                    let tooltipText = label + ': ' + formatCurrency(value);
+                                    tooltipText += `\nWithdrawal Rate: ${withdrawalRate}%`;
+                                    tooltipText += `\nAnnual Withdrawal: ${formatCurrency(withdrawalAmount)}`;
+                                    
+                                    if (totalGoalDeduction > 0) {
+                                        tooltipText += `\nGoal Deductions: ${formatCurrency(totalGoalDeduction)}`;
+                                    }
+                                    
+                                    return tooltipText;
+                                }
+                                
+                                return label + ': ' + formatCurrency(value);
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    position: 'left',
-                    title: { display: true, text: "Today's Value (₹)", color: '#6c757d' },
-                    ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
                 },
-                x: { 
-                    ticks: { color: '#6c757d' },
-                    title: { display: true, text: 'Years from Now', color: '#6c757d' }
+                scales: {
+                    y: {
+                        position: 'left',
+                        title: { display: true, text: 'Portfolio Value (₹)', color: '#6c757d' },
+                        ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Age', color: '#6c757d' },
+                        ticks: { color: '#6c757d' }
+                    }
+                }
+            }
+        });
+    } else {
+        // Show both charts when there's a shortfall - reality and motivation
+        console.log('Showing both FIRE Not Achieved and FIRE Achieved charts due to shortfall');
+        achievedContainer.style.display = 'flex';
+        notAchievedContainer.style.display = 'flex';
+        
+        // Reorder the containers so Not Achieved comes first, then Achieved for motivation
+        const chartsContainer = document.querySelector('.charts-container');
+        if (chartsContainer) {
+            // Find the Goal Execution Timeline container to move it back to the end
+            const goalTimelineContainer = chartsContainer.querySelector('.chart-row:has(#goal-events-summary)') || 
+                                        chartsContainer.querySelector('.chart-row:last-child');
+            
+            // Move the not achieved container before the achieved container
+            chartsContainer.appendChild(notAchievedContainer);
+            chartsContainer.appendChild(achievedContainer);
+            
+            // Move the Goal Execution Timeline back to the end
+            if (goalTimelineContainer && goalTimelineContainer !== chartsContainer.lastElementChild) {
+                chartsContainer.appendChild(goalTimelineContainer);
+            }
+        }
+        
+        // Calculate what would happen if they retired at target age without achieving FIRE
+        const targetAgeCorpus = data.finalCorpus; // This is what they'd have at target age
+        const notAchievedBurnDownLabels = [];
+        const notAchievedBurnDownData = { lean: [], regular: [], fat: [] };
+        
+        // Get target age for age-based labels in Not Achieved scenario
+        const targetAge = data.targetAge || 0;
+        
+        // Calculate different starting corpus amounts for each FIRE type (using target age corpus)
+        const notAchievedStartingCorpus = {
+            lean: targetAgeCorpus * 0.7,    // Lean FIRE needs 70% of regular corpus
+            regular: targetAgeCorpus,       // Regular FIRE uses full corpus
+            fat: targetAgeCorpus * 1.5      // Fat FIRE needs 150% of regular corpus
+        };
+        
+        for (let year = 0; year <= years; year++) {
+            const age = targetAge + year;
+            notAchievedBurnDownLabels.push(`Age ${age}`);
+            
+            if (year === 0) {
+                // Start with different corpus amounts for each FIRE type
+                for (const type of ['lean', 'regular', 'fat']) {
+                    notAchievedBurnDownData[type][year] = notAchievedStartingCorpus[type];
+                }
+            } else {
+                // Apply withdrawals and growth for each FIRE type
+                for (const type of ['lean', 'regular', 'fat']) {
+                    const prevCorpus = notAchievedBurnDownData[type][year - 1];
+                    
+                    if (prevCorpus <= 0) {
+                        notAchievedBurnDownData[type][year] = 0;
+                    } else {
+                        // Apply SWR-based withdrawal (percentage of current corpus)
+                        const swrWithdrawal = prevCorpus * swr;
+                        
+                        // Apply lifestyle-based withdrawal (fixed amount)
+                        const lifestyleWithdrawal = annualWithdrawals[type];
+                        
+                        // Use the higher of the two withdrawal methods
+                        const withdrawal = Math.max(swrWithdrawal, lifestyleWithdrawal);
+                        
+                        // Apply goal deductions if any goals occur this year
+                        const goalsThisYear = goalEvents.filter(g => g.year === year);
+                        const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                        
+                        // Total deductions: withdrawal + goals
+                        const totalDeductions = withdrawal + totalGoalDeduction;
+                        const afterDeductions = Math.max(0, prevCorpus - totalDeductions);
+                        
+                        // Apply growth on remaining corpus
+                        const futureValue = afterDeductions * (1 + annualReturn);
+                        
+                        notAchievedBurnDownData[type][year] = futureValue;
+                    }
                 }
             }
         }
-    });
-
+        
+        // Find when money runs out for each type in not achieved scenario
+        const notAchievedMoneyRunsOut = {};
+        for (const type of ['lean', 'regular', 'fat']) {
+            const zeroIndex = notAchievedBurnDownData[type].findIndex(value => value <= 0);
+            notAchievedMoneyRunsOut[type] = zeroIndex > 0 ? zeroIndex : null;
+        }
+        
+        chartInstances.burnDownChartNotAchieved = new Chart(document.getElementById('burnDownChartNotAchieved'), {
+            type: 'line',
+            data: {
+                labels: notAchievedBurnDownLabels,
+                datasets: [
+                    {
+                        label: `Lean FIRE${notAchievedMoneyRunsOut.lean ? ` (Runs out: Age ${targetAge + notAchievedMoneyRunsOut.lean})` : ''}`,
+                        data: notAchievedBurnDownData.lean,
+                        borderColor: '#10B981',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Regular FIRE${notAchievedMoneyRunsOut.regular ? ` (Runs out: Age ${targetAge + notAchievedMoneyRunsOut.regular})` : ''}`,
+                        data: notAchievedBurnDownData.regular,
+                        borderColor: '#FF6B35',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Fat FIRE${notAchievedMoneyRunsOut.fat ? ` (Runs out: Age ${targetAge + notAchievedMoneyRunsOut.fat})` : ''}`,
+                        data: notAchievedBurnDownData.fat,
+                        borderColor: '#8B5CF6',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    // Goal events as scatter points (only for retirement goals)
+                    ...retirementGoalEvents.map((goal, index) => ({
+                        label: `${goal.name} (Goal)`,
+                        data: notAchievedBurnDownLabels.map((label, idx) => {
+                            if (idx === goal.year) {
+                                return notAchievedBurnDownData.regular[idx] || 0;
+                            }
+                            return null;
+                        }),
+                        type: 'scatter',
+                        backgroundColor: goalColors[index % goalColors.length] + '80',
+                        borderColor: goalColors[index % goalColors.length],
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        showLine: false
+                    }))
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { labels: { color: '#6c757d' } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                const year = context.dataIndex;
+                                
+                                if (value <= 0) {
+                                    return label + ': Money has run out';
+                                }
+                                
+                                // Add withdrawal rate info for FIRE types
+                                if (label.includes('FIRE') && !label.includes('Goal')) {
+                                    const withdrawalRate = (swr * 100).toFixed(1);
+                                    const withdrawalAmount = annualWithdrawals[label.toLowerCase().split(' ')[0]] || 0;
+                                    const goalsThisYear = goalEvents.filter(g => g.year === year);
+                                    const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                                    
+                                    let tooltipText = label + ': ' + formatCurrency(value);
+                                    tooltipText += `\nWithdrawal Rate: ${withdrawalRate}%`;
+                                    tooltipText += `\nAnnual Withdrawal: ${formatCurrency(withdrawalAmount)}`;
+                                    
+                                    if (totalGoalDeduction > 0) {
+                                        tooltipText += `\nGoal Deductions: ${formatCurrency(totalGoalDeduction)}`;
+                                    }
+                                    
+                                    return tooltipText;
+                                }
+                                
+                                return label + ': ' + formatCurrency(value);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        position: 'left',
+                        title: { display: true, text: 'Portfolio Value (₹)', color: '#6c757d' },
+                        ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Age', color: '#6c757d' },
+                        ticks: { color: '#6c757d' }
+                    }
+                }
+            }
+        });
+        
+        // Now create the FIRE Achieved chart for motivation (showing what they could achieve)
+        // Use the actual FIRE corpus (inflatedFireNumber) instead of target age corpus
+        const fireAchievedCorpus = data.inflatedFireNumber || 0;
+        const fireAchievedBurnDownLabels = [];
+        const fireAchievedBurnDownData = { lean: [], regular: [], fat: [] };
+        
+        // Calculate different starting corpus amounts for each FIRE type (using actual FIRE corpus)
+        const fireAchievedStartingCorpus = {
+            lean: fireAchievedCorpus * 0.7,    // Lean FIRE needs 70% of regular corpus
+            regular: fireAchievedCorpus,       // Regular FIRE uses full corpus
+            fat: fireAchievedCorpus * 1.5      // Fat FIRE needs 150% of regular corpus
+        };
+        
+        for (let year = 0; year <= years; year++) {
+            const age = retirementAge + year;
+            fireAchievedBurnDownLabels.push(`Age ${age}`);
+            
+            if (year === 0) {
+                // Start with different corpus amounts for each FIRE type
+                for (const type of ['lean', 'regular', 'fat']) {
+                    fireAchievedBurnDownData[type][year] = fireAchievedStartingCorpus[type];
+                }
+            } else {
+                // Apply withdrawals and growth for each FIRE type
+                for (const type of ['lean', 'regular', 'fat']) {
+                    const prevCorpus = fireAchievedBurnDownData[type][year - 1];
+                    
+                    if (prevCorpus <= 0) {
+                        fireAchievedBurnDownData[type][year] = 0;
+                    } else {
+                        // Apply SWR-based withdrawal (percentage of current corpus)
+                        const swrWithdrawal = prevCorpus * swr;
+                        
+                        // Apply lifestyle-based withdrawal (fixed amount)
+                        const lifestyleWithdrawal = annualWithdrawals[type];
+                        
+                        // Use the higher of the two withdrawal methods
+                        const withdrawal = Math.max(swrWithdrawal, lifestyleWithdrawal);
+                        
+                        // Apply goal deductions if any goals occur this year
+                        const goalsThisYear = goalEvents.filter(g => g.year === year);
+                        const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                        
+                        // Total deductions: withdrawal + goals
+                        const totalDeductions = withdrawal + totalGoalDeduction;
+                        const afterDeductions = Math.max(0, prevCorpus - totalDeductions);
+                        
+                        // Apply growth on remaining corpus
+                        const futureValue = afterDeductions * (1 + annualReturn);
+                        
+                        fireAchievedBurnDownData[type][year] = futureValue;
+                    }
+                }
+            }
+        }
+        
+        // Find when money runs out for each type in FIRE achieved scenario
+        const fireAchievedMoneyRunsOut = {};
+        for (const type of ['lean', 'regular', 'fat']) {
+            const zeroIndex = fireAchievedBurnDownData[type].findIndex(value => value <= 0);
+            fireAchievedMoneyRunsOut[type] = zeroIndex > 0 ? zeroIndex : null;
+        }
+        
+        chartInstances.burnDownChartAchieved = new Chart(document.getElementById('burnDownChartAchieved'), {
+            type: 'line',
+            data: {
+                labels: fireAchievedBurnDownLabels,
+                datasets: [
+                    {
+                        label: `Lean FIRE${fireAchievedMoneyRunsOut.lean ? ` (Runs out: Age ${retirementAge + fireAchievedMoneyRunsOut.lean})` : ''}`,
+                        data: fireAchievedBurnDownData.lean,
+                        borderColor: '#10B981',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Regular FIRE${fireAchievedMoneyRunsOut.regular ? ` (Runs out: Age ${retirementAge + fireAchievedMoneyRunsOut.regular})` : ''}`,
+                        data: fireAchievedBurnDownData.regular,
+                        borderColor: '#FF6B35',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: `Fat FIRE${fireAchievedMoneyRunsOut.fat ? ` (Runs out: Age ${retirementAge + fireAchievedMoneyRunsOut.fat})` : ''}`,
+                        data: fireAchievedBurnDownData.fat,
+                        borderColor: '#8B5CF6',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    // Goal events as scatter points (only for retirement goals)
+                    ...retirementGoalEvents.map((goal, index) => ({
+                        label: `${goal.name} (Goal)`,
+                        data: fireAchievedBurnDownLabels.map((label, idx) => {
+                            if (idx === goal.year) {
+                                return fireAchievedBurnDownData.regular[idx] || 0;
+                            }
+                            return null;
+                        }),
+                        type: 'scatter',
+                        backgroundColor: goalColors[index % goalColors.length] + '80',
+                        borderColor: goalColors[index % goalColors.length],
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        showLine: false
+                    }))
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { labels: { color: '#6c757d' } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                const year = context.dataIndex;
+                                
+                                if (value <= 0) {
+                                    return label + ': Money has run out';
+                                }
+                                
+                                // Add withdrawal rate info for FIRE types
+                                if (label.includes('FIRE') && !label.includes('Goal')) {
+                                    const withdrawalRate = (swr * 100).toFixed(1);
+                                    const withdrawalAmount = annualWithdrawals[label.toLowerCase().split(' ')[0]] || 0;
+                                    const goalsThisYear = goalEvents.filter(g => g.year === year);
+                                    const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                                    
+                                    let tooltipText = label + ': ' + formatCurrency(value);
+                                    tooltipText += `\nWithdrawal Rate: ${withdrawalRate}%`;
+                                    tooltipText += `\nAnnual Withdrawal: ${formatCurrency(withdrawalAmount)}`;
+                                    
+                                    if (totalGoalDeduction > 0) {
+                                        tooltipText += `\nGoal Deductions: ${formatCurrency(totalGoalDeduction)}`;
+                                    }
+                                    
+                                    return tooltipText;
+                                }
+                                
+                                return label + ': ' + formatCurrency(value);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        position: 'left',
+                        title: { display: true, text: 'Portfolio Value (₹)', color: '#6c757d' },
+                        ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Age', color: '#6c757d' },
+                        ticks: { color: '#6c757d' }
+                    }
+                }
+            }
+        });
+    }
+    
     // Update goal events summary
     const goalEventsSummary = document.getElementById('goal-events-summary');
     if (goalEventsSummary) {
@@ -1807,9 +2400,24 @@ function shareResults() {
                 // Try Web Share API first
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     const userName = document.getElementById('user-name')?.value || 'User';
+                    const fireAge = document.getElementById('fire-age')?.textContent || '--';
+                    const coastFireAge = document.getElementById('coast-fire-age')?.textContent || '--';
+                    const coastFireStatus = document.getElementById('coast-fire-status')?.textContent || '--';
+                    
+                    let shareText = `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${fireAge}.`;
+                    
+                    // Add Coast FIRE information if available
+                    if (coastFireAge && coastFireAge !== '--') {
+                        if (coastFireStatus && coastFireStatus.includes('Achieved')) {
+                            shareText += ` I've already reached Coast FIRE!`;
+                        } else if (coastFireStatus && coastFireStatus.includes('Achievable')) {
+                            shareText += ` My Coast FIRE age is ${coastFireAge}.`;
+                        }
+                    }
+                    
                     navigator.share({
                         title: `${userName}'s FIRE Journey Results`,
-                        text: `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${document.getElementById('fire-age')?.textContent || '--'}.`,
+                        text: shareText,
                         files: [file],
                         url: window.location.href
                     }).catch(err => {
@@ -1844,8 +2452,19 @@ function shareToPlatform(platform, blob) {
     const yearsToFire = document.getElementById('years-to-fire')?.textContent || '--';
     const finalCorpus = document.getElementById('final-corpus')?.textContent || '--';
     const fireNumber = document.getElementById('inflated-fire-number')?.textContent || '--';
+    const coastFireAge = document.getElementById('coast-fire-age')?.textContent || '--';
+    const coastFireStatus = document.getElementById('coast-fire-status')?.textContent || '--';
     
-    const shareText = `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${fireAge}.`;
+    let shareText = `Check out my FIRE (Financial Independence, Retire Early) journey! I can achieve financial independence at age ${fireAge}.`;
+    
+    // Add Coast FIRE information if available
+    if (coastFireAge && coastFireAge !== '--') {
+        if (coastFireStatus && coastFireStatus.includes('Achieved')) {
+            shareText += ` I've already reached Coast FIRE!`;
+        } else if (coastFireStatus && coastFireStatus.includes('Achievable')) {
+            shareText += ` My Coast FIRE age is ${coastFireAge}.`;
+        }
+    }
     
     // Generate preview URL with essential results data only
     const previewUrl = new URL('https://nithin-murali-arch.github.io/adults/calculators/fire/preview.html');
@@ -1854,6 +2473,8 @@ function shareToPlatform(platform, blob) {
     previewUrl.searchParams.set('yearsToFire', encodeURIComponent(yearsToFire));
     previewUrl.searchParams.set('finalCorpus', encodeURIComponent(finalCorpus));
     previewUrl.searchParams.set('fireNumber', encodeURIComponent(fireNumber));
+    previewUrl.searchParams.set('coastFireAge', encodeURIComponent(coastFireAge));
+    previewUrl.searchParams.set('coastFireStatus', encodeURIComponent(coastFireStatus));
     
     // Add chart data for portfolio growth chart
     if (chartInstances.portfolioGrowthChart && chartInstances.portfolioGrowthChart.data) {

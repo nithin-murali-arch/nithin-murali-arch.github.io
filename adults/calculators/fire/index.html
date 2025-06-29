@@ -1506,6 +1506,18 @@
                         <div class="result-label">Actual Years to FIRE</div>
                     </div>
                     <div class="result-item">
+                        <div class="result-value" id="coast-fire-age">--</div>
+                        <div class="result-label">Coast FIRE Age</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="coast-fire-years">--</div>
+                        <div class="result-label">Years to Coast FIRE</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="coast-fire-status">--</div>
+                        <div class="result-label">Coast FIRE Status</div>
+                    </div>
+                    <div class="result-item">
                         <div class="result-value" id="retirement-duration-result">--</div>
                         <div class="result-label">Retirement Duration</div>
                     </div>
@@ -1539,15 +1551,35 @@
                         <strong>Note:</strong> "Actual FIRE Age" shows the earliest age when you can achieve FIRE with your current inputs. If your target age is not achievable, we assume income continues until age 58 to calculate the earliest possible FIRE age. "(extended)" indicates the age is beyond your target but achievable by working longer.
                     </p>
                 </div>
+                <div class="results-note" style="margin-top: 15px; padding: 15px; background: rgba(79, 70, 229, 0.1); border-left: 4px solid var(--fire-blue); border-radius: 8px;">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        <strong>Coast FIRE:</strong> This is when your portfolio is large enough that, even if you stop contributing, it will grow to your FIRE number by your target retirement age. At Coast FIRE, you can reduce your savings rate or switch to a lower-paying job while your investments continue to grow.
+                    </p>
+                </div>
                 <div class="charts-container">
-                    <div class="chart-section">
-                        <h3>Portfolio Growth & Asset Allocation <span class="chart-info"
-                                data-tooltip="Shows how your portfolio grows and how your asset allocation changes each year until retirement.">?</span>
-                        </h3>
-                        <div class="chart-wrapper">
-                            <canvas id="portfolioGrowthChart"></canvas>
+                    <!-- Row 1: Portfolio Growth & Asset Allocation (full width) -->
+                    <div class="chart-row">
+                        <div class="chart-section full-width">
+                            <h3>Portfolio Growth & Asset Allocation <span class="chart-info"
+                                    data-tooltip="Shows how your portfolio grows and how your asset allocation changes each year until retirement.">?</span>
+                            </h3>
+                            <div class="chart-wrapper">
+                                <canvas id="portfolioGrowthChart"></canvas>
+                            </div>
                         </div>
                     </div>
+                    <!-- Row 2: Coast FIRE Timeline (full width) -->
+                    <div class="chart-row">
+                        <div class="chart-section full-width" id="coast-fire-chart-container">
+                            <h3>Coast FIRE Timeline <span class="chart-info"
+                                    data-tooltip="Shows when you'll reach Coast FIRE (when your portfolio can grow to FIRE number without additional contributions).">?</span>
+                            </h3>
+                            <div class="chart-wrapper">
+                                <canvas id="coastFireChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row 3: Final Asset Allocation | STP - Debt to Equity Transfer -->
                     <div class="chart-row">
                         <div class="chart-section half-width">
                             <h3>Final Asset Allocation <span class="chart-info"
@@ -1568,28 +1600,41 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chart-section">
-                        <h3>Burn Down of Corpus Post Retirement <span class="chart-info"
-                                data-tooltip="Shows how your retirement corpus changes each year after retirement, in future rupees (not adjusted for inflation).">?</span>
-                        </h3>
-                        <div class="chart-wrapper">
-                            <canvas id="burnDownChart"></canvas>
+                    <!-- Row 4: Burn Down of Corpus Post Retirement (conditional based on FIRE achievement) -->
+                    <div class="chart-row" id="burndown-achieved-container" style="display: none;">
+                        <div class="chart-section full-width">
+                            <div class="results-note" style="margin-bottom: 15px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 8px;">
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                                    <strong>🎯 Your FIRE Dream:</strong> This chart shows how your life would look if you achieve your FIRE goal. It's your motivation to keep working towards financial independence - a sustainable retirement where your money lasts throughout your golden years.
+                                </p>
+                            </div>
+                            <h3>Burn Down of Corpus Post Retirement (FIRE Achieved) <span class="chart-info"
+                                    data-tooltip="Shows how your retirement corpus changes each year after achieving FIRE, in future rupees (not adjusted for inflation).">?</span>
+                            </h3>
+                            <div class="chart-wrapper">
+                                <canvas id="burnDownChartAchieved"></canvas>
+                            </div>
                         </div>
                     </div>
-                    <div class="chart-section">
-                        <h3>Burn Down of Corpus (Today's Value) <span class="chart-info"
-                                data-tooltip="Shows how your retirement corpus changes each year after retirement, adjusted for inflation to show today's value.">?</span>
-                        </h3>
-                        <div class="chart-wrapper">
-                            <canvas id="burnDownChartToday"></canvas>
+                    <div class="chart-row" id="burndown-not-achieved-container" style="display: none;">
+                        <div class="chart-section full-width">
+                            <h3>Burn Down of Corpus Post Retirement (FIRE Not Achieved) <span class="chart-info"
+                                    data-tooltip="Shows how your retirement corpus would change if you retired at your target age without achieving FIRE, in future rupees (not adjusted for inflation).">?</span>
+                            </h3>
+                            <div class="chart-wrapper">
+                                <canvas id="burnDownChartNotAchieved"></canvas>
+                            </div>
                         </div>
                     </div>
-                    <div class="chart-section">
-                        <h3>Goal Execution Timeline <span class="chart-info"
-                                data-tooltip="Shows when your financial goals will be executed and how they impact your portfolio value. Orange dots mark goal execution events.">?</span>
-                        </h3>
-                        <div id="goal-events-summary" class="goal-events-summary">
-                            <!-- Goal events will be populated by JavaScript -->
+                    <!-- Row 5: Goal Execution Timeline (full width) - Moved to last position -->
+                    <div class="chart-row">
+                        <div class="chart-section full-width">
+                            <h3>Goal Execution Timeline <span class="chart-info"
+                                    data-tooltip="Shows when your financial goals will be executed and how they impact your portfolio value. Orange dots mark goal execution events.">?</span>
+                            </h3>
+                            <div id="goal-events-summary" class="goal-events-summary">
+                                <!-- Goal events will be populated by JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>

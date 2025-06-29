@@ -553,6 +553,12 @@ p {
         margin-bottom: 20px;
     }
 
+    .full-width {
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 100%;
+    }
+
     .chart-wrapper {
         height: 300px;
     }
@@ -695,6 +701,18 @@ p {
         right: 18px;
         font-size: 20px;
     }
+    .chart-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    .full-width {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+    .chart-wrapper {
+        height: 250px;
+    }
 }
 
 .hidden {
@@ -730,15 +748,30 @@ p {
     display: flex;
     gap: 20px;
     margin-bottom: 30px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .half-width {
     flex: 1;
     margin-bottom: 0;
+    min-width: 0;
+}
+
+.full-width {
+    flex: 1 1 100%;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .half-width .chart-wrapper {
     height: 350px;
+}
+
+.full-width .chart-wrapper {
+    height: 400px;
 }
 
 /* New Expense Table Styles */
