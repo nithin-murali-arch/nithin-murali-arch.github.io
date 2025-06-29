@@ -6,6 +6,7 @@ let chartInstances = {};
 const LOCAL_STORAGE_KEY = 'fireCalculatorData_v6';
 let isInitialized = false;
 
+
 // --- Application State Management ---
 class FIREStateManager {
   constructor() {
@@ -611,6 +612,18 @@ function calculateFIRE() {
     const inputs = getInputs();
     const initialTotalMonthlyContributions = Object.values(inputs.portfolio).reduce((sum, asset) => sum + asset.contribution, 0);
     let investibleSurplus = inputs.monthlyIncome - inputs.monthlyExpenses - initialTotalMonthlyContributions;
+    
+    // Debug the calculation inputs
+    console.log('FIRE Calculation Debug:', {
+        monthlyIncome: inputs.monthlyIncome,
+        monthlyExpenses: inputs.monthlyExpenses,
+        initialContributions: initialTotalMonthlyContributions,
+        investibleSurplus: investibleSurplus,
+        currentAge: inputs.currentAge,
+        targetAge: inputs.targetAge,
+        yearsToSimulate: inputs.targetAge - inputs.currentAge
+    });
+    
     if (investibleSurplus < 0) {
         showMessage('Expenses plus portfolio contributions exceed income. Cannot invest.', 'error');
         window.fireData = null;
@@ -635,11 +648,40 @@ function calculateFIRE() {
     const yearsToHealthcare = inputs.healthcareBuffer.age - inputs.currentAge;
     const futureHealthcareValue = yearsToHealthcare > 0 ?
         inputs.healthcareBuffer.value * Math.pow(1 + inputs.healthcareBuffer.inflation, yearsToHealthcare) : 0;
-    const totalFutureGoalValues = inputs.goals.reduce((total, goal) => {
+    
+    // Only include goals that occur after retirement in the FIRE number
+    const retirementGoals = inputs.goals.filter(goal => goal.years > yearsToSimulate);
+    const totalFutureGoalValues = retirementGoals.reduce((total, goal) => {
         const futureValue = goal.value * Math.pow(1 + goal.inflation, goal.years);
         return total + futureValue;
     }, 0);
-    const inflatedFireNumber = (inflatedAnnualExpenses / inputs.withdrawalRate) + totalFutureGoalValues + futureHealthcareValue;
+    
+    // Calculate healthcare buffer only for the period from retirement to healthcare age
+    const retirementAge = inputs.targetAge;
+    const yearsFromRetirementToHealthcare = Math.max(0, inputs.healthcareBuffer.age - retirementAge);
+    const healthcareBufferForRetirement = yearsFromRetirementToHealthcare > 0 ?
+        inputs.healthcareBuffer.value * Math.pow(1 + inputs.healthcareBuffer.inflation, yearsToHealthcare) * (yearsFromRetirementToHealthcare / (inputs.healthcareBuffer.age - inputs.currentAge)) : 0;
+    
+    const inflatedFireNumber = (inflatedAnnualExpenses / inputs.withdrawalRate) + totalFutureGoalValues + healthcareBufferForRetirement;
+    
+    // Debug FIRE number calculation
+    console.log('FIRE Number Debug:', {
+        monthlyRetirementExpenses: monthlyRetirementExpenses,
+        annualRetirementExpenses: annualRetirementExpenses,
+        inflatedAnnualExpenses: inflatedAnnualExpenses,
+        withdrawalRate: inputs.withdrawalRate,
+        totalFutureGoalValues: totalFutureGoalValues,
+        healthcareBufferForRetirement: healthcareBufferForRetirement,
+        inflatedFireNumber: inflatedFireNumber,
+        accumulationGoals: inputs.goals.filter(goal => goal.years <= yearsToSimulate),
+        retirementGoals: retirementGoals,
+        yearsToSimulate: yearsToSimulate,
+        healthcareAge: inputs.healthcareBuffer.age,
+        yearsToHealthcare: yearsToHealthcare,
+        retirementAge: retirementAge,
+        yearsFromRetirementToHealthcare: yearsFromRetirementToHealthcare
+    });
+    
     // --- Portfolio Simulation Logic (restored) ---
     let simulationPortfolio = JSON.parse(JSON.stringify(inputs.portfolio));
     let portfolioHistory = [];
@@ -658,10 +700,28 @@ function calculateFIRE() {
         if (inputs.stp.frequency === 'monthly') return 1;
         return 0;
     };
+    
+    // Debug STP values
+    console.log('STP Debug:', {
+        stp: inputs.stp,
+        transfersPerMonth: getTransfersPerMonth(),
+        debtValue: simulationPortfolio.debt.value,
+        equityValue: simulationPortfolio.equity_in.value
+    });
+    
+    // Track when corpus reaches FIRE number for earliest FIRE age calculation
+    let earliestFireAge = null;
+    let corpusReachedFireNumber = false;
+    
+    // Separate goals into accumulation and retirement goals
+    const accumulationGoals = inputs.goals.filter(goal => goal.years <= yearsToSimulate);
+    // const retirementGoals = inputs.goals.filter(goal => goal.years > yearsToSimulate); // Duplicate declaration removed
+    
+    // First, simulate the target period
     for (let month = 1; month <= yearsToSimulate * 12; month++) {
         if ((month - 1) % 12 === 0 && month > 1) {
             for (const key in currentMonthlyContributions) {
-                currentMonthlyContributions[key] *= (1 + inputs.sipStepUpPercent);
+                currentMonthlyContributions[key] *= (1 + (inputs.salaryGrowth || 0.05));
             }
         }
         let transfers = getTransfersPerMonth();
@@ -670,16 +730,75 @@ function calculateFIRE() {
             if (transferAmount > 0) {
                 simulationPortfolio.debt.value -= transferAmount;
                 simulationPortfolio.equity_in.value += transferAmount;
+                
+                // Debug logging for first few months
+                if (month <= 3) {
+                    console.log(`Month ${month}, Transfer ${i + 1}: ${transferAmount} from debt to equity_in`);
+                    console.log(`Debt: ${simulationPortfolio.debt.value}, Equity: ${simulationPortfolio.equity_in.value}`);
+                }
             }
         }
+        
+        // Add investible surplus to the portfolio (distribute across assets proportionally)
+        if (investibleSurplus > 0) {
+            const totalPortfolioValue = Object.values(simulationPortfolio).reduce((sum, asset) => sum + asset.value, 0);
+            if (totalPortfolioValue > 0) {
+                for (const key in simulationPortfolio) {
+                    const proportion = simulationPortfolio[key].value / totalPortfolioValue;
+                    simulationPortfolio[key].value += investibleSurplus * proportion;
+                }
+            } else {
+                // If no existing portfolio, add to first asset
+                const firstKey = Object.keys(simulationPortfolio)[0];
+                if (firstKey) {
+                    simulationPortfolio[firstKey].value += investibleSurplus;
+                }
+            }
+        }
+        
+        // Add regular contributions
         for (const key in simulationPortfolio) {
             if (currentMonthlyContributions[key] !== undefined) {
                 simulationPortfolio[key].value += currentMonthlyContributions[key];
             }
         }
+        
+        // Apply monthly returns
         for (const key in simulationPortfolio) {
             simulationPortfolio[key].value *= (1 + simulationPortfolio[key].return / 12);
         }
+        
+        // Execute accumulation goals that occur this year
+        const currentYear = month / 12;
+        const goalsThisYear = accumulationGoals.filter(goal => Math.floor(goal.years) === currentYear);
+        if (goalsThisYear.length > 0) {
+            const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => {
+                const futureValue = goal.value * Math.pow(1 + goal.inflation, goal.years);
+                return sum + futureValue;
+            }, 0);
+            
+            // Deduct goals proportionally from all assets
+            const totalPortfolioValue = Object.values(simulationPortfolio).reduce((sum, asset) => sum + asset.value, 0);
+            if (totalPortfolioValue > 0) {
+                for (const key in simulationPortfolio) {
+                    const proportion = simulationPortfolio[key].value / totalPortfolioValue;
+                    simulationPortfolio[key].value = Math.max(0, simulationPortfolio[key].value - (totalGoalDeduction * proportion));
+                }
+            }
+            
+            console.log(`Year ${currentYear}: Executed goals worth ${formatCurrency(totalGoalDeduction)}`);
+        }
+        
+        // Check if corpus has reached FIRE number for earliest FIRE age
+        if (!corpusReachedFireNumber) {
+            const currentCorpus = Object.values(simulationPortfolio).reduce((s, a) => s + a.value, 0);
+            if (currentCorpus >= inflatedFireNumber) {
+                earliestFireAge = inputs.currentAge + (month / 12);
+                corpusReachedFireNumber = true;
+                console.log(`FIRE achieved at age ${earliestFireAge} (month ${month})`);
+            }
+        }
+        
         if (month % 12 === 0) {
             portfolioHistory.push({
                 year: month / 12,
@@ -687,17 +806,136 @@ function calculateFIRE() {
             });
         }
     }
+    
+    // If FIRE not achieved in target period, extend simulation to find earliest achievable age
+    if (!corpusReachedFireNumber) {
+        console.log('FIRE not achieved in target period, extending simulation...');
+        
+        // Create a copy of the portfolio for extended simulation
+        const extendedPortfolio = JSON.parse(JSON.stringify(simulationPortfolio));
+        const extendedContributions = JSON.parse(JSON.stringify(currentMonthlyContributions));
+        
+        // Continue simulation for additional years (up to age 58)
+        const maxExtendedYears = 58 - inputs.currentAge;
+        const additionalYears = maxExtendedYears - yearsToSimulate;
+        
+        for (let month = 1; month <= additionalYears * 12; month++) {
+            const currentYear = yearsToSimulate + (month / 12);
+            
+            // Apply salary growth to contributions
+            if ((month - 1) % 12 === 0) {
+                for (const key in extendedContributions) {
+                    extendedContributions[key] *= (1 + (inputs.salaryGrowth || 0.05));
+                }
+            }
+            
+            // Apply STP transfers
+            let transfers = getTransfersPerMonth();
+            for (let i = 0; i < transfers; i++) {
+                let transferAmount = Math.min(inputs.stp.amount, extendedPortfolio.debt.value);
+                if (transferAmount > 0) {
+                    extendedPortfolio.debt.value -= transferAmount;
+                    extendedPortfolio.equity_in.value += transferAmount;
+                }
+            }
+            
+            // Add investible surplus
+            if (investibleSurplus > 0) {
+                const totalPortfolioValue = Object.values(extendedPortfolio).reduce((sum, asset) => sum + asset.value, 0);
+                if (totalPortfolioValue > 0) {
+                    for (const key in extendedPortfolio) {
+                        const proportion = extendedPortfolio[key].value / totalPortfolioValue;
+                        extendedPortfolio[key].value += investibleSurplus * proportion;
+                    }
+                }
+            }
+            
+            // Add regular contributions
+            for (const key in extendedPortfolio) {
+                if (extendedContributions[key] !== undefined) {
+                    extendedPortfolio[key].value += extendedContributions[key];
+                }
+            }
+            
+            // Apply monthly returns
+            for (const key in extendedPortfolio) {
+                extendedPortfolio[key].value *= (1 + extendedPortfolio[key].return / 12);
+            }
+            
+            // Check if corpus has reached FIRE number
+            const currentCorpus = Object.values(extendedPortfolio).reduce((s, a) => s + a.value, 0);
+            if (currentCorpus >= inflatedFireNumber) {
+                earliestFireAge = inputs.currentAge + currentYear;
+                corpusReachedFireNumber = true;
+                console.log(`FIRE achieved at age ${earliestFireAge} (extended simulation)`);
+                break;
+            }
+        }
+    }
     const finalCorpus = Object.values(simulationPortfolio).reduce((s, a) => s + a.value, 0);
     const finalAllocation = Object.keys(simulationPortfolio).reduce((acc, key) => ({ ...acc, [key]: simulationPortfolio[key].value }), {});
+    
+    // Debug final results
+    console.log('Final Results Debug:', {
+        finalCorpus: finalCorpus,
+        inflatedFireNumber: inflatedFireNumber,
+        shortfall: finalCorpus - inflatedFireNumber,
+        earliestFireAge: earliestFireAge,
+        targetAge: inputs.targetAge
+    });
+    
+    // Debug final allocation
+    console.log('Final Allocation:', finalAllocation);
+    console.log('STP Effect:', {
+        initialDebt: inputs.portfolio.debt.value,
+        finalDebt: finalAllocation.debt,
+        initialEquity: inputs.portfolio.equity_in.value,
+        finalEquity: finalAllocation.equity_in,
+        debtReduction: inputs.portfolio.debt.value - finalAllocation.debt,
+        equityIncrease: finalAllocation.equity_in - inputs.portfolio.equity_in.value
+    });
+    
     // --- End Portfolio Simulation Logic ---
-    const fireAge = inputs.targetAge;
-    const retirementDuration = (inputs.lifeExpectancy || 85) - (inputs.targetAge || 0);
+    
+    // Determine FIRE age based on shortfall
+    let fireAge = inputs.targetAge;
+    let actualFireAge = inputs.targetAge;
+    let yearsToFire = inputs.targetAge - inputs.currentAge;
+    let actualYearsToFire = inputs.targetAge - inputs.currentAge;
+    let extendedWorkAge = 58; // Assume income continues until 58 if target not achievable
+    
+    if (finalCorpus < inflatedFireNumber) {
+        // Portfolio shortfall - check if earliest achievable age is within target
+        if (earliestFireAge && earliestFireAge <= inputs.targetAge) {
+            // Achievable within target age
+            actualFireAge = earliestFireAge;
+            actualYearsToFire = earliestFireAge - inputs.currentAge;
+        } else if (earliestFireAge && earliestFireAge <= extendedWorkAge) {
+            // Not achievable at target age, but achievable by extending work to 58
+            actualFireAge = earliestFireAge;
+            actualYearsToFire = earliestFireAge - inputs.currentAge;
+        } else {
+            // Not achievable even by extending work to 58
+            actualFireAge = null;
+            actualYearsToFire = null;
+        }
+    } else {
+        // No shortfall - target age is achievable
+        actualFireAge = inputs.targetAge;
+        actualYearsToFire = inputs.targetAge - inputs.currentAge;
+    }
+    
+    const retirementDuration = (inputs.lifeExpectancy || 85) - (actualFireAge || inputs.targetAge || 0);
     const monthlyExpenses = inputs.monthlyExpenses;
     const annualExpenses = monthlyExpenses * 12;
     const withdrawalRate = inputs.withdrawalRate;
     window.fireData = {
         ...inputs,
-        fireAge,
+        fireAge: actualFireAge, // Use actual achievable age
+        targetAge: inputs.targetAge, // Keep original target for reference
+        earliestFireAge: earliestFireAge, // Earliest possible age
+        yearsToFire: actualYearsToFire, // Years to actual FIRE age
+        targetYearsToFire: inputs.targetAge - inputs.currentAge, // Years to target age
         retirementDuration,
         monthlyExpenses,
         annualExpenses,
@@ -707,7 +945,8 @@ function calculateFIRE() {
         corpusShortfall: finalCorpus - inflatedFireNumber,
         unutilizedMonthlyInvestment: investibleSurplus,
         portfolioHistory,
-        finalAllocation
+        finalAllocation,
+        fireAchievable: finalCorpus >= inflatedFireNumber || earliestFireAge !== null
     };
 
     saveFormData();
@@ -749,9 +988,58 @@ function updateUIAndCharts(data) {
         }
     }
 
-    document.getElementById('fire-age').textContent = data.fireAge ?? data.targetAge ?? '--';
-    document.getElementById('years-to-fire').textContent = data.yearsToFire ?? (data.targetAge && data.currentAge ? data.targetAge - data.currentAge : '--');
-    document.getElementById('retirement-duration-result').textContent = data.retirementDuration ?? ((data.lifeExpectancy && data.targetAge) ? data.lifeExpectancy - data.targetAge : '--');
+    // Update result values with appropriate styling
+    const expectedFireAgeEl = document.getElementById('expected-fire-age');
+    const actualFireAgeEl = document.getElementById('actual-fire-age');
+    const expectedYearsEl = document.getElementById('expected-years-to-fire');
+    const actualYearsEl = document.getElementById('actual-years-to-fire');
+    
+    expectedFireAgeEl.textContent = data.targetAge ?? '--';
+    expectedFireAgeEl.className = 'result-value expected';
+    
+    actualFireAgeEl.textContent = data.fireAge ?? '--';
+    if (data.corpusShortfall < 0 && data.fireAge) {
+        if (data.fireAge > data.targetAge) {
+            // Achievable by extending work
+            actualFireAgeEl.className = 'result-value extended';
+            actualFireAgeEl.textContent = `${Math.round(data.fireAge)} (extended)`;
+        } else {
+            // Achievable within target
+            actualFireAgeEl.className = 'result-value actual';
+        }
+    } else if (data.corpusShortfall < 0 && !data.fireAge) {
+        if (data.earliestFireAge && data.earliestFireAge > 58) {
+            actualFireAgeEl.className = 'result-value unachievable';
+            actualFireAgeEl.textContent = 'Not Achievable';
+        } else {
+            actualFireAgeEl.className = 'result-value unachievable';
+            actualFireAgeEl.textContent = 'Not Achievable';
+        }
+    } else {
+        actualFireAgeEl.className = 'result-value actual';
+    }
+    
+    expectedYearsEl.textContent = data.targetYearsToFire ?? (data.targetAge && data.currentAge ? data.targetAge - data.currentAge : '--');
+    expectedYearsEl.className = 'result-value expected';
+    
+    actualYearsEl.textContent = data.yearsToFire ?? '--';
+    if (data.corpusShortfall < 0 && data.yearsToFire) {
+        if (data.fireAge > data.targetAge) {
+            // Achievable by extending work
+            actualYearsEl.className = 'result-value extended';
+            actualYearsEl.textContent = `${Math.round(data.yearsToFire)} (extended)`;
+        } else {
+            // Achievable within target
+            actualYearsEl.className = 'result-value actual';
+        }
+    } else if (data.corpusShortfall < 0 && !data.yearsToFire) {
+        actualYearsEl.className = 'result-value unachievable';
+        actualYearsEl.textContent = '--';
+    } else {
+        actualYearsEl.className = 'result-value actual';
+    }
+    
+    document.getElementById('retirement-duration-result').textContent = data.retirementDuration ?? ((data.lifeExpectancy && data.fireAge) ? data.lifeExpectancy - data.fireAge : '--');
     document.getElementById('inflated-fire-number').textContent = formatCurrency(data.inflatedFireNumber);
     document.getElementById('final-corpus').textContent = formatCurrency(data.finalCorpus);
     const shortfallEl = document.getElementById('corpus-shortfall');
@@ -767,6 +1055,19 @@ function updateUIAndCharts(data) {
 
     // Update FIRE Progress Bar
     updateFireProgressBar(data);
+    
+    // Show message if FIRE is not achievable
+    if (data.corpusShortfall < 0 && !data.fireAge) {
+        if (data.earliestFireAge && data.earliestFireAge > 58) {
+            showMessage('FIRE is not achievable even by extending work to age 58. Consider increasing your savings rate, reducing expenses, or adjusting your FIRE goals.', 'error');
+        } else {
+            showMessage('FIRE is not achievable with your current inputs. Consider increasing your savings rate, reducing expenses, or extending your target age.', 'error');
+        }
+    } else if (data.corpusShortfall < 0 && data.fireAge && data.fireAge > data.targetAge) {
+        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.round(data.fireAge)} by extending your work until then.`, 'info');
+    } else if (data.corpusShortfall < 0 && data.fireAge) {
+        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.round(data.fireAge)} with your current inputs.`, 'info');
+    }
 
     Object.values(chartInstances).forEach(chart => chart.destroy());
 
@@ -806,7 +1107,7 @@ function updateUIAndCharts(data) {
     chartInstances.portfolioGrowthChart = new Chart(document.getElementById('portfolioGrowthChart'), getChartConfig('stacked-area', portfolioGrowthData));
 
     // 2. Final Allocation Chart (Doughnut) - Use allocation at retirement
-    let retirementIndex = data.yearsToFire ?? (data.targetAge && data.currentAge ? data.targetAge - data.currentAge : 0);
+    let retirementIndex = data.yearsToFire ?? (data.fireAge && data.currentAge ? data.fireAge - data.currentAge : 0);
     if (retirementIndex < 0) retirementIndex = 0;
     const portfolioAtRetirement = data.portfolioHistory[retirementIndex] || data.portfolioHistory[data.portfolioHistory.length - 1];
     const allocationAtRetirement = {};
@@ -816,7 +1117,7 @@ function updateUIAndCharts(data) {
     // Update subtitle for asset allocation chart
     const subtitle = document.getElementById('asset-allocation-retirement-age');
     if (subtitle) {
-        subtitle.textContent = `Asset Allocation at Retirement (Age ${data.fireAge ?? data.targetAge ?? '--'})`;
+        subtitle.textContent = `Asset Allocation at Retirement (Age ${data.fireAge ?? '--'})`;
     }
     const finalAllocationData = {
         labels: Object.keys(allocationAtRetirement).map(key => assetLabels[key]),
@@ -856,84 +1157,239 @@ function updateUIAndCharts(data) {
     }
 
     // 4. Burn Down Chart (Post Retirement Corpus)
-    // Simulate corpus burn down for Lean, Regular, Fat FIRE
+    // Simulate corpus burn down using actual achieved corpus and include goal execution events
+    const multipliers = { lean: 0.7, regular: 1.0, fat: 1.5 };
+    const years = 50; // Simulate 50 years post retirement to catch money running out
+    
+    // Use actual final corpus achieved, not theoretical required corpus
+    const actualFinalCorpus = data.finalCorpus || 0;
+    const swr = data.withdrawalRate ?? 0.04; // Safe Withdrawal Rate (4% default)
+    const inflation = data.inflationRate ?? 0.06;
+    const annualReturn = 0.06; // Assume 6% post-retirement return
+    const salaryGrowth = data.salaryGrowth ?? 0.05; // Use salary growth for step-up assumption
+    
+    // Calculate annual withdrawal amounts for each FIRE type using SWR
+    const annualWithdrawals = {
+        lean: (data.annualExpenses ?? 0) * multipliers.lean,
+        regular: (data.annualExpenses ?? 0) * multipliers.regular,
+        fat: (data.annualExpenses ?? 0) * multipliers.fat
+    };
+    
+    // Process goals to create execution timeline
+    const goalEvents = [];
+    if (data.goals && data.goals.length > 0) {
+        data.goals.forEach(goal => {
+            if (goal.name && goal.value > 0 && goal.years > 0) {
+                const executionYear = goal.years;
+                const futureValue = goal.value * Math.pow(1 + (goal.inflation || 0.06), goal.years);
+                goalEvents.push({
+                    year: executionYear,
+                    name: goal.name,
+                    value: futureValue,
+                    originalValue: goal.value
+                });
+            }
+        });
+    }
+    
+    // Sort goal events by execution year
+    goalEvents.sort((a, b) => a.year - b.year);
+    
+    // Create burndown chart data - start from retirement corpus and show depletion
     const burnDownLabels = [];
     const burnDownData = { lean: [], regular: [], fat: [] };
     const burnDownDataToday = { lean: [], regular: [], fat: [] };
-    const multipliers = { lean: 0.7, regular: 1.0, fat: 1.5 };
-    const years = 40; // Simulate 40 years post retirement
-    // Calculate required corpus for each FIRE type
-    const swr = data.withdrawalRate ?? 0.04;
-    const inflation = data.inflationRate ?? 0.06;
-    const requiredCorpus = {
-        lean: (data.annualExpenses ?? 0) * multipliers.lean / swr,
-        regular: (data.annualExpenses ?? 0) * multipliers.regular / swr,
-        fat: (data.annualExpenses ?? 0) * multipliers.fat / swr
+    
+    // Calculate different starting corpus amounts for each FIRE type
+    // Each FIRE type needs a different corpus based on their withdrawal needs
+    const startingCorpus = {
+        lean: actualFinalCorpus * 0.7,    // Lean FIRE needs 70% of regular corpus
+        regular: actualFinalCorpus,       // Regular FIRE uses full corpus
+        fat: actualFinalCorpus * 1.5      // Fat FIRE needs 150% of regular corpus
     };
-    let annualReturn = 0.06; // Assume 6% post-retirement return
-    for (let i = 0; i <= years; i++) {
-        burnDownLabels.push(`Year ${i}`);
-        for (const type of ['lean', 'regular', 'fat']) {
-            if (i === 0) {
-                burnDownData[type][i] = requiredCorpus[type];
-                burnDownDataToday[type][i] = requiredCorpus[type];
-            } else {
-                // Previous corpus grows, then withdrawal
-                const prev = burnDownData[type][i - 1];
-                const withdrawal = (data.annualExpenses ?? 0) * multipliers[type];
-                let futureValue = (prev - withdrawal) * (1 + annualReturn);
-                burnDownData[type][i] = futureValue;
-                // Discount the future value to today's value
-                let todayValue = futureValue / Math.pow(1 + inflation, i);
-                burnDownDataToday[type][i] = todayValue;
-                if (i <= 5 && type === 'regular') {
-                    console.log(`Year ${i}: Future Value = ${futureValue}, Today's Value = ${todayValue}`);
+    
+    for (let year = 0; year <= years; year++) {
+        burnDownLabels.push(`Year ${year}`);
+        
+        if (year === 0) {
+            // Start with different corpus amounts for each FIRE type
+            for (const type of ['lean', 'regular', 'fat']) {
+                burnDownData[type][year] = startingCorpus[type];
+                burnDownDataToday[type][year] = startingCorpus[type];
+            }
+        } else {
+            // Apply withdrawals and growth for each FIRE type
+            for (const type of ['lean', 'regular', 'fat']) {
+                const prevCorpus = burnDownData[type][year - 1];
+                
+                if (prevCorpus <= 0) {
+                    burnDownData[type][year] = 0;
+                    burnDownDataToday[type][year] = 0;
+                } else {
+                    // Apply SWR-based withdrawal (percentage of current corpus)
+                    const swrWithdrawal = prevCorpus * swr;
+                    
+                    // Apply lifestyle-based withdrawal (fixed amount)
+                    const lifestyleWithdrawal = annualWithdrawals[type];
+                    
+                    // Use the higher of the two withdrawal methods
+                    const withdrawal = Math.max(swrWithdrawal, lifestyleWithdrawal);
+                    
+                    // Apply goal deductions if any goals occur this year
+                    const goalsThisYear = goalEvents.filter(g => g.year === year);
+                    const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                    
+                    // Total deductions: withdrawal + goals
+                    const totalDeductions = withdrawal + totalGoalDeduction;
+                    const afterDeductions = Math.max(0, prevCorpus - totalDeductions);
+                    
+                    // Apply growth on remaining corpus
+                    const futureValue = afterDeductions * (1 + annualReturn);
+                    
+                    burnDownData[type][year] = futureValue;
+                    burnDownDataToday[type][year] = futureValue / Math.pow(1 + inflation, year);
                 }
             }
         }
     }
+    
+    // Find when money runs out for each type
+    const moneyRunsOut = {};
+    for (const type of ['lean', 'regular', 'fat']) {
+        const zeroIndex = burnDownData[type].findIndex(value => value <= 0);
+        moneyRunsOut[type] = zeroIndex > 0 ? zeroIndex : null;
+    }
+    
+    // Create goal event annotations (only for goals that occur during retirement)
+    const retirementGoalEvents = goalEvents.filter(goal => goal.year > 0);
+    
+    // Color palette for goal events
+    const goalColors = [
+        '#FF6B35', // Orange
+        '#4ECDC4', // Teal
+        '#45B7D1', // Blue
+        '#96CEB4', // Green
+        '#FFEAA7', // Yellow
+        '#DDA0DD', // Plum
+        '#98D8C8', // Mint
+        '#F7DC6F', // Gold
+        '#BB8FCE', // Purple
+        '#85C1E9'  // Light Blue
+    ];
+    
+    const goalAnnotations = retirementGoalEvents.map((goal, index) => ({
+        type: 'point',
+        xValue: goal.year,
+        yValue: burnDownData.regular[goal.year] || 0,
+        backgroundColor: goalColors[index % goalColors.length] + '80',
+        borderColor: goalColors[index % goalColors.length],
+        borderWidth: 2,
+        radius: 6,
+        label: {
+            content: `${goal.name}\n-${formatCurrency(goal.value)}`,
+            enabled: true,
+            position: 'top'
+        }
+    }));
+    
     chartInstances.burnDownChart = new Chart(document.getElementById('burnDownChart'), {
         type: 'line',
         data: {
             labels: burnDownLabels,
             datasets: [
                 {
-                    label: 'Lean FIRE',
+                    label: `Lean FIRE${moneyRunsOut.lean ? ` (Runs out: Year ${moneyRunsOut.lean})` : ''}`,
                     data: burnDownData.lean,
                     borderColor: '#10B981',
                     fill: false,
                     tension: 0.4
                 },
                 {
-                    label: 'Regular FIRE',
+                    label: `Regular FIRE${moneyRunsOut.regular ? ` (Runs out: Year ${moneyRunsOut.regular})` : ''}`,
                     data: burnDownData.regular,
                     borderColor: '#FF6B35',
                     fill: false,
                     tension: 0.4
                 },
                 {
-                    label: 'Fat FIRE',
+                    label: `Fat FIRE${moneyRunsOut.fat ? ` (Runs out: Year ${moneyRunsOut.fat})` : ''}`,
                     data: burnDownData.fat,
                     borderColor: '#8B5CF6',
                     fill: false,
                     tension: 0.4
-                }
+                },
+                // Goal events as scatter points (only for retirement goals)
+                ...retirementGoalEvents.map((goal, index) => ({
+                    label: `${goal.name} (Goal)`,
+                    data: burnDownLabels.map((label, idx) => {
+                        if (idx === goal.year) {
+                            return burnDownData.regular[idx] || 0;
+                        }
+                        return null;
+                    }),
+                    type: 'scatter',
+                    backgroundColor: goalColors[index % goalColors.length] + '80',
+                    borderColor: goalColors[index % goalColors.length],
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    showLine: false
+                }))
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: 'var(--text-secondary)' } } },
+            plugins: { 
+                legend: { labels: { color: '#6c757d' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            const year = context.dataIndex;
+                            
+                            if (value <= 0) {
+                                return label + ': Money has run out';
+                            }
+                            
+                            // Add withdrawal rate info for FIRE types
+                            if (label.includes('FIRE') && !label.includes('Goal')) {
+                                const withdrawalRate = (swr * 100).toFixed(1);
+                                const withdrawalAmount = annualWithdrawals[label.toLowerCase().split(' ')[0]] || 0;
+                                const goalsThisYear = goalEvents.filter(g => g.year === year);
+                                const totalGoalDeduction = goalsThisYear.reduce((sum, goal) => sum + goal.value, 0);
+                                
+                                let tooltipText = label + ': ' + formatCurrency(value);
+                                tooltipText += `\nWithdrawal Rate: ${withdrawalRate}%`;
+                                tooltipText += `\nAnnual Withdrawal: ${formatCurrency(withdrawalAmount)}`;
+                                
+                                if (totalGoalDeduction > 0) {
+                                    tooltipText += `\nGoal Deductions: ${formatCurrency(totalGoalDeduction)}`;
+                                }
+                                
+                                return tooltipText;
+                            }
+                            
+                            return label + ': ' + formatCurrency(value);
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     position: 'left',
-                    title: { display: true, text: 'Future Value (₹)', color: 'var(--text-secondary)' },
-                    ticks: { callback: (v) => formatCurrency(v), color: 'var(--text-secondary)' }
+                    title: { display: true, text: 'Portfolio Value (₹)', color: '#6c757d' },
+                    ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
                 },
-                x: { ticks: { color: 'var(--text-secondary)' } }
+                x: {
+                    title: { display: true, text: 'Years After Retirement', color: '#6c757d' },
+                    ticks: { color: '#6c757d' }
+                }
             }
         }
     });
+    
     // Burn Down Chart (Today's Value)
     chartInstances.burnDownChartToday = new Chart(document.getElementById('burnDownChartToday'), {
         type: 'line',
@@ -941,7 +1397,7 @@ function updateUIAndCharts(data) {
             labels: burnDownLabels,
             datasets: [
                 {
-                    label: "Lean FIRE (Today's Value)",
+                    label: `Lean FIRE (Today's Value)${moneyRunsOut.lean ? ` (Runs out: Year ${moneyRunsOut.lean})` : ''}`,
                     data: burnDownDataToday.lean,
                     borderColor: '#10B981',
                     borderDash: [8, 4],
@@ -949,7 +1405,7 @@ function updateUIAndCharts(data) {
                     tension: 0.4
                 },
                 {
-                    label: "Regular FIRE (Today's Value)",
+                    label: `Regular FIRE (Today's Value)${moneyRunsOut.regular ? ` (Runs out: Year ${moneyRunsOut.regular})` : ''}`,
                     data: burnDownDataToday.regular,
                     borderColor: '#FF6B35',
                     borderDash: [8, 4],
@@ -957,49 +1413,109 @@ function updateUIAndCharts(data) {
                     tension: 0.4
                 },
                 {
-                    label: "Fat FIRE (Today's Value)",
+                    label: `Fat FIRE (Today's Value)${moneyRunsOut.fat ? ` (Runs out: Year ${moneyRunsOut.fat})` : ''}`,
                     data: burnDownDataToday.fat,
                     borderColor: '#8B5CF6',
                     borderDash: [8, 4],
                     fill: false,
                     tension: 0.4
-                }
+                },
+                // Goal events as scatter points (Today's Value)
+                ...goalEvents.map((goal, index) => ({
+                    label: `${goal.name} (Goal)`,
+                    data: burnDownLabels.map((label, idx) => {
+                        if (idx === goal.year) {
+                            return burnDownDataToday.regular[idx] || 0;
+                        }
+                        return null;
+                    }),
+                    type: 'scatter',
+                    backgroundColor: goalColors[index % goalColors.length] + '80',
+                    borderColor: goalColors[index % goalColors.length],
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    showLine: false
+                }))
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: 'var(--text-secondary)' } } },
+            plugins: { 
+                legend: { labels: { color: '#6c757d' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            if (value <= 0) {
+                                return label + ': Money has run out';
+                            }
+                            return label + ': ' + formatCurrency(value);
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     position: 'left',
-                    title: { display: true, text: "Today's Value (₹)", color: 'var(--text-secondary)' },
-                    ticks: { callback: (v) => formatCurrency(v), color: 'var(--text-secondary)' }
+                    title: { display: true, text: "Today's Value (₹)", color: '#6c757d' },
+                    ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' }
                 },
-                x: { ticks: { color: 'var(--text-secondary)' } }
+                x: { 
+                    ticks: { color: '#6c757d' },
+                    title: { display: true, text: 'Years from Now', color: '#6c757d' }
+                }
             }
         }
     });
+
+    // Update goal events summary
+    const goalEventsSummary = document.getElementById('goal-events-summary');
+    if (goalEventsSummary) {
+        if (goalEvents.length === 0) {
+            goalEventsSummary.innerHTML = '<div class="goal-events-summary empty">No financial goals defined. Add goals in the Goals tab to see their impact on your portfolio.</div>';
+        } else {
+            let summaryHTML = '<h4>Goal Execution Timeline</h4>';
+            goalEvents.forEach(goal => {
+                const todayValue = goal.value / Math.pow(1 + inflation, goal.year);
+                summaryHTML += `
+                    <div class="goal-event-item">
+                        <div class="goal-event-info">
+                            <div class="goal-event-name">${goal.name}</div>
+                            <div class="goal-event-details">Year ${goal.year} • Original: ${formatCurrency(goal.originalValue)}</div>
+                        </div>
+                        <div class="goal-event-impact">
+                            -${formatCurrency(goal.value)}
+                            <span class="goal-event-year">Year ${goal.year}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            goalEventsSummary.innerHTML = summaryHTML;
+        }
+    }
 }
 
 // --- FIRE Progress Bar Update ---
 function updateFireProgressBar(data) {
     const currentAge = data.currentAge || 0;
-    const fireAge = data.fireAge || 0; // Use calculated FIRE age (earliest possible)
-    const targetAge = data.targetAge || 0; // Keep target age for reference
+    const actualFireAge = data.fireAge || 0; // Use actual achievable FIRE age
+    const expectedFireAge = data.targetAge || 0; // Keep expected age for reference
     
     // Update progress bar elements
     document.getElementById('progress-current-age').textContent = currentAge;
-    document.getElementById('progress-target-age').textContent = fireAge || targetAge;
+    document.getElementById('progress-target-age').textContent = actualFireAge || expectedFireAge;
     
     // Calculate progress percentage
     let progressPercentage = 0;
     let yearsCompleted = 0;
     let yearsRemaining = 0;
     
-    if (fireAge > currentAge && fireAge > 0) {
-        // Calculate progress based on corpus accumulation toward earliest FIRE age
-        const totalYears = fireAge - currentAge;
+    if (actualFireAge > currentAge && actualFireAge > 0) {
+        // Calculate progress based on corpus accumulation toward actual FIRE age
+        const totalYears = actualFireAge - currentAge;
         yearsCompleted = 0; // Since we're measuring progress toward FIRE, not age progress
         yearsRemaining = totalYears;
         
@@ -1010,14 +1526,14 @@ function updateFireProgressBar(data) {
         if (targetCorpus > 0) {
             progressPercentage = Math.min((currentCorpus / targetCorpus) * 100, 100);
         }
-    } else if (fireAge <= currentAge && fireAge > 0) {
+    } else if (actualFireAge <= currentAge && actualFireAge > 0) {
         // User has already reached or passed their calculated FIRE age
         progressPercentage = 100;
-        yearsCompleted = Math.abs(fireAge - currentAge);
+        yearsCompleted = Math.abs(actualFireAge - currentAge);
         yearsRemaining = 0;
-    } else if (fireAge === 0 && targetAge > currentAge) {
-        // FIRE not achievable with current inputs, but target age is set
-        const totalYears = targetAge - currentAge;
+    } else if (actualFireAge === 0 && expectedFireAge > currentAge) {
+        // FIRE not achievable with current inputs, but expected age is set
+        const totalYears = expectedFireAge - currentAge;
         yearsCompleted = 0;
         yearsRemaining = totalYears;
         
@@ -1173,8 +1689,8 @@ document.getElementById('add-goal-btn').addEventListener('click', () => addGoalR
 
 // --- Charting ---
 function getChartConfig(type, data) {
-    const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'var(--text-secondary)' } } } };
-    const scalesOptions = { y: { ticks: { callback: (v) => formatCurrency(v), color: 'var(--text-secondary)' } }, x: { ticks: { color: 'var(--text-secondary)' } } };
+    const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#6c757d' } } } };
+    const scalesOptions = { y: { ticks: { callback: (v) => formatCurrency(v), color: '#6c757d' } }, x: { ticks: { color: '#6c757d' } } };
 
     if (type === 'line') {
         return { type: 'line', data, options: { ...baseOptions, scales: scalesOptions } };

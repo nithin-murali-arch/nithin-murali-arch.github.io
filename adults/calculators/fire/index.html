@@ -78,8 +78,8 @@
         gtag('config', 'G-X7566Q6TZM');
     </script>
         
-        
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -1490,12 +1490,20 @@
                 <h2>🎉 Your FIRE Journey Results</h2>
                 <div class="results-grid">
                     <div class="result-item">
-                        <div class="result-value" id="fire-age">--</div>
-                        <div class="result-label">FIRE Age</div>
+                        <div class="result-value" id="expected-fire-age">--</div>
+                        <div class="result-label">Expected FIRE Age</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-value" id="years-to-fire">--</div>
-                        <div class="result-label">Years to FIRE</div>
+                        <div class="result-value" id="actual-fire-age">--</div>
+                        <div class="result-label">Actual FIRE Age</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="expected-years-to-fire">--</div>
+                        <div class="result-label">Expected Years to FIRE</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="actual-years-to-fire">--</div>
+                        <div class="result-label">Actual Years to FIRE</div>
                     </div>
                     <div class="result-item">
                         <div class="result-value" id="retirement-duration-result">--</div>
@@ -1525,6 +1533,11 @@
                         <div class="result-value" id="annual-expenses-result">--</div>
                         <div class="result-label">Total Annual Expenses</div>
                     </div>
+                </div>
+                <div class="results-note" style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 53, 0.1); border-left: 4px solid var(--fire-orange); border-radius: 8px;">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        <strong>Note:</strong> "Actual FIRE Age" shows the earliest age when you can achieve FIRE with your current inputs. If your target age is not achievable, we assume income continues until age 58 to calculate the earliest possible FIRE age. "(extended)" indicates the age is beyond your target but achievable by working longer.
+                    </p>
                 </div>
                 <div class="charts-container">
                     <div class="chart-section">
@@ -1569,6 +1582,14 @@
                         </h3>
                         <div class="chart-wrapper">
                             <canvas id="burnDownChartToday"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-section">
+                        <h3>Goal Execution Timeline <span class="chart-info"
+                                data-tooltip="Shows when your financial goals will be executed and how they impact your portfolio value. Orange dots mark goal execution events.">?</span>
+                        </h3>
+                        <div id="goal-events-summary" class="goal-events-summary">
+                            <!-- Goal events will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>

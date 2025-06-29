@@ -341,11 +341,33 @@ button,
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--fire-orange);
+    margin-bottom: 5px;
+}
+
+.result-value.expected {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.result-value.actual {
+    color: var(--fire-orange);
+    font-weight: 700;
+}
+
+.result-value.unachievable {
+    color: var(--fire-red);
+    font-weight: 700;
+}
+
+.result-value.extended {
+    color: var(--warning-orange);
+    font-weight: 700;
 }
 
 .result-label {
     font-size: 0.9rem;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .card {
@@ -2142,4 +2164,78 @@ label span[title]:hover::before {
     border-bottom: 7px solid var(--card-bg, #222);
     border-top: none;
     z-index: 101;
+}
+
+.chart-wrapper {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: var(--shadow-card);
+}
+
+.goal-events-summary {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: var(--shadow-card);
+}
+
+.goal-events-summary.empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+.goal-events-summary h4 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.goal-event-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.goal-event-item:last-child {
+    border-bottom: none;
+}
+
+.goal-event-info {
+    flex: 1;
+}
+
+.goal-event-name {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.goal-event-details {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.goal-event-impact {
+    text-align: right;
+    color: var(--fire-orange);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.goal-event-year {
+    background: var(--fire-orange);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 10px;
 }
