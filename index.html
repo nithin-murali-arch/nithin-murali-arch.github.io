@@ -400,6 +400,149 @@
           width: 100vw;
         }
       }
+
+      /* Attention Parents Modal */
+      #attention-parents-modal.attention-modal {
+        position: fixed;
+        z-index: 3000;
+        left: 0; top: 0; right: 0; bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: modal-fade-in 0.5s cubic-bezier(.4,1.6,.6,1) 1;
+      }
+      #attention-parents-modal .modal-backdrop {
+        position: absolute;
+        left: 0; top: 0; right: 0; bottom: 0;
+        background: rgba(30, 30, 40, 0.55);
+        backdrop-filter: blur(4px);
+        z-index: 1;
+        animation: modal-backdrop-fade 0.5s;
+      }
+      #attention-parents-modal .modal-content {
+        position: relative;
+        z-index: 2;
+        background: linear-gradient(135deg, rgba(255,255,255,0.96) 60%, rgba(255,245,230,0.92) 100%);
+        border-radius: 2.2rem;
+        padding: 2.7rem 2.2rem 2.2rem 2.2rem;
+        max-width: 390px;
+        width: 94vw;
+        box-shadow: 0 12px 48px 0 rgba(0,0,0,0.22), 0 2px 16px 0 rgba(255,107,53,0.10);
+        text-align: center;
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        animation: modal-slide-in 0.7s cubic-bezier(.4,1.6,.6,1);
+        outline: none;
+        border: none;
+        transition: box-shadow 0.2s, outline 0.2s;
+      }
+      #attention-parents-modal .modal-content:focus {
+        box-shadow: 0 0 0 4px #ffe0c2, 0 12px 48px 0 rgba(0,0,0,0.22);
+        outline: none;
+      }
+      #attention-parents-modal .modal-emoji {
+        font-size: 3.5rem;
+        margin-bottom: 0.7rem;
+        filter: drop-shadow(0 4px 16px rgba(255,107,53,0.18));
+        animation: emoji-float 2.5s ease-in-out infinite alternate;
+      }
+      @keyframes emoji-float {
+        from { transform: translateY(0); }
+        to { transform: translateY(-10px) scale(1.07); }
+      }
+      #attention-parents-modal h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 0.8rem;
+        color: #FF6B35;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 12px rgba(255,107,53,0.10);
+      }
+      #attention-parents-modal p {
+        font-size: 1.18rem;
+        margin-bottom: 2.2rem;
+        color: #2d2d2d;
+        line-height: 1.6;
+        font-weight: 500;
+      }
+      #attention-parents-modal .modal-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(90deg, #FF6B35 0%, #F7931E 100%);
+        color: #fff;
+        font-weight: 800;
+        border: none;
+        border-radius: 2rem;
+        padding: 1.1rem 2.3rem;
+        font-size: 1.18rem;
+        text-decoration: none;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 18px rgba(255,107,53,0.15);
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        cursor: pointer;
+        gap: 0.8em;
+        letter-spacing: 0.01em;
+      }
+      #attention-parents-modal .modal-btn:hover, #attention-parents-modal .modal-btn:focus {
+        background: linear-gradient(90deg, #F7931E 0%, #FF6B35 100%);
+        transform: translateY(-2px) scale(1.045);
+        box-shadow: 0 6px 24px rgba(255,107,53,0.22);
+        outline: none;
+      }
+      #attention-parents-modal .modal-btn-icon {
+        font-size: 1.35em;
+        margin-left: 0.2em;
+        display: inline-block;
+        transition: transform 0.2s;
+      }
+      #attention-parents-modal .modal-btn:hover .modal-btn-icon {
+        transform: translateX(6px) scale(1.1);
+      }
+      #attention-parents-modal .modal-close {
+        position: absolute;
+        top: 18px; right: 24px;
+        background: rgba(255,255,255,0.7);
+        border: none;
+        font-size: 2.2rem;
+        color: #FF6B35;
+        cursor: pointer;
+        z-index: 3;
+        transition: color 0.18s, transform 0.18s, background 0.18s;
+        padding: 0 0.3em;
+        line-height: 1;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(255,107,53,0.08);
+      }
+      #attention-parents-modal .modal-close:hover, #attention-parents-modal .modal-close:focus {
+        color: #fff;
+        background: #FF6B35;
+        transform: scale(1.18) rotate(8deg);
+        outline: none;
+      }
+      @media (max-width: 500px) {
+        #attention-parents-modal .modal-content {
+          max-width: 99vw;
+          padding: 1.2rem 2vw 1.2rem 2vw;
+        }
+        #attention-parents-modal .modal-emoji {
+          font-size: 2.3rem;
+        }
+        #attention-parents-modal h2 {
+          font-size: 1.3rem;
+        }
+      }
+      @keyframes modal-fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes modal-backdrop-fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes modal-slide-in {
+        from { transform: translateY(60px) scale(0.98); opacity: 0; }
+        to { transform: translateY(0) scale(1); opacity: 1; }
+      }
     </style>
   </head>
   <body>
@@ -437,6 +580,21 @@
       </div>
       <div class="ad-space ad-right">
         <!-- Adsense code can be inserted here -->
+      </div>
+    </div>
+    <!-- Attention Parents Modal -->
+    <div id="attention-parents-modal" class="attention-modal" role="dialog" aria-modal="true" aria-labelledby="attention-parents-title" tabindex="-1" style="display:none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content" tabindex="0">
+        <div class="modal-emoji" aria-hidden="true">👨‍👩‍👧‍👦</div>
+        <h2 id="attention-parents-title">Attention Parents</h2>
+        <p>Are you planning for your family's financial future?<br>
+          Try our <strong>FIRE (Financial Independence, Retire Early) Calculator</strong> to see how you can achieve your goals faster!
+        </p>
+        <a href="adults/calculators/fire/index.html" class="modal-btn" tabindex="0">
+          <span>Go to FIRE Calculator</span> <span class="modal-btn-icon">→</span>
+        </a>
+        <button class="modal-close" aria-label="Close" tabindex="0">&times;</button>
       </div>
     </div>
     <script>
@@ -1070,6 +1228,45 @@
 
       // Add some encouraging sounds (visual feedback instead)
       console.log("🎮 Mouse Practice Game Started! Have fun! 🎮");
+
+      window.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById('attention-parents-modal');
+        var closeBtn = modal.querySelector('.modal-close');
+        var backdrop = modal.querySelector('.modal-backdrop');
+        var focusableEls = modal.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+        var firstFocusable = focusableEls[0];
+        var lastFocusable = focusableEls[focusableEls.length - 1];
+        function closeModal() {
+          modal.style.display = 'none';
+          document.body.removeAttribute('aria-hidden');
+        }
+        closeBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
+        // Trap focus inside modal
+        modal.addEventListener('keydown', function(e) {
+          if (e.key === 'Tab') {
+            if (e.shiftKey) { // shift + tab
+              if (document.activeElement === firstFocusable) {
+                e.preventDefault();
+                lastFocusable.focus();
+              }
+            } else { // tab
+              if (document.activeElement === lastFocusable) {
+                e.preventDefault();
+                firstFocusable.focus();
+              }
+            }
+          } else if (e.key === 'Escape') {
+            closeModal();
+          }
+        });
+        // Show modal
+        modal.style.display = 'flex';
+        modal.focus();
+        document.body.setAttribute('aria-hidden', 'true');
+        // Focus first element
+        setTimeout(function() { firstFocusable.focus(); }, 100);
+      });
     </script>
   </body>
 </html>
