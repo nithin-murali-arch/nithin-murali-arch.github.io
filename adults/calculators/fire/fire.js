@@ -1109,7 +1109,7 @@ function updateUIAndCharts(data) {
         if (data.fireAge > data.targetAge) {
             // Achievable by extending work
             actualFireAgeEl.className = 'result-value extended';
-            actualFireAgeEl.textContent = `${Math.ceil(data.fireAge)} (extended)`;
+            actualFireAgeEl.textContent = `${Math.ceil(data.fireAge)} `;
         } else {
             // Achievable within target
             actualFireAgeEl.className = 'result-value actual';
@@ -1134,7 +1134,7 @@ function updateUIAndCharts(data) {
         if (data.fireAge > data.targetAge) {
             // Achievable by extending work
             actualYearsEl.className = 'result-value extended';
-            actualYearsEl.textContent = `${Math.ceil(data.yearsToFire)} (extended)`;
+            actualYearsEl.textContent = `${Math.ceil(data.yearsToFire)} `;
         } else {
             // Achievable within target
             actualYearsEl.className = 'result-value actual';
