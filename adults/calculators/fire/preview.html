@@ -41,6 +41,8 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7566Q6TZM"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -287,6 +289,41 @@
             text-align: center;
         }
 
+        .import-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .import-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .import-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .import-note {
+            margin-top: 10px;
+            color: #cccccc;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
         @media (max-width: 768px) {
             .preview-container {
                 padding: 30px 15px;
@@ -378,6 +415,14 @@
         <a href="https://nithin-murali-arch.github.io/adults/calculators/fire/" class="cta-button">
             Calculate Your FIRE Journey →
         </a>
+        
+        <div class="import-section">
+            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+            <button class="import-button" onclick="document.getElementById('import-file').click()">
+                <i class="fas fa-upload"></i> Import FIRE Data
+            </button>
+            <p class="import-note">Import your exported FIRE calculator data to see your results here</p>
+        </div>
     </div>
 
     <div class="url">nithin-murali-arch.github.io</div>
@@ -585,6 +630,125 @@
                     }
                 }
             });
+        }
+
+        // Function to handle file import
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    displayImportedData(importedData);
+                } catch (error) {
+                    console.error('Error parsing imported file:', error);
+                    alert('Invalid file format. Please select a valid FIRE calculator export file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Function to display imported data
+        function displayImportedData(importedData) {
+            console.log('Displaying imported data:', importedData);
+            
+            // Handle both old format (with formData wrapper) and new format (direct properties)
+            let dataToDisplay = importedData;
+            if (importedData.formData) {
+                // Old format - extract formData
+                dataToDisplay = importedData.formData;
+            }
+            
+            // Validate the imported data
+            if (!dataToDisplay || (typeof dataToDisplay !== 'object')) {
+                alert('Invalid FIRE calculator data format.');
+                return;
+            }
+            
+            // Show results section
+            document.getElementById('default-content').style.display = 'none';
+            document.getElementById('user-results').style.display = 'block';
+
+            const userName = dataToDisplay.userName || 'User';
+            const fireAge = dataToDisplay.fireAge || dataToDisplay.earliestFireAge || '--';
+            const yearsToFire = dataToDisplay.yearsToFire || '--';
+            const finalCorpus = dataToDisplay.finalCorpus || '--';
+            const coastFireAge = dataToDisplay.coastFireAge || '--';
+            const coastFireYears = dataToDisplay.coastFireYears || '--';
+            const exportDate = importedData.exportDate || new Date().toISOString();
+
+            // Update user greeting
+            document.getElementById('user-greeting').innerHTML = `
+                <h3>🎉 Welcome back, ${userName}!</h3>
+                <p>Here are your FIRE calculation results from ${new Date(exportDate).toLocaleDateString()}</p>
+            `;
+
+            // Populate results grid with imported data
+            const resultsGrid = document.getElementById('results-grid');
+            resultsGrid.innerHTML = `
+                <div class="result-item">
+                    <div class="result-value">${fireAge}</div>
+                    <div class="result-label">FIRE Age</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value">${yearsToFire}</div>
+                    <div class="result-label">Years to FIRE</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value">${finalCorpus}</div>
+                    <div class="result-label">Projected Corpus</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value">${coastFireAge}</div>
+                    <div class="result-label">Coast FIRE Age</div>
+                </div>
+            `;
+
+            // Render chart if portfolio history data is available
+            if (dataToDisplay.portfolioHistory && Array.isArray(dataToDisplay.portfolioHistory)) {
+                // Create chart data from portfolio history
+                const chartData = {
+                    labels: dataToDisplay.portfolioHistory.map(item => `Year ${item.year}`),
+                    datasets: [{
+                        data: dataToDisplay.portfolioHistory.map(item => {
+                            // Sum all asset values for each year
+                            return Object.values(item).reduce((sum, value) => {
+                                return typeof value === 'number' ? sum + value : sum;
+                            }, 0);
+                        })
+                    }]
+                };
+                renderPortfolioChart(chartData);
+            } else if (importedData.chartData && importedData.chartData.portfolioGrowth) {
+                // Fallback to old chart data format
+                renderPortfolioChart(importedData.chartData.portfolioGrowth);
+            } else {
+                document.getElementById('portfolio-chart-container').style.display = 'none';
+            }
+
+            // Update meta tags for social sharing
+            const shareText = `${userName} can achieve financial independence at age ${fireAge} in ${yearsToFire} years! Calculate your own FIRE journey.`;
+            const pageTitle = `${userName}'s FIRE Journey - Age ${fireAge}`;
+
+            // Update all meta tags
+            document.querySelector('meta[property="og:title"]').setAttribute('content', pageTitle);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', shareText);
+            document.querySelector('meta[property="twitter:title"]').setAttribute('content', pageTitle);
+            document.querySelector('meta[property="twitter:description"]').setAttribute('content', shareText);
+            document.querySelector('meta[name="description"]').setAttribute('content', shareText);
+
+            // Update page title
+            document.title = pageTitle;
+
+            // Track import event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'import_data_preview', {
+                    event_category: 'engagement',
+                    event_label: 'FIRE Calculator Preview Import'
+                });
+            }
         }
     </script>
 </body>

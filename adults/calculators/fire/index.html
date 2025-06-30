@@ -1038,6 +1038,16 @@
                 </div>
             </div>
 
+            <div class="import-section">
+                <h3>Import Previous Data</h3>
+                <p>Load your previously exported FIRE calculator data to continue where you left off.</p>
+                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+                <button type="button" class="btn import-btn" onclick="document.getElementById('import-file').click()">
+                    <i class="fas fa-upload"></i> Import FIRE Data
+                </button>
+                <p class="import-note">Select a previously exported .json file to load your data</p>
+            </div>
+
             <div class="navigation-buttons">
                 <button class="btn next" onclick="goToNextTab()">Next <i class="fas fa-arrow-right"></i></button>
             </div>
@@ -1641,6 +1651,7 @@
                 <div class="navigation-buttons">
                     <button class="btn prev" onclick="goToPreviousTab()"><i class="fas fa-arrow-left"></i> Back to
                         Inputs</button>
+                    <button id="export-data-btn" class="btn export" onclick="exportFireData()"><i class="fas fa-download"></i> Export Data</button>
                     <button id="share-screenshot-btn" class="btn next"><i class="fas fa-share-alt"></i> Share Your
                         Results</button>
                 </div>

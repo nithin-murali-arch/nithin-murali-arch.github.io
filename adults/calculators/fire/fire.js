@@ -718,8 +718,8 @@ function calculateFIRE() {
                     }, 0);
                     
                     if (testWeightedReturn >= testRequiredGrowthRate) {
-                        coastFireAge = inputs.currentAge + year;
-                        coastFireYears = year;
+                        coastFireAge = inputs.currentAge + Math.ceil(year); // Round up to next whole year
+                        coastFireYears = Math.ceil(year); // Round up to next whole year
                         break;
                     }
                 }
@@ -884,7 +884,7 @@ function calculateFIRE() {
         if (!corpusReachedFireNumber) {
             const currentCorpus = Object.values(simulationPortfolio).reduce((s, a) => s + a.value, 0);
             if (currentCorpus >= inflatedFireNumber) {
-                earliestFireAge = inputs.currentAge + (month / 12);
+                earliestFireAge = inputs.currentAge + Math.ceil(month / 12); // Round up to next whole year
                 corpusReachedFireNumber = true;
                 console.log(`FIRE achieved at age ${earliestFireAge} (month ${month})`);
             }
@@ -956,7 +956,7 @@ function calculateFIRE() {
             // Check if corpus has reached FIRE number
             const currentCorpus = Object.values(extendedPortfolio).reduce((s, a) => s + a.value, 0);
             if (currentCorpus >= inflatedFireNumber) {
-                earliestFireAge = inputs.currentAge + currentYear;
+                earliestFireAge = inputs.currentAge + Math.ceil(currentYear); // Round up to next whole year
                 corpusReachedFireNumber = true;
                 console.log(`FIRE achieved at age ${earliestFireAge} (extended simulation)`);
                 break;
@@ -1000,11 +1000,11 @@ function calculateFIRE() {
         if (earliestFireAge && earliestFireAge <= inputs.targetAge) {
             // Achievable within target age
             actualFireAge = earliestFireAge;
-            actualYearsToFire = earliestFireAge - inputs.currentAge;
+            actualYearsToFire = Math.ceil(earliestFireAge - inputs.currentAge); // Round up to next whole year
         } else if (earliestFireAge && earliestFireAge <= extendedWorkAge) {
             // Not achievable at target age, but achievable by extending work to 58
             actualFireAge = earliestFireAge;
-            actualYearsToFire = earliestFireAge - inputs.currentAge;
+            actualYearsToFire = Math.ceil(earliestFireAge - inputs.currentAge); // Round up to next whole year
         } else {
             // Not achievable even by extending work to 58
             actualFireAge = null;
@@ -1013,7 +1013,7 @@ function calculateFIRE() {
     } else {
         // No shortfall - target age is achievable
         actualFireAge = inputs.targetAge;
-        actualYearsToFire = inputs.targetAge - inputs.currentAge;
+        actualYearsToFire = Math.ceil(inputs.targetAge - inputs.currentAge); // Round up to next whole year
     }
     
     const retirementDuration = (inputs.lifeExpectancy || 85) - (actualFireAge || inputs.targetAge || 0);
@@ -1026,7 +1026,7 @@ function calculateFIRE() {
         targetAge: inputs.targetAge, // Keep original target for reference
         earliestFireAge: earliestFireAge, // Earliest possible age
         yearsToFire: actualYearsToFire, // Years to actual FIRE age
-        targetYearsToFire: inputs.targetAge - inputs.currentAge, // Years to target age
+        targetYearsToFire: Math.ceil(inputs.targetAge - inputs.currentAge), // Years to target age (rounded up)
         retirementDuration,
         monthlyExpenses,
         annualExpenses,
@@ -1101,15 +1101,15 @@ function updateUIAndCharts(data) {
     const expectedYearsEl = document.getElementById('expected-years-to-fire');
     const actualYearsEl = document.getElementById('actual-years-to-fire');
     
-    expectedFireAgeEl.textContent = data.targetAge ?? '--';
+    expectedFireAgeEl.textContent = data.targetAge ? Math.ceil(data.targetAge) : '--';
     expectedFireAgeEl.className = 'result-value expected';
     
-    actualFireAgeEl.textContent = data.fireAge ?? '--';
+    actualFireAgeEl.textContent = data.fireAge ? Math.ceil(data.fireAge) : '--';
     if (data.corpusShortfall < 0 && data.fireAge) {
         if (data.fireAge > data.targetAge) {
             // Achievable by extending work
             actualFireAgeEl.className = 'result-value extended';
-            actualFireAgeEl.textContent = `${Math.round(data.fireAge)} (extended)`;
+            actualFireAgeEl.textContent = `${Math.ceil(data.fireAge)} (extended)`;
         } else {
             // Achievable within target
             actualFireAgeEl.className = 'result-value actual';
@@ -1126,15 +1126,15 @@ function updateUIAndCharts(data) {
         actualFireAgeEl.className = 'result-value actual';
     }
     
-    expectedYearsEl.textContent = data.targetYearsToFire ?? (data.targetAge && data.currentAge ? data.targetAge - data.currentAge : '--');
+    expectedYearsEl.textContent = data.targetYearsToFire ? Math.ceil(data.targetYearsToFire) : (data.targetAge && data.currentAge ? Math.ceil(data.targetAge - data.currentAge) : '--');
     expectedYearsEl.className = 'result-value expected';
     
-    actualYearsEl.textContent = data.yearsToFire ?? '--';
+    actualYearsEl.textContent = data.yearsToFire ? Math.ceil(data.yearsToFire) : '--';
     if (data.corpusShortfall < 0 && data.yearsToFire) {
         if (data.fireAge > data.targetAge) {
             // Achievable by extending work
             actualYearsEl.className = 'result-value extended';
-            actualYearsEl.textContent = `${Math.round(data.yearsToFire)} (extended)`;
+            actualYearsEl.textContent = `${Math.ceil(data.yearsToFire)} (extended)`;
         } else {
             // Achievable within target
             actualYearsEl.className = 'result-value actual';
@@ -1151,10 +1151,10 @@ function updateUIAndCharts(data) {
     const coastFireYearsEl = document.getElementById('coast-fire-years');
     const coastFireStatusEl = document.getElementById('coast-fire-status');
     
-    coastFireAgeEl.textContent = data.coastFireAge ?? '--';
+    coastFireAgeEl.textContent = data.coastFireAge ? Math.ceil(data.coastFireAge) : '--';
     coastFireAgeEl.className = data.coastFireAchieved ? 'result-value actual' : 'result-value expected';
     
-    coastFireYearsEl.textContent = data.coastFireYears ?? '--';
+    coastFireYearsEl.textContent = data.coastFireYears ? Math.ceil(data.coastFireYears) : '--';
     coastFireYearsEl.className = data.coastFireAchieved ? 'result-value actual' : 'result-value expected';
     
     if (data.coastFireAchieved) {
@@ -1162,7 +1162,7 @@ function updateUIAndCharts(data) {
         coastFireStatusEl.className = 'result-value actual';
         coastFireStatusEl.style.color = 'var(--success-green)';
     } else if (data.coastFireAge) {
-        coastFireStatusEl.textContent = `Achievable in ${data.coastFireYears} years`;
+        coastFireStatusEl.textContent = `Achievable in ${Math.ceil(data.coastFireYears)} years`;
         coastFireStatusEl.className = 'result-value extended';
         coastFireStatusEl.style.color = 'var(--fire-orange)';
     } else {
@@ -1171,7 +1171,7 @@ function updateUIAndCharts(data) {
         coastFireStatusEl.style.color = 'var(--fire-red)';
     }
     
-    document.getElementById('retirement-duration-result').textContent = data.retirementDuration ?? ((data.lifeExpectancy && data.fireAge) ? data.lifeExpectancy - data.fireAge : '--');
+    document.getElementById('retirement-duration-result').textContent = data.retirementDuration ? Math.ceil(data.retirementDuration) : ((data.lifeExpectancy && data.fireAge) ? Math.ceil(data.lifeExpectancy - data.fireAge) : '--');
     document.getElementById('inflated-fire-number').textContent = formatCurrency(data.inflatedFireNumber);
     document.getElementById('final-corpus').textContent = formatCurrency(data.finalCorpus);
     const shortfallEl = document.getElementById('corpus-shortfall');
@@ -1196,9 +1196,9 @@ function updateUIAndCharts(data) {
             showMessage('FIRE is not achievable with your current inputs. Consider increasing your savings rate, reducing expenses, or extending your target age.', 'error');
         }
     } else if (data.corpusShortfall < 0 && data.fireAge && data.fireAge > data.targetAge) {
-        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.round(data.fireAge)} by extending your work until then.`, 'info');
+        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.ceil(data.fireAge)} by extending your work until then.`, 'info');
     } else if (data.corpusShortfall < 0 && data.fireAge) {
-        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.round(data.fireAge)} with your current inputs.`, 'info');
+        showMessage(`Your target FIRE age of ${data.targetAge} is not achievable, but you can achieve FIRE at age ${Math.ceil(data.fireAge)} with your current inputs.`, 'info');
     }
 
     Object.values(chartInstances).forEach(chart => chart.destroy());
@@ -2098,8 +2098,8 @@ function updateFireProgressBar(data) {
     const expectedFireAge = data.targetAge || 0; // Keep expected age for reference
     
     // Update progress bar elements
-    document.getElementById('progress-current-age').textContent = currentAge;
-    document.getElementById('progress-target-age').textContent = actualFireAge || expectedFireAge;
+    document.getElementById('progress-current-age').textContent = Math.ceil(currentAge);
+    document.getElementById('progress-target-age').textContent = actualFireAge ? Math.ceil(actualFireAge) : Math.ceil(expectedFireAge);
     
     // Calculate progress percentage
     let progressPercentage = 0;
@@ -2152,8 +2152,8 @@ function updateFireProgressBar(data) {
     }
     
     // Update stats
-    document.getElementById('progress-years-completed').textContent = yearsCompleted;
-    document.getElementById('progress-years-remaining').textContent = yearsRemaining;
+    document.getElementById('progress-years-completed').textContent = Math.ceil(yearsCompleted);
+    document.getElementById('progress-years-remaining').textContent = Math.ceil(yearsRemaining);
     
     // Add visual feedback based on progress
     if (progressPercentage >= 100) {
@@ -2643,3 +2643,383 @@ function copyToClipboard(url, shareText) {
     document.addEventListener('DOMContentLoaded', attachMobileTooltipHandlers);
     window.addEventListener('resize', attachMobileTooltipHandlers);
 })();
+
+// --- Export/Import Functionality ---
+function exportFireData() {
+    try {
+        // Get all form inputs in the new format
+        const exportData = {
+            // Basic user info
+            userName: document.getElementById('user-name')?.value || '',
+            currentAge: parseFloat(document.getElementById('current-age')?.value || 0),
+            targetAge: parseFloat(document.getElementById('target-age')?.value || 0),
+            
+            // Financial inputs
+            annualExpenses: parseFloat(document.getElementById('annual-expenses')?.value || 0),
+            withdrawalRate: parseFloat(document.getElementById('withdrawal-rate')?.value || 0) / 100,
+            inflationRate: parseFloat(document.getElementById('inflation-rate')?.value || 0) / 100,
+            monthlyIncome: parseFloat(document.getElementById('monthly-income')?.value || 0),
+            monthlyExpenses: parseFloat(document.getElementById('monthly-expenses')?.value || 0),
+            lifeExpectancy: parseFloat(document.getElementById('life-expectancy')?.value || 0),
+            emergencyFund: parseFloat(document.getElementById('emergency-fund')?.value || 0),
+            bufferPercentage: parseFloat(document.getElementById('buffer-percentage')?.value || 0) / 100,
+            sipStepUpPercent: parseFloat(document.getElementById('sip-stepup-percent')?.value || 0) / 100,
+            
+            // Portfolio data
+            portfolio: {
+                equity_in: {
+                    value: parseFloat(document.getElementById('equity-in-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-equity-in')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('equity-in-contribution')?.value || 0)
+                },
+                equity_gl: {
+                    value: parseFloat(document.getElementById('equity-gl-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-equity-gl')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('equity-gl-contribution')?.value || 0)
+                },
+                debt: {
+                    value: parseFloat(document.getElementById('debt-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-debt')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('debt-contribution')?.value || 0)
+                },
+                real_estate: {
+                    value: parseFloat(document.getElementById('real-estate-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-real-estate')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('real-estate-contribution')?.value || 0)
+                },
+                epf: {
+                    value: parseFloat(document.getElementById('epf-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-epf')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('epf-contribution')?.value || 0)
+                },
+                nps: {
+                    value: parseFloat(document.getElementById('nps-value')?.value || 0),
+                    return: parseFloat(document.getElementById('return-nps')?.value || 0) / 100,
+                    contribution: parseFloat(document.getElementById('nps-contribution')?.value || 0)
+                }
+            },
+            
+            // STP data
+            stp: {
+                amount: parseFloat(document.getElementById('stp-amount')?.value || 0),
+                frequency: document.getElementById('stp-frequency')?.value || 'none'
+            },
+            
+            // Healthcare buffer
+            healthcareBuffer: {
+                value: parseFloat(document.getElementById('healthcare-buffer-value')?.value || 0),
+                age: parseFloat(document.getElementById('healthcare-buffer-age')?.value || 65),
+                inflation: parseFloat(document.getElementById('healthcare-buffer-inflation')?.value || 0) / 100
+            },
+            
+            // Tax rates
+            tax: {
+                equityShortCurrent: parseFloat(document.getElementById('tax-equity-short-current')?.value || 0) / 100,
+                equityLongCurrent: parseFloat(document.getElementById('tax-equity-long-current')?.value || 0) / 100,
+                debtShortCurrent: parseFloat(document.getElementById('tax-debt-short-current')?.value || 0) / 100,
+                debtLongCurrent: parseFloat(document.getElementById('tax-debt-long-current')?.value || 0) / 100,
+                equityShortRetire: parseFloat(document.getElementById('tax-equity-short-retire')?.value || 0) / 100,
+                equityLongRetire: parseFloat(document.getElementById('tax-equity-long-retire')?.value || 0) / 100,
+                debtShortRetire: parseFloat(document.getElementById('tax-debt-short-retire')?.value || 0) / 100,
+                debtLongRetire: parseFloat(document.getElementById('tax-debt-long-retire')?.value || 0) / 100
+            },
+            
+            // Lifestyle and risk tolerance
+            lifestyle: {
+                now: parseFloat(document.getElementById('lifestyle-now')?.value || 1),
+                retire: parseFloat(document.getElementById('lifestyle-retire')?.value || 1)
+            },
+            riskTolerance: {
+                now: document.getElementById('risk-tolerance-now')?.value || 'moderate',
+                retire: document.getElementById('risk-tolerance-retire')?.value || 'moderate'
+            },
+            
+            // Goals
+            goals: []
+        };
+        
+        // Get goals data
+        document.querySelectorAll('.goal-row').forEach(row => {
+            exportData.goals.push({
+                name: row.querySelector('.goal-name')?.value || '',
+                value: parseFloat(row.querySelector('.goal-value')?.value || 0),
+                years: parseFloat(row.querySelector('.goal-years')?.value || 0),
+                inflation: parseFloat(row.querySelector('.goal-inflation')?.value || 0) / 100
+            });
+        });
+        
+        // Get current FIRE calculation results if available
+        const fireAge = document.getElementById('fire-age')?.textContent;
+        if (fireAge && fireAge !== '--') {
+            exportData.fireAge = parseFloat(fireAge);
+            exportData.earliestFireAge = parseFloat(document.getElementById('fire-age')?.textContent || 0);
+            exportData.yearsToFire = Math.ceil(parseFloat(document.getElementById('years-to-fire')?.textContent || 0)); // Round up to next whole year
+            exportData.targetYearsToFire = Math.ceil(exportData.targetAge - exportData.currentAge); // Round up to next whole year
+            exportData.retirementDuration = exportData.lifeExpectancy - exportData.fireAge;
+            exportData.inflatedFireNumber = parseFloat(document.getElementById('inflated-fire-number')?.textContent?.replace(/[^\d.-]/g, '') || 0);
+            exportData.finalCorpus = parseFloat(document.getElementById('final-corpus')?.textContent?.replace(/[^\d.-]/g, '') || 0);
+            exportData.corpusShortfall = parseFloat(document.getElementById('corpus-shortfall')?.textContent?.replace(/[^\d.-]/g, '') || 0);
+            exportData.unutilizedMonthlyInvestment = parseFloat(document.getElementById('unutilized-money')?.textContent?.replace(/[^\d.-]/g, '') || 0);
+            exportData.fireAchievable = document.getElementById('fire-achievable')?.textContent?.includes('Achievable') || false;
+            
+            // Coast FIRE data
+            const coastFireAge = document.getElementById('coast-fire-age')?.textContent;
+            if (coastFireAge && coastFireAge !== '--') {
+                exportData.coastFireAge = parseFloat(coastFireAge);
+                exportData.coastFireYears = Math.ceil(parseFloat(document.getElementById('coast-fire-years')?.textContent || 0)); // Round up to next whole year
+                exportData.coastFireAchieved = document.getElementById('coast-fire-status')?.textContent?.includes('Achieved') || false;
+                exportData.coastFireNumber = exportData.inflatedFireNumber;
+            }
+            
+            // Portfolio summary
+            exportData.currentPortfolioValue = Object.values(exportData.portfolio).reduce((sum, asset) => sum + asset.value, 0);
+            
+            // Calculate weighted return
+            const totalValue = exportData.currentPortfolioValue;
+            if (totalValue > 0) {
+                exportData.weightedReturn = Object.values(exportData.portfolio).reduce((sum, asset) => {
+                    return sum + (asset.value / totalValue) * asset.return;
+                }, 0);
+            }
+            
+            // Required growth rate for FIRE
+            if (exportData.yearsToFire > 0) {
+                exportData.requiredGrowthRate = Math.pow(exportData.inflatedFireNumber / exportData.currentPortfolioValue, 1 / exportData.yearsToFire) - 1;
+            }
+        }
+        
+        // Add metadata
+        exportData.exportDate = new Date().toISOString();
+        exportData.version = '2.0';
+        exportData.calculator = 'FIRE Calculator';
+        exportData.url = window.location.href;
+        
+        // Create and download file
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `fire-calculator-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showMessage('FIRE data exported successfully!', 'success');
+        
+        // Track export event
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'export_data', {
+                event_category: 'engagement',
+                event_label: 'FIRE Calculator Export'
+            });
+        }
+        
+    } catch (error) {
+        console.error('Export failed:', error);
+        showMessage('Failed to export data. Please try again.', 'error');
+    }
+}
+
+// Function to import FIRE data
+function importFireData(importedData) {
+    try {
+        console.log('Importing data:', importedData);
+        
+        // Handle both old format (with formData wrapper) and new format (direct properties)
+        let dataToImport = importedData;
+        if (importedData.formData) {
+            // Old format - extract formData
+            dataToImport = importedData.formData;
+        }
+        
+        // Validate the imported data
+        if (!dataToImport || (typeof dataToImport !== 'object')) {
+            throw new Error('Invalid import data format');
+        }
+        
+        // Map the new data structure to form fields
+        const fieldMappings = {
+            'userName': 'user-name',
+            'currentAge': 'current-age',
+            'targetAge': 'target-age',
+            'annualExpenses': 'annual-expenses',
+            'withdrawalRate': 'withdrawal-rate',
+            'inflationRate': 'inflation-rate',
+            'monthlyIncome': 'monthly-income',
+            'monthlyExpenses': 'monthly-expenses',
+            'lifeExpectancy': 'life-expectancy',
+            'emergencyFund': 'emergency-fund',
+            'bufferPercentage': 'buffer-percentage',
+            'sipStepUpPercent': 'sip-stepup-percent'
+        };
+        
+        // Load basic form fields
+        for (const [newKey, formFieldId] of Object.entries(fieldMappings)) {
+            if (dataToImport[newKey] !== undefined) {
+                const el = document.getElementById(formFieldId);
+                if (el) {
+                    el.value = dataToImport[newKey];
+                }
+            }
+        }
+        
+        // Handle detailed expenses
+        if (dataToImport.detailedExpenses && Array.isArray(dataToImport.detailedExpenses)) {
+            // Clear existing expense rows
+            const expenseContainer = document.getElementById('expenses-container');
+            if (expenseContainer) {
+                expenseContainer.innerHTML = '';
+                dataToImport.detailedExpenses.forEach(expense => {
+                    // Add expense row logic here if needed
+                    // For now, we'll just set the total monthly expenses
+                    const monthlyExpensesEl = document.getElementById('monthly-expenses');
+                    if (monthlyExpensesEl) {
+                        monthlyExpensesEl.value = dataToImport.monthlyExpenses || 0;
+                    }
+                });
+            }
+        }
+        
+        // Handle portfolio data
+        if (dataToImport.portfolio) {
+            const portfolio = dataToImport.portfolio;
+            
+            // Map portfolio assets to form fields
+            const portfolioMappings = {
+                'equity_in': { value: 'equity-in-value', return: 'return-equity-in', contribution: 'equity-in-contribution' },
+                'equity_gl': { value: 'equity-gl-value', return: 'return-equity-gl', contribution: 'equity-gl-contribution' },
+                'debt': { value: 'debt-value', return: 'return-debt', contribution: 'debt-contribution' },
+                'real_estate': { value: 'real-estate-value', return: 'return-real-estate', contribution: 'real-estate-contribution' },
+                'epf': { value: 'epf-value', return: 'return-epf', contribution: 'epf-contribution' },
+                'nps': { value: 'nps-value', return: 'return-nps', contribution: 'nps-contribution' }
+            };
+            
+            for (const [assetKey, fieldMappings] of Object.entries(portfolioMappings)) {
+                if (portfolio[assetKey]) {
+                    const asset = portfolio[assetKey];
+                    if (asset.value !== undefined) {
+                        const valueEl = document.getElementById(fieldMappings.value);
+                        if (valueEl) valueEl.value = asset.value;
+                    }
+                    if (asset.return !== undefined) {
+                        const returnEl = document.getElementById(fieldMappings.return);
+                        if (returnEl) returnEl.value = asset.return * 100; // Convert to percentage
+                    }
+                    if (asset.contribution !== undefined) {
+                        const contributionEl = document.getElementById(fieldMappings.contribution);
+                        if (contributionEl) contributionEl.value = asset.contribution;
+                    }
+                }
+            }
+        }
+        
+        // Handle STP data
+        if (dataToImport.stp) {
+            const stpAmountEl = document.getElementById('stp-amount');
+            const stpFrequencyEl = document.getElementById('stp-frequency');
+            if (stpAmountEl) stpAmountEl.value = dataToImport.stp.amount || 0;
+            if (stpFrequencyEl) stpFrequencyEl.value = dataToImport.stp.frequency || 'none';
+        }
+        
+        // Handle goals
+        if (dataToImport.goals && Array.isArray(dataToImport.goals)) {
+            const goalsContainer = document.getElementById('goals-container');
+            if (goalsContainer) {
+                goalsContainer.innerHTML = ''; // Clear existing goals
+                dataToImport.goals.forEach(goal => {
+                    addGoalRow({
+                        name: goal.name || '',
+                        value: goal.value || 0,
+                        years: goal.years || 0,
+                        inflation: goal.inflation ? goal.inflation * 100 : 0 // Convert to percentage
+                    });
+                });
+            }
+        }
+        
+        // Handle healthcare buffer
+        if (dataToImport.healthcareBuffer) {
+            const healthcareValueEl = document.getElementById('healthcare-buffer-value');
+            const healthcareAgeEl = document.getElementById('healthcare-buffer-age');
+            const healthcareInflationEl = document.getElementById('healthcare-buffer-inflation');
+            
+            if (healthcareValueEl) healthcareValueEl.value = dataToImport.healthcareBuffer.value || 0;
+            if (healthcareAgeEl) healthcareAgeEl.value = dataToImport.healthcareBuffer.age || 65;
+            if (healthcareInflationEl) healthcareInflationEl.value = (dataToImport.healthcareBuffer.inflation || 0) * 100;
+        }
+        
+        // Handle tax rates
+        if (dataToImport.tax) {
+            const taxMappings = {
+                'equityShortCurrent': 'tax-equity-short-current',
+                'equityLongCurrent': 'tax-equity-long-current',
+                'debtShortCurrent': 'tax-debt-short-current',
+                'debtLongCurrent': 'tax-debt-long-current',
+                'equityShortRetire': 'tax-equity-short-retire',
+                'equityLongRetire': 'tax-equity-long-retire',
+                'debtShortRetire': 'tax-debt-short-retire',
+                'debtLongRetire': 'tax-debt-long-retire'
+            };
+            
+            for (const [taxKey, fieldId] of Object.entries(taxMappings)) {
+                if (dataToImport.tax[taxKey] !== undefined) {
+                    const el = document.getElementById(fieldId);
+                    if (el) el.value = dataToImport.tax[taxKey] * 100; // Convert to percentage
+                }
+            }
+        }
+        
+        // Handle lifestyle and risk tolerance
+        if (dataToImport.lifestyle) {
+            const lifestyleNowEl = document.getElementById('lifestyle-now');
+            const lifestyleRetireEl = document.getElementById('lifestyle-retire');
+            if (lifestyleNowEl) lifestyleNowEl.value = dataToImport.lifestyle.now || 1;
+            if (lifestyleRetireEl) lifestyleRetireEl.value = dataToImport.lifestyle.retire || 1;
+        }
+        
+        if (dataToImport.riskTolerance) {
+            const riskNowEl = document.getElementById('risk-tolerance-now');
+            const riskRetireEl = document.getElementById('risk-tolerance-retire');
+            if (riskNowEl) riskNowEl.value = dataToImport.riskTolerance.now || 'moderate';
+            if (riskRetireEl) riskRetireEl.value = dataToImport.riskTolerance.retire || 'moderate';
+        }
+        
+        // Trigger recalculation
+        triggerResultUpdate();
+        
+        showMessage('FIRE data imported successfully!', 'success');
+        
+        // Track import event
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'import_data', {
+                event_category: 'engagement',
+                event_label: 'FIRE Calculator Import'
+            });
+        }
+        
+    } catch (error) {
+        console.error('Import failed:', error);
+        showMessage('Failed to import data. Please check the file format.', 'error');
+    }
+}
+
+// Function to handle file import from file input
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            importFireData(importedData);
+        } catch (error) {
+            console.error('Error parsing imported file:', error);
+            showMessage('Invalid file format. Please select a valid FIRE calculator export file.', 'error');
+        }
+    };
+    reader.readAsText(file);
+}

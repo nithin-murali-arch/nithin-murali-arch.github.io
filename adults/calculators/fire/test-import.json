@@ -1,0 +1,160 @@
+{
+    "userName": "Test User",
+    "currentAge": 30,
+    "targetAge": 45,
+    "annualExpenses": 884400,
+    "withdrawalRate": 0.04,
+    "inflationRate": 0.06,
+    "monthlyIncome": 250000,
+    "monthlyExpenses": 73700,
+    "detailedExpenses": [
+        {
+            "amount": 30000,
+            "yearsLeft": 0
+        },
+        {
+            "amount": 25000,
+            "yearsLeft": 1
+        },
+        {
+            "amount": 10000,
+            "yearsLeft": 1
+        },
+        {
+            "amount": 2000,
+            "yearsLeft": 1
+        },
+        {
+            "amount": 5000,
+            "yearsLeft": 1
+        },
+        {
+            "amount": 1500,
+            "yearsLeft": 1
+        },
+        {
+            "amount": 200,
+            "yearsLeft": 1
+        }
+    ],
+    "lifeExpectancy": 85,
+    "emergencyFund": 6,
+    "bufferPercentage": 0.1,
+    "tax": {
+        "equityShortCurrent": 0.15,
+        "equityLongCurrent": 0.1,
+        "debtShortCurrent": 0.3,
+        "debtLongCurrent": 0.3,
+        "equityShortRetire": 0.15,
+        "equityLongRetire": 0.1,
+        "debtShortRetire": 0.3,
+        "debtLongRetire": 0.3
+    },
+    "lifestyle": {
+        "now": 1,
+        "retire": 1
+    },
+    "riskTolerance": {
+        "now": "moderate",
+        "retire": "moderate"
+    },
+    "portfolio": {
+        "equity_in": {
+            "value": 1000000,
+            "return": 0.12,
+            "contribution": 0
+        },
+        "equity_gl": {
+            "value": 200000,
+            "return": 0.11,
+            "contribution": 0
+        },
+        "debt": {
+            "value": 300000,
+            "return": 0.07,
+            "contribution": 0
+        },
+        "real_estate": {
+            "value": 5000000,
+            "return": 0.05,
+            "contribution": 0
+        },
+        "epf": {
+            "value": 800000,
+            "return": 0.085,
+            "contribution": 15000
+        },
+        "nps": {
+            "value": 500000,
+            "return": 0.1,
+            "contribution": 5000
+        }
+    },
+    "sipStepUpPercent": 0,
+    "stp": {
+        "amount": 0,
+        "frequency": "none"
+    },
+    "healthcareBuffer": {
+        "value": 5000000,
+        "age": 65,
+        "inflation": 0.1
+    },
+    "goals": [
+        {
+            "name": "Child's Higher Education",
+            "value": 2500000,
+            "years": 15,
+            "inflation": 0.08
+        }
+    ],
+    "fireAge": 44.416666666666664,
+    "earliestFireAge": 44.416666666666664,
+    "yearsToFire": 14.416666666666664,
+    "targetYearsToFire": 15,
+    "retirementDuration": 40.583333333333336,
+    "inflatedFireNumber": 80292676.70875521,
+    "finalCorpus": 78401990.04877903,
+    "corpusShortfall": -1890686.6599761844,
+    "unutilizedMonthlyInvestment": 156300,
+    "portfolioHistory": [
+        {
+            "year": 0,
+            "equity_in": 1000000,
+            "equity_gl": 200000,
+            "debt": 300000,
+            "real_estate": 5000000,
+            "epf": 800000,
+            "nps": 500000
+        },
+        {
+            "year": 1,
+            "equity_in": 1386221.9976878164,
+            "equity_gl": 274511.8279432113,
+            "debt": 395739.9041299099,
+            "real_estate": 6465705.442327087,
+            "epf": 1278018.9402730907,
+            "nps": 749049.0904821274
+        }
+    ],
+    "finalAllocation": {
+        "equity_in": 16378190.634110425,
+        "equity_gl": 2823385.0693732672,
+        "debt": 2334663.1287925756,
+        "real_estate": 28869070.469501834,
+        "epf": 17988710.357012212,
+        "nps": 10007970.389988706
+    },
+    "fireAchievable": true,
+    "coastFireAchieved": false,
+    "coastFireAge": 46,
+    "coastFireYears": 16,
+    "coastFireNumber": 80292676.70875521,
+    "currentPortfolioValue": 7800000,
+    "requiredGrowthRate": 16.81683145306514,
+    "weightedReturn": 6.8076923076923075,
+    "exportDate": "2024-01-15T10:30:00.000Z",
+    "version": "2.0",
+    "calculator": "FIRE Calculator",
+    "url": "https://nithin-murali-arch.github.io/adults/calculators/fire/"
+} 
