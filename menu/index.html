@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Dinner Schedule Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dinner Schedule Generator</h1>
+            <p>Your personalized weekly meal plan, intelligently crafted.</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'generator')">Plan Generator</button>
+            <button class="tab-link" onclick="openTab(event, 'manage')">Manage Plans</button>
+            <button class="tab-link" onclick="openTab(event, 'history')">History</button>
+        </div>
+
+        <div id="generator" class="tab-content" style="display: block;">
+            <div class="controls">
+                <button id="generate-btn" class="btn btn-primary">Generate Meal Plan</button>
+                <div class="toggle-switch">
+                    <label for="duration-toggle">Generate for Rest of Year</label>
+                    <input type="checkbox" id="duration-toggle">
+                    <span class="slider"></span>
+                </div>
+                 <div id="saved-plans-container" style="display: none;">
+                    <select id="saved-plans"></select>
+                 </div>
+                 <a href="./recipe_book.html" target="_blank" class="btn btn-secondary">View Cookbook</a>
+                 <button id="print-btn" class="btn btn-secondary" style="display: none;">Print</button>
+                 <button id="save-changes-btn" class="btn btn-primary" style="display: none;">Save Changes</button>
+            </div>
+    
+            <details id="rules-container">
+                <summary>View Scheduling Rules</summary>
+                <!-- Rules will be dynamically populated by app.js -->
+            </details>
+    
+            <div id="output" class="output-section">
+                <div class="output-grid">
+                    <div id="schedule-wrapper">
+                        <h2 class="section-title">Dinner Schedule</h2>
+                        <div id="schedule-container"></div>
+                    </div>
+                    <div id="shopping-list-wrapper">
+                         <h2 class="section-title">Weekly Shopping List</h2>
+                        <div id="shopping-list-container"></div>
+                    </div>
+                </div>
+    
+                <div id="print-schedule-container" class="print-only">
+                    <h2 class="section-title">Dinner Schedule</h2>
+                    <table id="print-schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Main Dish</th>
+                                <th>Side Dish</th>
+                            </tr>
+                        </thead>
+                        <tbody id="print-schedule-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="manage" class="tab-content">
+            <div class="manage-container">
+                <h2 class="section-title">Manage Saved Plans</h2>
+                <div id="manage-plans-list"></div>
+            </div>
+        </div>
+        
+        <div id="history" class="tab-content">
+            <div class="manage-container">
+                <h2 class="section-title">Import & View Meal History</h2>
+                <p>You can import a meal history to influence future plan generations. The format should be a JSON array of past schedule items.</p>
+                <textarea id="history-import-text" rows="10" placeholder="Paste meal history JSON here..."></textarea>
+                <button id="import-history-btn" class="btn btn-primary">Import & Overwrite History</button>
+                <h3>Current History</h3>
+                <div id="current-history-display"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="replace-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <h3 id="modal-title">Choose a Replacement</h3>
+            <div id="replacement-options"></div>
+        </div>
+    </div>
+    
+    <script src="./config.js"></script>
+    <script src="./ingredients.js"></script>
+    <script src="./rules.js"></script>
+    <script src="./scheduler.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
+

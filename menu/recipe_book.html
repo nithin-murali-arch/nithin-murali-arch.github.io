@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home-Style Indian Dinner Cookbook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-font: 'Lato', sans-serif;
+            --heading-font: 'Playfair Display', serif;
+            --body-font: 'Lora', serif;
+            --primary-color: #2c3e50;
+            --secondary-color: #8E44AD;
+            --background-color: #f4f7f6;
+            --card-background: #ffffff;
+            --text-color: #34495e;
+            --light-text-color: #7f8c8d;
+            --border-color: #ecf0f1;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: var(--body-font);
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container { max-width: 900px; margin: 20px auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 4em; }
+        header h1 { font-family: var(--heading-font); font-size: 3.5em; color: var(--primary-color); margin-bottom: 10px; }
+        header p { font-family: var(--primary-font); font-size: 1.2em; color: var(--light-text-color); }
+        
+        #toc {
+            background-color: var(--card-background);
+            border-radius: 16px;
+            padding: 2.5em;
+            margin-bottom: 5em;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.07);
+        }
+        #toc > h2 { font-family: var(--heading-font); font-size: 2.2em; color: var(--primary-color); margin-top: 0; text-align: center; margin-bottom: 1.5em; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5em 2.5em; }
+        .toc-category h3 { font-family: var(--heading-font); font-size: 1.4em; color: var(--secondary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5em; margin-bottom: 1em; }
+        .toc-category ul { list-style-type: none; padding-left: 0; margin-top: 0; }
+        .toc-category li { margin-bottom: 0.8em; font-size: 1.1em; font-family: var(--primary-font); }
+        .toc-category a { text-decoration: none; color: var(--text-color); font-weight: bold; transition: color 0.3s; }
+        .toc-category a:hover { color: var(--secondary-color); }
+
+        .section-title { font-family: var(--heading-font); font-size: 3em; text-align: center; margin: 2.5em 0 1.5em; color: var(--primary-color); }
+        
+        .recipe-card {
+            background: var(--card-background);
+            margin-bottom: 5em;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .recipe-card:hover { transform: translateY(-5px); }
+        .recipe-card img { width: 100%; height: 400px; object-fit: cover; }
+        .recipe-content { padding: 2.5em; }
+        .recipe-content h3 { font-family: var(--heading-font); font-size: 2.8em; color: var(--primary-color); margin-top: 0; margin-bottom: 1em; }
+        .recipe-details { display: grid; grid-template-columns: 1fr 2fr; gap: 3em; }
+        .recipe-details strong { font-family: var(--heading-font); color: var(--secondary-color); font-weight: bold; display: block; margin-bottom: 1em; font-size: 1.5em; }
+        .recipe-details ul, .recipe-details ol { padding-left: 20px; margin-top: 0; font-family: var(--primary-font); }
+        .recipe-details li { margin-bottom: 0.8em; color: var(--light-text-color); }
+        .recipe-details ol li { line-height: 1.9; color: var(--text-color); }
+
+        @media (max-width: 768px) {
+            body { padding: 1em; }
+            header h1 { font-size: 2.5em; }
+            .recipe-details { grid-template-columns: 1fr; }
+            .recipe-card img { height: 250px; }
+            .recipe-content h3 { font-size: 2em; }
+        }
+        @media print {
+            body { padding: 0; background-color: #fff; }
+            header, #toc, .print-hide { display: none; }
+            .container { max-width: 100%; margin: 0; }
+            .recipe-card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 2em; page-break-inside: avoid; }
+            .section-title { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Home Chef's Companion</h1>
+            <p>A curated collection of simple and delicious recipes for your weekly menu.</p>
+        </header>
+
+        <div id="toc">
+            <h2>Table of Contents</h2>
+            <div class="toc-grid">
+                <div class="toc-category">
+                    <h3>Breads & Tiffins</h3>
+                    <ul>
+                        <li><a href="#chapati">Chapati</a></li>
+                        <li><a href="#alooparatha">Aloo Paratha</a></li>
+                        <li><a href="#poori">Poori</a></li>
+                        <li><a href="#ravakichadi">Rava Kichadi</a></li>
+                        <li><a href="#godhumarava">Godhuma Rava Upma</a></li>
+                        <li><a href="#venpongal">Ven Pongal</a></li>
+                        <li><a href="#adai">Adai</a></li>
+                        <li><a href="#semiyaupma">Semiya Upma</a></li>
+                        <li><a href="#arisiupma">Arisi Upma</a></li>
+                    </ul>
+                </div>
+                <div class="toc-category">
+                    <h3>Rice Dishes</h3>
+                     <ul>
+                        <li><a href="#pulao">Vegetable Pulao</a></li>
+                        <li><a href="#biryani">Vegetable Biriyani</a></li>
+                    </ul>
+                </div>
+                 <div class="toc-category">
+                    <h3>Gravies & Curries</h3>
+                     <ul>
+                        <li><a href="#pbm">Paneer Butter Masala</a></li>
+                        <li><a href="#chana">Chana Masala</a></li>
+                        <li><a href="#kurma">Mixed Vegetable Kurma</a></li>
+                        <li><a href="#kpaneer">Kadai Paneer</a></li>
+                        <li><a href="#mpaneer">Mutter Paneer</a></li>
+                        <li><a href="#dalfry">Dal Fry</a></li>
+                        <li><a href="#kveg">Kadai Vegetable</a></li>
+                        <li><a href="#aloomasala">Aloo Masala</a></li>
+                         <li><a href="#sambar">Sambar</a></li>
+                    </ul>
+                </div>
+                <div class="toc-category">
+                    <h3>Dry Vegetables & Sides</h3>
+                     <ul>
+                        <li><a href="#bhindi">Bhindi Masala</a></li>
+                        <li><a href="#jeeraaloo">Jeera Aloo</a></li>
+                        <li><a href="#avial">Avial</a></li>
+                        <li><a href="#gothsu">Gothsu</a></li>
+                        <li><a href="#vathakuzhambu">Vathakuzhambu</a></li>
+                        <li><a href="#potatoroast">Potato Roast</a></li>
+                        <li><a href="#raita">Cucumber Onion Raita</a></li>
+                        <li><a href="#chutney">Coconut & Tomato Chutney</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="section-title">Breads & Tiffins</h2>
+        
+        <div id="chapati" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2021/09/roti-recipe-2.jpg" alt="Soft homemade chapati bread">
+            <div class="recipe-content"><h3>Chapati (சப்பாத்தி)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Wheat Flour - 2 cups</li><li>Warm Water - ~1 cup</li><li>Oil/Ghee - 2 tsp</li><li>Salt - 1/2 tsp</li></ul></div><div><strong>Instructions:</strong><ol><li>Mix flour and salt. Gradually add warm water and knead into a soft dough.</li><li>Add oil/ghee and knead for another 5 minutes. Cover and rest for 30 minutes.</li><li>Make small balls and roll into thin circles.</li><li>Cook on a hot tawa, flipping twice, pressing gently to puff up.</li></ol></div></div></div>
+        </div>
+        <div id="alooparatha" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/02/aloo-paratha-recipe.jpg" alt="Aloo Paratha with yogurt">
+            <div class="recipe-content"><h3>Aloo Paratha (உருளைக்கிழங்கு பராத்தா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>For Dough: Use Chapati dough recipe</li><li>For Filling: 3 boiled potatoes, 1 onion (chopped), 1 green chilli (chopped), Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Mash potatoes and mix with onion, chilli, and spices.</li><li>Take a ball of dough, flatten, place filling, and seal.</li><li>Roll out gently into a slightly thick circle.</li><li>Cook on a tawa with ghee until golden and crisp.</li></ol></div></div></div>
+        </div>
+        <div id="poori" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2020/12/poori-puri-recipe.jpg" alt="Puffy Poori bread">
+            <div class="recipe-content"><h3>Poori (பூரி)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Wheat Flour - 2 cups</li><li>Rava/Sooji - 2 tbsp (for crispiness)</li><li>Salt, Water, Oil for frying</li></ul></div><div><strong>Instructions:</strong><ol><li>Knead a stiff dough using flour, rava, salt, and water. Rest for 15 minutes.</li><li>Roll into small, thick discs.</li><li>Deep fry in hot oil, pressing gently to puff up.</li><li>Fry until golden and drain. Serve immediately.</li></ol></div></div></div>
+        </div>
+        <div id="ravakichadi" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2013/01/rava-khichdi-recipe-1.jpg" alt="Rava Kichadi">
+            <div class="recipe-content"><h3>Rava Kichadi (ரவா கிச்சடி)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Rava (Semolina) - 1 cup</li><li>Mixed Vegetables - 1 cup</li><li>Onion & Tomato - 1 each</li><li>Ghee, Turmeric, Tempering Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Roast rava until aromatic.</li><li>In a pan, temper spices in ghee, sauté onions, tomatoes, and vegetables.</li><li>Add 3 cups of hot water, salt, and turmeric. Bring to a boil.</li><li>Slowly add rava while stirring. Cover and cook on low heat.</li></ol></div></div></div>
+        </div>
+        <div id="godhumarava" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/03/gothumai-rava-upma-samba-godhumai-upma.jpg" alt="Godhuma Rava Upma">
+            <div class="recipe-content"><h3>Godhuma Rava Upma (கோதுமை ரவா உப்புமா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Cracked Wheat (Samba Rava) - 1 cup</li><li>Onion - 1, Green Chillis - 2</li><li>Tempering Spices, Oil, Salt, Water - 2.5 cups</li></ul></div><div><strong>Instructions:</strong><ol><li>Temper spices in hot oil, sauté onions and chillis.</li><li>Add water and salt, bring to a boil.</li><li>Reduce heat, add cracked wheat slowly, stirring continuously.</li><li>Cover and cook on low flame for 10-15 minutes.</li></ol></div></div></div>
+        </div>
+        <div id="venpongal" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2013/01/ven-pongal-recipe-1.jpg" alt="Ven Pongal">
+            <div class="recipe-content"><h3>Ven Pongal (வெண் பொங்கல்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Raw Rice - 1 cup</li><li>Moong Dal - 1/2 cup</li><li>Ghee - 4 tbsp</li><li>Ginger, Pepper, Cumin, Cashews</li></ul></div><div><strong>Instructions:</strong><ol><li>Dry roast moong dal lightly.</li><li>Pressure cook rice and dal with 4 cups of water until mushy.</li><li>In ghee, temper pepper, cumin, ginger, and cashews.</li><li>Pour tempering over the cooked pongal, add salt, and mix well.</li></ol></div></div></div>
+        </div>
+        <div id="adai" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2018/12/adai-recipe-1.jpg" alt="Adai">
+            <div class="recipe-content"><h3>Adai (அடை)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Adai Batter (from mix or homemade)</li><li>Onion, Coriander (optional, chopped)</li><li>Oil for cooking</li></ul></div><div><strong>Instructions:</strong><ol><li>If using, mix chopped onion and coriander into the batter.</li><li>Heat a tawa, pour a ladle of batter and spread into a thick circle.</li><li>Drizzle oil around the edges and in the center.</li><li>Cook on both sides until golden brown and crisp.</li></ol></div></div></div>
+        </div>
+        <div id="semiyaupma" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/07/semiya-upma-vermicelli-upma.jpg" alt="Semiya Upma">
+            <div class="recipe-content"><h3>Semiya Upma (சேமியா உப்புமா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Vermicelli (Semiya) - 1.5 cups, roasted</li><li>Mixed Vegetables - 1 cup</li><li>Onion - 1, Green Chillis - 2</li><li>Tempering Spices, Oil, Salt</li></ul></div><div><strong>Instructions:</strong><ol><li>Temper spices, sauté onions, chillis and vegetables.</li><li>Add 2.5 cups of water and salt, bring to a boil.</li><li>Add roasted vermicelli, stir well, and cook on low heat until water is absorbed.</li></ol></div></div></div>
+        </div>
+        <div id="arisiupma" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2016/09/arisi-upma-recipe-1.jpg" alt="Arisi Upma">
+            <div class="recipe-content"><h3>Arisi Upma (அரிசி உப்புமா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Raw Rice - 1 cup</li><li>Toor Dal - 2 tbsp</li><li>Onion - 1 (optional)</li><li>Tempering: Mustard, Urad Dal, Red Chilli, Asafoetida</li></ul></div><div><strong>Instructions:</strong><ol><li>Coarsely grind rice and toor dal.</li><li>In a pressure cooker, heat oil, temper spices. Sauté onions if using.</li><li>Add 3 cups water and salt. Bring to a boil.</li><li>Slowly add the rice mixture, stirring to prevent lumps.</li><li>Cook for 2-3 whistles.</li></ol></div></div></div>
+        </div>
+
+        <h2 class="section-title">Rice Dishes</h2>
+        <div id="pulao" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/06/veg-pulao-vegetable-pulav.jpg" alt="Vegetable Pulao">
+            <div class="recipe-content"><h3>Vegetable Pulao (வெஜிடபிள் புலாவ்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Basmati Rice - 1.5 cups, soaked</li><li>Mixed Vegetables - 2 cups</li><li>Onion - 1, Ginger-Garlic Paste</li><li>Whole Spices (Cinnamon, Clove, Bay Leaf)</li></ul></div><div><strong>Instructions:</strong><ol><li>Sauté whole spices in ghee. Add sliced onions and fry until golden.</li><li>Add ginger-garlic paste and vegetables. Sauté for a few minutes.</li><li>Add soaked rice, 3 cups of water, and salt.</li><li>Cook until rice is fluffy (pressure cooker or pot).</li></ol></div></div></div>
+        </div>
+        <div id="biryani" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2019/02/veg-biryani-recipe-1.jpg" alt="Vegetable Biriyani">
+            <div class="recipe-content"><h3>Vegetable Biriyani (வெஜிடபிள் பிரியாணி)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Basmati Rice - 1.5 cups, soaked</li><li>Mixed Vegetables - 2 cups</li><li>Onion, Tomato, Ginger-Garlic Paste</li><li>Curd, Mint Leaves, Biryani Masala</li></ul></div><div><strong>Instructions:</strong><ol><li>Sauté whole spices, then onions. Add ginger-garlic paste, tomatoes, vegetables, and powders.</li><li>Stir in curd, mint, and salt. Add soaked rice and water.</li><li>Pressure cook for 2 whistles.</li></ol></div></div></div>
+        </div>
+
+        <h2 class="section-title">Gravies & Curries</h2>
+        <div id="pbm" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/03/paneer-butter-masala.jpg" alt="Paneer Butter Masala">
+            <div class="recipe-content"><h3>Paneer Butter Masala (பனீர் பட்டர் மசாலா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Paneer - 200g</li><li>Onion - 2, Tomatoes - 4, Cashews - 15</li><li>Ginger-Garlic Paste, Spices</li><li>Kasuri Methi, Butter, Cream</li></ul></div><div><strong>Instructions:</strong><ol><li>Make a paste of blanched tomatoes and soaked cashews.</li><li>Sauté onions and ginger-garlic paste. Add tomato-cashew paste and spices. Cook until oil separates.</li><li>Add water, paneer, and kasuri methi. Simmer, finish with cream.</li></ol></div></div></div>
+        </div>
+        <div id="chana" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/08/chana-masala-recipe.jpg" alt="Chana Masala">
+            <div class="recipe-content"><h3>Chana Masala (சன்னா மசாலா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Chickpeas - 1 cup, boiled</li><li>Onion - 1, Tomato - 2 (pureed)</li><li>Ginger-Garlic Paste, Chana Masala Powder</li></ul></div><div><strong>Instructions:</strong><ol><li>Sauté onions, then ginger-garlic paste. Add tomato puree and spices.</li><li>Cook well, then add boiled chickpeas and water.</li><li>Simmer for 15 minutes.</li></ol></div></div></div>
+        </div>
+        <div id="kurma" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2012/04/vegetable-kurma-recipe-1.jpg" alt="Mixed Vegetable Kurma">
+            <div class="recipe-content"><h3>Mixed Vegetable Kurma (வெஜிடபிள் குருமா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Mixed Vegetables - 2 cups</li><li>Onion & Tomato - 1 each</li><li>For Paste: Coconut, Cashews, Green Chilli, Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Grind the coconut paste.</li><li>Sauté whole spices, onions, and tomatoes.</li><li>Add vegetables and cook until soft.</li><li>Add coconut paste and water. Simmer until thick.</li></ol></div></div></div>
+        </div>
+        <div id="kpaneer" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/03/kadai-paneer-recipe.jpg" alt="Kadai Paneer">
+            <div class="recipe-content"><h3>Kadai Paneer (கடாய் பனீர்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Paneer - 200g, cubed</li><li>Capsicum, Onion, Tomato - 1 each, cubed</li><li>Kadai Masala, Ginger-Garlic Paste</li></ul></div><div><strong>Instructions:</strong><ol><li>Roast and grind whole spices for Kadai Masala.</li><li>Sauté cubed onions and capsicum until crisp. Remove.</li><li>Make a gravy with onions, tomatoes, ginger-garlic paste, and kadai masala.</li><li>Add paneer, sautéed vegetables, and simmer.</li></ol></div></div></div>
+        </div>
+        <div id="mpaneer" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2021/05/matar-paneer-1.jpg" alt="Mutter Paneer">
+            <div class="recipe-content"><h3>Mutter Paneer (மட்டர் பனீர்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Paneer - 200g</li><li>Green Peas (Mutter) - 1 cup</li><li>Onion - 2, Tomato - 3</li><li>Ginger-Garlic Paste, Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Make a puree of onion, ginger, and garlic. Make a separate puree of tomatoes.</li><li>Sauté onion puree until golden. Add tomato puree and spices. Cook well.</li><li>Add peas and water, cook until soft.</li><li>Add paneer cubes and simmer for 5-7 minutes.</li></ol></div></div></div>
+        </div>
+        <div id="dalfry" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/09/dal-fry-recipe.jpg" alt="Dal Fry">
+            <div class="recipe-content"><h3>Dal Fry (தால் ஃப்ரை)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Toor Dal - 1 cup, pressure cooked</li><li>Onion & Tomato - 1 each</li><li>Ginger-Garlic, Spices</li><li>Tadka: Ghee, Cumin, Mustard, Red Chilli</li></ul></div><div><strong>Instructions:</strong><ol><li>Sauté onions, ginger-garlic, and tomatoes. Add spices.</li><li>Add this masala to the cooked dal and simmer.</li><li>Prepare tadka in ghee and pour over the dal before serving.</li></ol></div></div></div>
+        </div>
+        <div id="kveg" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2017/02/kadai-vegetables-recipe-1.jpg" alt="Kadai Vegetable">
+            <div class="recipe-content"><h3>Kadai Vegetable (கடாய் வெஜிடபிள்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Mixed Vegetables - 2 cups, cubed</li><li>Capsicum & Onion - 1 each, cubed</li><li>Kadai Masala, Tomato Puree</li></ul></div><div><strong>Instructions:</strong><ol><li>Stir-fry cubed onions and capsicum. Keep aside.</li><li>Sauté other vegetables until almost cooked.</li><li>Add tomato puree and kadai masala. Cook for a few minutes.</li><li>Add the stir-fried vegetables and mix well.</li></ol></div></div></div>
+        </div>
+        <div id="aloomasala" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/11/aloo-masala-for-dosa-poori.jpg" alt="Aloo Masala for Poori">
+            <div class="recipe-content"><h3>Aloo Masala (பூரி கிழங்கு மசாலா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Potatoes - 4, boiled & mashed</li><li>Onion - 2, sliced</li><li>Green Chilli, Ginger, Turmeric</li><li>Tempering Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Temper spices, sauté onions, green chillis, and ginger.</li><li>Add turmeric, mashed potatoes, salt, and 1 cup of water.</li><li>Mix well and simmer for 5 minutes until it thickens slightly.</li></ol></div></div></div>
+        </div>
+        <div id="sambar" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2021/05/sambar-recipe-1.jpg" alt="Sambar">
+            <div class="recipe-content"><h3>Sambar (சாம்பார்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Toor Dal - 3/4 cup, cooked</li><li>Mixed Vegetables (Drumstick, Pumpkin, Brinjal) - 1.5 cups</li><li>Tamarind extract, Sambar Powder</li><li>Tempering Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Cook vegetables in water with turmeric until tender.</li><li>Add tamarind extract, sambar powder, and salt. Boil for 5-7 minutes.</li><li>Add cooked, mashed dal and bring to a simmer.</li><li>Prepare tadka and pour over the sambar.</li></ol></div></div></div>
+        </div>
+
+        <h2 class="section-title">Dry Vegetables & Sides</h2>
+        <div id="bhindi" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/02/bhindi-masala-recipe.jpg" alt="Bhindi Masala">
+            <div class="recipe-content"><h3>Bhindi Masala (வெண்டைக்காய் மசாலா)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Okra (Bhindi) - 250g, chopped</li><li>Onion - 1, Tomato - 2</li><li>Spices: Turmeric, Chilli, Coriander powder</li></ul></div><div><strong>Instructions:</strong><ol><li>Pan-fry bhindi until crisp and keep aside.</li><li>Make a masala with onions, tomatoes, and spices.</li><li>Add fried bhindi to the masala and mix gently.</li></ol></div></div></div>
+        </div>
+        <div id="jeeraaloo" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2021/05/jeera-aloo-recipe-1.jpg" alt="Jeera Aloo">
+            <div class="recipe-content"><h3>Jeera Aloo (சீரக உருளைக்கிழங்கு)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Potatoes - 4, boiled & cubed</li><li>Cumin Seeds (Jeera) - 1 tbsp</li><li>Turmeric, Chilli Powder, Asafoetida</li></ul></div><div><strong>Instructions:</strong><ol><li>Heat oil, add cumin seeds. Once they crackle, add asafoetida.</li><li>Add boiled potato cubes, turmeric, chilli powder, and salt.</li><li>Toss gently and roast on low heat until potatoes are slightly crisp.</li></ol></div></div></div>
+        </div>
+        <div id="avial" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2012/04/avial-recipe-1.jpg" alt="Avial">
+            <div class="recipe-content"><h3>Avial (அவியல்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Mixed Veggies (Yam, Plantain, Carrot, Beans, Drumstick) - 2 cups</li><li>Curd - 1/2 cup, sour</li><li>For Paste: Coconut, Cumin, Green Chilli</li><li>Coconut Oil</li></ul></div><div><strong>Instructions:</strong><ol><li>Cook vegetables with turmeric until tender.</li><li>Grind coconut paste without water.</li><li>Add the paste to cooked vegetables. Mix and cook for 2 minutes.</li><li>Switch off heat, add beaten curd and a drizzle of coconut oil. Mix well.</li></ol></div></div></div>
+        </div>
+        <div id="gothsu" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2019/04/gothsu-recipe-1.jpg" alt="Gothsu">
+            <div class="recipe-content"><h3>Gothsu (கத்திரிக்காய் கொத்சு)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Brinjal - 250g, roasted & mashed</li><li>Onion - 1, chopped</li><li>Tamarind extract</li><li>Tempering Spices</li></ul></div><div><strong>Instructions:</strong><ol><li>Roast brinjal over a flame, peel skin, and mash the pulp.</li><li>Temper spices, sauté onions.</li><li>Add tamarind extract and salt. Boil for 5 minutes.</li><li>Add mashed brinjal pulp and simmer for another 5 minutes.</li></ol></div></div></div>
+        </div>
+        <div id="vathakuzhambu" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/07/vatha-kuzhambu-recipe.jpg" alt="Vathakuzhambu">
+            <div class="recipe-content"><h3>Vathakuzhambu (வற்றல் குழம்பு)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Sundakkai Vathal - 2 tbsp</li><li>Tamarind - lemon sized ball</li><li>Sambar Powder, Turmeric</li><li>Tempering Spices, Sesame Oil</li></ul></div><div><strong>Instructions:</strong><ol><li>Soak tamarind and extract juice.</li><li>Fry vathal in a little oil until dark. Keep aside.</li><li>Temper spices in sesame oil. Add sambar powder.</li><li>Add tamarind extract, salt, and turmeric. Boil until raw smell goes.</li><li>Add fried vathal and a piece of jaggery. Simmer until thick.</li></ol></div></div></div>
+        </div>
+        <div id="potatoroast" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2022/03/potato-fry-recipe-potato-roast.jpg" alt="Potato Roast">
+            <div class="recipe-content"><h3>Potato Roast (உருளைக்கிழங்கு வறுவல்)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Potatoes - 4, boiled & cubed</li><li>Chilli Powder, Turmeric, Salt</li><li>Tempering Spices, Oil</li></ul></div><div><strong>Instructions:</strong><ol><li>Heat oil, temper spices.</li><li>Add cubed potatoes, chilli powder, turmeric, and salt.</li><li>Roast on medium-low flame, turning occasionally, until potatoes are golden and crisp on all sides.</li></ol></div></div></div>
+        </div>
+        <div id="raita" class="recipe-card">
+            <img src="https://www.vegrecipesofindia.com/wp-content/uploads/2021/05/onion-raita-1.jpg" alt="Cucumber Onion Raita">
+            <div class="recipe-content"><h3>Cucumber Onion Raita (வெள்ளரி வெங்காய தயிர் பச்சடி)</h3><div class="recipe-details"><div><strong>Ingredients:</strong><ul><li>Thick Curd - 1 cup</li><li>Cucumber - 1/2, finely chopped</li><li>Onion - 1 small, finely chopped</li><li>Coriander leaves, Salt</li></ul></div><div><strong>Instructions:</strong><ol><li>Whisk the curd until smooth.</li><li>Add chopped cucumber, onion, and a pinch of salt.</li><li>Mix well and garnish with fresh coriander.</li><li>Chill before serving.</li></ol></div></div></div>
+        </div>
+        <div id="chutney" class="recipe-card">
+            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/10/coconut-chutney-recipe.jpg" alt="Coconut and Tomato Chutney">
+            <div class="recipe-content"><h3>Coconut & Tomato Chutney (சட்னி வகைகள்)</h3><div class="recipe-details"><div><strong>Coconut Chutney:</strong><ul><li>Grated Coconut - 1 cup</li><li>Roasted Chana Dal - 2 tbsp</li><li>Green Chilli - 2, Ginger - small piece</li></ul></div><div><strong>Tomato Chutney:</strong><ol><li>Sauté 1 chopped onion, 2 chopped tomatoes, and 2 red chillis in oil until soft.</li><li>Cool and grind to a paste with salt.</li><li>Temper with mustard seeds and curry leaves.</li></ol></div></div></div>
+        </div>
+
+    </div>
+</body>
+</html>
+
