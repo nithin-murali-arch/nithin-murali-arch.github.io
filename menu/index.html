@@ -7,58 +7,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css" />
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-database-compat.js"></script>
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-      
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-          apiKey: "AIzaSyApAgsox7rvSNjbqWqMlVMf69e6_ApqcJw",
-          authDomain: "meal-plan-sync.firebaseapp.com",
-          databaseURL: "https://meal-plan-sync-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "meal-plan-sync",
-          storageBucket: "meal-plan-sync.firebasestorage.app",
-          messagingSenderId: "156023355933",
-          appId: "1:156023355933:web:8ed2ac6278a8387f9224f4",
-          measurementId: "G-R18SLY36WV"
-        };
-      
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-      </script>
+    <link rel="stylesheet" href="/menu/style.css" />
 </head>
 <body>
-    <div class="container">
-        <div id="login-screen" style="text-align: center; padding-top: 100px;">
-            <h1>Dinner Schedule Generator</h1>
-            <p>Please log in with your Google Account to continue.</p>
-            <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
-        </div>
-    
-        <div class="container" style="display: none;">
-            <header>
-                <h1>Dinner Schedule Generator</h1>
-                <p>Your personalized weekly meal plan, intelligently crafted.</p>
-                <div class="collaboration-container">
-                    <div id="presence-indicators" class="presence-indicators"></div>
-                    <div class="share-controls">
-                        <button id="share-btn" class="btn btn-secondary">Share</button>
-                        <button id="stop-sharing-btn" class="btn btn-secondary">Stop Sharing</button>
-                    </div>
-                </div>
-            </header>
-    
-            </div>
 
+    <div id="login-screen" style="text-align: center; padding-top: 100px;">
+        <h1>Dinner Schedule Generator</h1>
+        <p>Please log in with your Google Account to continue.</p>
+        <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
+    </div>
+
+    <div class="container" style="display: none;">
+        <header>
+            <h1>Dinner Schedule Generator</h1>
+            <p>Your personalized weekly meal plan, intelligently crafted.</p>
+            <div class="collaboration-container">
+                <div id="presence-indicators" class="presence-indicators"></div>
+                <div class="share-controls">
+                    <div id="share-link-container" class="share-link-container" style="display: none;">
+                        <input type="text" id="share-link-input" readonly>
+                        <button id="copy-link-btn" class="btn btn-secondary">Copy</button>
+                    </div>
+                    <button id="start-sharing-btn" class="btn btn-primary">Start Sharing</button>
+                    <button id="stop-sharing-btn" class="btn btn-secondary" style="display: none;">End Sharing</button>
+                </div>
+            </div>
+        </header>
+        
         <div class="tabs">
             <button class="tab-link active" onclick="openTab(event, 'generator')">Plan Generator</button>
             <button class="tab-link" onclick="openTab(event, 'manage')">Manage Plans</button>
@@ -83,8 +58,7 @@
     
             <details id="rules-container">
                 <summary>View Scheduling Rules</summary>
-                <!-- Rules will be dynamically populated by app.js -->
-            </details>
+                </details>
     
             <div id="output" class="output-section">
                 <div class="output-grid">
@@ -134,21 +108,22 @@
             </div>
         </div>
 
-    </div>
-
-    <div id="replace-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-btn">&times;</button>
-            <h3 id="modal-title">Choose a Replacement</h3>
-            <div id="replacement-options"></div>
+        <div id="replace-modal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-btn">&times;</button>
+                <h3 id="modal-title">Choose a Replacement</h3>
+                <div id="replacement-options"></div>
+            </div>
         </div>
     </div>
     
-    <script src="./config.js"></script>
-    <script src="./ingredients.js"></script>
-    <script src="./rules.js"></script>
-    <script src="./scheduler.js"></script>
-    <script src="./app.js"></script>
+    <script src="/menu/config.js"></script>
+    <script src="/menu/ingredients.js"></script>
+    <script src="/menu/rules.js"></script>
+    <script src="/menu/scheduler.js"></script>
+    
+    <script type="module" src="/menu/firebase-init.js"></script> 
+    <script type="module" src="/menu/app.js"></script>
+    
 </body>
 </html>
-

@@ -2351,3 +2351,23 @@ label span[title]:hover::before {
     font-size: 0.85rem;
     opacity: 0.8;
 }
+/* Add these styles to the end of your style.css file */
+.share-link-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+#share-link-input {
+    padding: 0.5em;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #fafafa;
+    width: 250px; /* Adjust as needed */
+    font-family: monospace;
+}
+
+#copy-link-btn {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+}
