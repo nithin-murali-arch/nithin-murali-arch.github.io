@@ -24,32 +24,115 @@ let presenceRef = null;
 let uiEventRef = null;
 let currentUser = null;
 let isSyncingScroll = false;
-let isOwner = false; // New flag to track ownership
+let isOwner = false;
 
 // --- Master Lists for URL Shortening ---
-// ... (this section remains unchanged)
+const allCategories = Object.keys(CONFIG.meal_options).sort();
+const allMains = [...new Set(Object.values(CONFIG.meal_options).flatMap(cat => cat.main))].sort();
+const allSideDishes = (() => {
+    const sides = new Set();
+    Object.values(CONFIG.meal_options).forEach(cat => {
+        const sideSource = cat.sides;
+        if (Array.isArray(sideSource)) {
+            sideSource.forEach(s => sides.add(s));
+        } else if (typeof sideSource === 'string') {
+            sides.add(sideSource);
+        } else if (typeof sideSource === 'object') {
+            Object.values(sideSource).flat().forEach(s => sides.add(s));
+        }
+    });
+    return [...sides].sort();
+})();
 
 // --- Helper Functions ---
-// ... (throttle function remains unchanged)
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
 
-// --- Firebase Login and Real-time Logic ---
-onAuthStateChanged(auth, user => {
-    // ... (this section remains unchanged)
-});
+// --- Main App Logic (runs after DOM is loaded) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Firebase Login and Real-time Logic
+    onAuthStateChanged(auth, user => {
+        const loginScreen = document.getElementById('login-screen');
+        const mainContainer = document.querySelector('.container');
 
-document.getElementById('login-btn').addEventListener('click', () => {
-    // ... (this section remains unchanged)
+        if (user) {
+            currentUser = user;
+            loginScreen.style.display = 'none';
+            mainContainer.style.display = 'block';
+            initializeApp();
+        } else {
+            currentUser = null;
+            loginScreen.style.display = 'block';
+            mainContainer.style.display = 'none';
+            if (dbRef) onValue(dbRef, null); 
+            if (presenceRef) onValue(presenceRef, null);
+            if (uiEventRef) onValue(uiEventRef, null);
+        }
+    });
+
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider);
+    });
 });
 
 
 // --- Main App Initialization (runs after login) ---
 function initializeApp() {
-    // ... (this section remains unchanged)
+    document.getElementById('generate-btn').addEventListener('click', () => {
+        currentOverrides = {};
+        generateAndRender();
+    });
+    document.getElementById('print-btn').addEventListener('click', handlePrintClick);
+    document.getElementById('saved-plans').addEventListener('change', handleSavedPlanChange);
+    document.getElementById('save-changes-btn').addEventListener('click', handleSaveChangesClick);
+    document.getElementById('start-sharing-btn').addEventListener('click', handleStartSharingClick);
+    document.getElementById('copy-link-btn').addEventListener('click', handleCopyLinkClick);
+    document.getElementById('stop-sharing-btn').addEventListener('click', handleStopSharingClick);
+    
+    const modal = document.getElementById('replace-modal');
+    document.querySelector('.modal-close-btn').addEventListener('click', () => {
+        modal.classList.remove('visible');
+        publishUIEvent({ type: 'MODAL_CLOSE' });
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            modal.classList.remove('visible');
+            publishUIEvent({ type: 'MODAL_CLOSE' });
+        }
+    });
+    
+    window.addEventListener('scroll', throttle(() => {
+        if (isSyncingScroll) return;
+        const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollableHeight <= 0) return;
+        const scrollPercentage = window.scrollY / scrollableHeight;
+        publishUIEvent({ type: 'SCROLL_POSITION', percentage: scrollPercentage });
+    }, 200));
+
+
+    renderSavedPlans();
+    const urlParams = new URLSearchParams(window.location.search);
+    const seed = urlParams.get('seed');
+    const overrides = urlParams.get('overrides');
+    
+    if (seed) {
+        initializePlanFromUrl(parseInt(seed), overrides);
+    }
 }
 
 // --- Real-time and Presence Functions ---
 function setupFirebaseListener() {
-    // Detach old listeners
     if (dbRef) onValue(dbRef, null);
     if (presenceRef) {
         remove(child(presenceRef, currentUser.uid));
@@ -60,20 +143,16 @@ function setupFirebaseListener() {
     if (!currentSeed) return;
 
     const planRef = ref(db, `plans/${currentSeed}`);
-    dbRef = child(planRef, 'data'); // For overrides
+    dbRef = child(planRef, 'data');
     presenceRef = ref(db, `presence/${currentSeed}`);
-    uiEventRef = child(planRef, 'ui_event'); // For UI events
-    const ownerRef = child(planRef, 'ownerUid');
-
-    // Listener for plan data, including owner
+    uiEventRef = child(planRef, 'ui_event');
+    
     onValue(planRef, (snapshot) => {
         const planData = snapshot.val() || {};
         const remoteOwnerUid = planData.ownerUid;
         
-        // Determine if the current user is the owner
         isOwner = remoteOwnerUid === currentUser.uid;
         
-        // If there's no owner, the first person becomes the owner upon sharing
         if (!remoteOwnerUid) {
             isOwner = false; 
         }
@@ -84,15 +163,14 @@ function setupFirebaseListener() {
         if (remoteOverridesStr !== localOverridesStr) {
             currentOverrides = parseOverrides(remoteOverridesStr);
             applyOverrides();
-            renderSchedule(currentSchedule); // Re-render to apply owner/viewer UI
+            renderSchedule(currentSchedule);
             recalculateAndRenderShoppingList();
             updateUrl();
         } else {
-             renderSchedule(currentSchedule); // Re-render in case ownership changed
+             renderSchedule(currentSchedule);
         }
     });
 
-    // Listener for UI events
     onValue(uiEventRef, (snapshot) => {
         const event = snapshot.val();
         if (event && event.sender !== currentUser.uid) {
@@ -100,7 +178,6 @@ function setupFirebaseListener() {
         }
     });
 
-    // Handle user presence
     const userRef = child(presenceRef, currentUser.uid);
     set(userRef, {
         name: currentUser.displayName,
@@ -108,7 +185,6 @@ function setupFirebaseListener() {
     });
     onDisconnect(userRef).remove();
 
-    // Listener for presence list
     onValue(presenceRef, (snapshot) => {
         const users = snapshot.val() || {};
         const container = document.getElementById('presence-indicators');
@@ -130,194 +206,13 @@ function publishOverrides() {
     }
 }
 
-function handleStartSharingClick() {
-    // Set the current user as the owner in the database
-    const ownerRef = ref(db, `plans/${currentSeed}/ownerUid`);
-    set(ownerRef, currentUser.uid);
-
-    publishOverrides(); 
-    showActiveSharingUI();
-}
-
-// --- Core functions updated with ownership checks ---
-
-function confirmReplacement(dayIndex, newMainDish, newCategory, newSideDish) {
-    if (!isOwner) return alert("Only the person who started sharing can make changes.");
-    // ... (rest of the function is unchanged)
-    currentSchedule[dayIndex].MainDish = newMainDish;
-    currentSchedule[dayIndex].Category = newCategory;
-    currentSchedule[dayIndex].SideDish = newSideDish;
-
-    currentOverrides[dayIndex] = {
-        MainDish: newMainDish,
-        SideDish: newSideDish,
-        Category: newCategory,
-    };
-    
-    updateUrl();
-    renderSchedule(currentSchedule);
-    recalculateAndRenderShoppingList();
-    
-    document.getElementById('save-changes-btn').style.display = 'inline-flex';
-    document.getElementById('replace-modal').classList.remove('visible');
-    
-    publishOverrides();
-    publishUIEvent({ type: 'MODAL_CLOSE' });
-}
-
-function confirmPrepChange(dayIndex, newPrepTask) {
-    if (!isOwner) return alert("Only the person who started sharing can make changes.");
-    // ... (rest of the function is unchanged)
-    const dayData = currentSchedule[dayIndex];
-    let sideDishBase = (dayData.SideDish || "").split(' (+ ')[0];
-    let newSideDish;
-
-    if (newPrepTask) {
-        newSideDish = `${sideDishBase} (+ Prep: ${newPrepTask})`;
-    } else {
-        newSideDish = sideDishBase;
-    }
-
-    dayData.SideDish = newSideDish;
-    currentOverrides[dayIndex] = {
-        MainDish: dayData.MainDish,
-        SideDish: dayData.SideDish,
-        Category: dayData.Category
-    };
-    
-    updateUrl();
-    
-    document.getElementById('save-changes-btn').style.display = 'inline-flex';
-    renderSchedule(currentSchedule);
-    recalculateAndRenderShoppingList();
-    document.getElementById('replace-modal').classList.remove('visible');
-
-    publishOverrides();
-    publishUIEvent({ type: 'MODAL_CLOSE' });
-}
-
-function openReplaceModal(dayIndex) {
-    if (!isOwner) return; // Prevent non-owners from opening the modal
-    // ... (rest of the function is unchanged)
-    const dayData = currentSchedule[dayIndex];
-    let allMainsOptions = [];
-    Object.keys(CONFIG.meal_options).forEach(cat => {
-        CONFIG.meal_options[cat].main.forEach(main => {
-            allMainsOptions.push({ dish: main, category: cat });
-        });
-    });
-
-    const validReplacements = allMainsOptions.filter(item => item.dish !== dayData.MainDish);
-    
-    document.getElementById('modal-title').textContent = 'Step 1: Choose a Replacement Dish';
-    const optionsContainer = document.getElementById('replacement-options');
-    optionsContainer.innerHTML = '';
-    
-    validReplacements.forEach(item => {
-        const button = document.createElement('button');
-        button.textContent = `${item.dish} (${item.category})`;
-        button.className = 'btn btn-secondary';
-        button.onclick = () => showSideDishOptions(dayIndex, item.dish, item.category);
-        optionsContainer.appendChild(button);
-    });
-    
-    document.getElementById('replace-modal').classList.add('visible');
-    publishUIEvent({ type: 'MODAL_OPEN' });
-}
-
-function openPrepModal(dayIndex) {
-    if (!isOwner) return; // Prevent non-owners from opening the modal
-    // ... (rest of the function is unchanged)
-    const dayData = currentSchedule[dayIndex];
-    document.getElementById('modal-title').textContent = `Choose Prep Task for ${dayData.MainDish}`;
-    const optionsContainer = document.getElementById('replacement-options');
-    optionsContainer.innerHTML = '';
-    
-    CONFIG.prep_tasks.forEach(task => {
-        const button = document.createElement('button');
-        button.textContent = task;
-        button.className = 'btn btn-secondary';
-        button.onclick = () => confirmPrepChange(dayIndex, task);
-        optionsContainer.appendChild(button);
-    });
-
-    if ((dayData.SideDish || "").includes('(+ Prep:')) {
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove Prep Task';
-        removeButton.className = 'btn btn-secondary';
-        removeButton.style.borderColor = 'var(--accent-color)';
-        removeButton.style.color = 'var(--accent-color)';
-        removeButton.style.marginTop = '1em';
-        removeButton.onclick = () => confirmPrepChange(dayIndex, null);
-        optionsContainer.appendChild(removeButton);
-    }
-    
-    document.getElementById('replace-modal').classList.add('visible');
-    publishUIEvent({ type: 'MODAL_OPEN' });
-}
-
-
-// --- UI rendering updated with ownership checks ---
-
-function renderSchedule(schedule) {
-    const cardContainer = document.getElementById('schedule-container');
-    const tableBody = document.getElementById('print-schedule-body');
-    cardContainer.innerHTML = '';
-    tableBody.innerHTML = '';
-    schedule.forEach((day, index) => {
-        const date = new Date(day.Date + 'T00:00:00');
-        const dateString = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-        
-        let sideDishText = (day.SideDish || "").split(' (+ ')[0]; 
-        let prepTask = (day.SideDish || "").includes(' (+ Prep:') ? day.SideDish.split(' (+ Prep: ')[1].replace(')', '') : null;
-        
-        const noPrepRule = RULES.find(r => r.type === 'NO_PREP_ON_CATEGORY' && r.category === day.Category);
-        const isEligibleForPrep = !noPrepRule;
-
-        let prepHtml = '';
-        if (isOwner) { // Only show edit buttons if user is the owner
-            if (prepTask) {
-                prepHtml = `<span class="extra">(+ Prep: ${prepTask} <span role="button" class="replace-prep-btn" onclick="openPrepModal(${index})" title="Replace/Remove Prep Task">&#x21bb;</span>)</span>`;
-            } else if (isEligibleForPrep) {
-                prepHtml = `<button class="btn btn-secondary btn-add-prep" onclick="openPrepModal(${index})">Add Prep Task</button>`;
-            }
-        } else if(prepTask) { // If not owner, just show the text
-            prepHtml = `<span class="extra">(+ Prep: ${prepTask})</span>`;
-        }
-
-        const card = `
-            <div class="day-card" data-index="${index}">
-                ${isOwner ? `<button class="replace-btn" onclick="openReplaceModal(${index})" title="Replace Meal">&#x21bb;</button>` : ''}
-                <div class="date">${dateString}</div>
-                <div class="day">${day.Day}</div>
-                <div class="meal-item">
-                    <strong>${day.MainDish}</strong>
-                    <span>${sideDishText}</span>
-                    ${prepHtml}
-                </div>
-            </div>`;
-        cardContainer.innerHTML += card;
-
-        const row = `<tr><td>${dateString}</td><td>${day.Day}</td><td>${day.MainDish}</td><td>${day.SideDish || ""}</td></tr>`;
-        tableBody.innerHTML += row;
-    });
-}
-
-
-// --- The rest of app.js remains the same ---
-// (All other functions from the previous version are included below without changes)
-function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
+function publishUIEvent(eventData) {
+    if (uiEventRef) {
+        eventData.sender = currentUser.uid;
+        set(uiEventRef, eventData);
     }
 }
+
 function handleUIEvent(event) {
     switch (event.type) {
         case 'MODAL_OPEN':
@@ -339,13 +234,28 @@ function handleUIEvent(event) {
             break;
     }
 }
-function handleShareClick() {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-        alert('Plan URL copied to clipboard!');
+
+function handleStartSharingClick() {
+    const ownerRef = ref(db, `plans/${currentSeed}/ownerUid`);
+    set(ownerRef, currentUser.uid);
+
+    publishOverrides(); 
+    showActiveSharingUI();
+}
+function handleCopyLinkClick() {
+    const linkInput = document.getElementById('share-link-input');
+    linkInput.select();
+    navigator.clipboard.writeText(linkInput.value).then(() => {
+        alert('Link copied to clipboard!');
     }, () => {
-        alert('Failed to copy URL. Please copy it from the address bar.');
+        alert('Failed to copy link.');
     });
+}
+function handleStopSharingClick() {
+    if (confirm("Are you sure you want to end sharing? This will clear the session for all current viewers.")) {
+        if (presenceRef) remove(presenceRef);
+        if (dbRef) remove(ref(db, `plans/${currentSeed}`));
+    }
 }
 function showInactiveSharingUI() {
     document.getElementById('start-sharing-btn').style.display = 'inline-flex';
@@ -456,6 +366,57 @@ function generateAndRender(seed, isReplacement = false) {
     
     showInactiveSharingUI(); 
 }
+function confirmReplacement(dayIndex, newMainDish, newCategory, newSideDish) {
+    if (!isOwner) return alert("Only the person who started sharing can make changes.");
+    currentSchedule[dayIndex].MainDish = newMainDish;
+    currentSchedule[dayIndex].Category = newCategory;
+    currentSchedule[dayIndex].SideDish = newSideDish;
+
+    currentOverrides[dayIndex] = {
+        MainDish: newMainDish,
+        SideDish: newSideDish,
+        Category: newCategory,
+    };
+    
+    updateUrl();
+    renderSchedule(currentSchedule);
+    recalculateAndRenderShoppingList();
+    
+    document.getElementById('save-changes-btn').style.display = 'inline-flex';
+    document.getElementById('replace-modal').classList.remove('visible');
+    
+    publishOverrides();
+    publishUIEvent({ type: 'MODAL_CLOSE' });
+}
+function confirmPrepChange(dayIndex, newPrepTask) {
+    if (!isOwner) return alert("Only the person who started sharing can make changes.");
+    const dayData = currentSchedule[dayIndex];
+    let sideDishBase = (dayData.SideDish || "").split(' (+ ')[0];
+    let newSideDish;
+
+    if (newPrepTask) {
+        newSideDish = `${sideDishBase} (+ Prep: ${newPrepTask})`;
+    } else {
+        newSideDish = sideDishBase;
+    }
+
+    dayData.SideDish = newSideDish;
+    currentOverrides[dayIndex] = {
+        MainDish: dayData.MainDish,
+        SideDish: dayData.SideDish,
+        Category: dayData.Category
+    };
+    
+    updateUrl();
+    
+    document.getElementById('save-changes-btn').style.display = 'inline-flex';
+    renderSchedule(currentSchedule);
+    recalculateAndRenderShoppingList();
+    document.getElementById('replace-modal').classList.remove('visible');
+
+    publishOverrides();
+    publishUIEvent({ type: 'MODAL_CLOSE' });
+}
 function handlePrintClick() { window.print(); }
 function handleSavedPlanChange(e) {
     const selectedOption = e.target.options[e.target.selectedIndex];
@@ -478,6 +439,49 @@ function handleSaveChangesClick() {
             btn.textContent = 'Save Changes';
         }, 2000);
     }
+}
+function renderSchedule(schedule) {
+    const cardContainer = document.getElementById('schedule-container');
+    const tableBody = document.getElementById('print-schedule-body');
+    cardContainer.innerHTML = '';
+    tableBody.innerHTML = '';
+    schedule.forEach((day, index) => {
+        const date = new Date(day.Date + 'T00:00:00');
+        const dateString = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+        
+        let sideDishText = (day.SideDish || "").split(' (+ ')[0]; 
+        let prepTask = (day.SideDish || "").includes(' (+ Prep:') ? day.SideDish.split(' (+ Prep: ')[1].replace(')', '') : null;
+        
+        const noPrepRule = RULES.find(r => r.type === 'NO_PREP_ON_CATEGORY' && r.category === day.Category);
+        const isEligibleForPrep = !noPrepRule;
+
+        let prepHtml = '';
+        if (isOwner) {
+            if (prepTask) {
+                prepHtml = `<span class="extra">(+ Prep: ${prepTask} <span role="button" class="replace-prep-btn" onclick="openPrepModal(${index})" title="Replace/Remove Prep Task">&#x21bb;</span>)</span>`;
+            } else if (isEligibleForPrep) {
+                prepHtml = `<button class="btn btn-secondary btn-add-prep" onclick="openPrepModal(${index})">Add Prep Task</button>`;
+            }
+        } else if(prepTask) {
+            prepHtml = `<span class="extra">(+ Prep: ${prepTask})</span>`;
+        }
+
+        const card = `
+            <div class="day-card" data-index="${index}">
+                ${isOwner ? `<button class="replace-btn" onclick="openReplaceModal(${index})" title="Replace Meal">&#x21bb;</button>` : ''}
+                <div class="date">${dateString}</div>
+                <div class="day">${day.Day}</div>
+                <div class="meal-item">
+                    <strong>${day.MainDish}</strong>
+                    <span>${sideDishText}</span>
+                    ${prepHtml}
+                </div>
+            </div>`;
+        cardContainer.innerHTML += card;
+
+        const row = `<tr><td>${dateString}</td><td>${day.Day}</td><td>${day.MainDish}</td><td>${day.SideDish || ""}</td></tr>`;
+        tableBody.innerHTML += row;
+    });
 }
 function renderShoppingList(shoppingList) {
     const container = document.getElementById('shopping-list-container');
@@ -564,6 +568,33 @@ function handleDeletePlanClick(e) {
         deletePlan(seed);
     }
 }
+function openReplaceModal(dayIndex) {
+    if (!isOwner) return;
+    const dayData = currentSchedule[dayIndex];
+    let allMainsOptions = [];
+    Object.keys(CONFIG.meal_options).forEach(cat => {
+        CONFIG.meal_options[cat].main.forEach(main => {
+            allMainsOptions.push({ dish: main, category: cat });
+        });
+    });
+
+    const validReplacements = allMainsOptions.filter(item => item.dish !== dayData.MainDish);
+    
+    document.getElementById('modal-title').textContent = 'Step 1: Choose a Replacement Dish';
+    const optionsContainer = document.getElementById('replacement-options');
+    optionsContainer.innerHTML = '';
+    
+    validReplacements.forEach(item => {
+        const button = document.createElement('button');
+        button.textContent = `${item.dish} (${item.category})`;
+        button.className = 'btn btn-secondary';
+        button.onclick = () => showSideDishOptions(dayIndex, item.dish, item.category);
+        optionsContainer.appendChild(button);
+    });
+    
+    document.getElementById('replace-modal').classList.add('visible');
+    publishUIEvent({ type: 'MODAL_OPEN' });
+}
 function showSideDishOptions(dayIndex, newMainDish, newCategory) {
     document.getElementById('modal-title').textContent = `Step 2: Choose Side for ${newMainDish}`;
     const optionsContainer = document.getElementById('replacement-options');
@@ -594,6 +625,35 @@ function showSideDishOptions(dayIndex, newMainDish, newCategory) {
     footer.className = 'modal-footer';
     footer.appendChild(backButton);
     optionsContainer.appendChild(footer);
+}
+function openPrepModal(dayIndex) {
+    if (!isOwner) return;
+    const dayData = currentSchedule[dayIndex];
+    document.getElementById('modal-title').textContent = `Choose Prep Task for ${dayData.MainDish}`;
+    const optionsContainer = document.getElementById('replacement-options');
+    optionsContainer.innerHTML = '';
+    
+    CONFIG.prep_tasks.forEach(task => {
+        const button = document.createElement('button');
+        button.textContent = task;
+        button.className = 'btn btn-secondary';
+        button.onclick = () => confirmPrepChange(dayIndex, task);
+        optionsContainer.appendChild(button);
+    });
+
+    if ((dayData.SideDish || "").includes('(+ Prep:')) {
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove Prep Task';
+        removeButton.className = 'btn btn-secondary';
+        removeButton.style.borderColor = 'var(--accent-color)';
+        removeButton.style.color = 'var(--accent-color)';
+        removeButton.style.marginTop = '1em';
+        removeButton.onclick = () => confirmPrepChange(dayIndex, null);
+        optionsContainer.appendChild(removeButton);
+    }
+    
+    document.getElementById('replace-modal').classList.add('visible');
+    publishUIEvent({ type: 'MODAL_OPEN' });
 }
 function openTab(evt, tabName) {
   let i, tabcontent, tablinks;
