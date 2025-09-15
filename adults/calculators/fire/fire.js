@@ -89,7 +89,7 @@ class FIREStateManager {
         gtag('event', eventName, {
           event_category: 'FIRE Calculator',
           event_label: 'State Update',
-          custom_map: analyticsData
+          ...analyticsData
         });
       }
       

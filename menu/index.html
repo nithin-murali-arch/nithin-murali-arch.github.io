@@ -8,13 +8,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-database-compat.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyApAgsox7rvSNjbqWqMlVMf69e6_ApqcJw",
+          authDomain: "meal-plan-sync.firebaseapp.com",
+          databaseURL: "https://meal-plan-sync-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "meal-plan-sync",
+          storageBucket: "meal-plan-sync.firebasestorage.app",
+          messagingSenderId: "156023355933",
+          appId: "1:156023355933:web:8ed2ac6278a8387f9224f4",
+          measurementId: "G-R18SLY36WV"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
 </head>
 <body>
     <div class="container">
-        <header>
+        <div id="login-screen" style="text-align: center; padding-top: 100px;">
             <h1>Dinner Schedule Generator</h1>
-            <p>Your personalized weekly meal plan, intelligently crafted.</p>
-        </header>
+            <p>Please log in with your Google Account to continue.</p>
+            <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
+        </div>
+    
+        <div class="container" style="display: none;">
+            <header>
+                <h1>Dinner Schedule Generator</h1>
+                <p>Your personalized weekly meal plan, intelligently crafted.</p>
+                <div class="collaboration-container">
+                    <div id="presence-indicators" class="presence-indicators"></div>
+                    <div class="share-controls">
+                        <button id="share-btn" class="btn btn-secondary">Share</button>
+                        <button id="stop-sharing-btn" class="btn btn-secondary">Stop Sharing</button>
+                    </div>
+                </div>
+            </header>
+    
+            </div>
 
         <div class="tabs">
             <button class="tab-link active" onclick="openTab(event, 'generator')">Plan Generator</button>

@@ -1,13 +1,14 @@
 // --- Global State ---
 let currentSchedule = [];
 let currentSeed = null;
-let currentOverrides = {}; // Tracks manual changes
+let currentOverrides = {};
+let dbRef = null; // Reference to our Firebase database "channel" for overrides
+let presenceRef = null; // Reference to our presence channel
+let currentUser = null;
 
 // --- Master Lists for URL Shortening ---
 const allCategories = Object.keys(CONFIG.meal_options).sort();
 const allMains = [...new Set(Object.values(CONFIG.meal_options).flatMap(cat => cat.main))].sort();
-
-// Create a comprehensive list of all possible side dish strings
 const allSideDishes = (() => {
     const sides = new Set();
     Object.values(CONFIG.meal_options).forEach(cat => {
@@ -23,8 +24,140 @@ const allSideDishes = (() => {
     return [...sides].sort();
 })();
 
+// --- Firebase Login and Real-time Logic ---
+auth.onAuthStateChanged(user => {
+    const loginScreen = document.getElementById('login-screen');
+    const mainContainer = document.querySelector('.container');
+
+    if (user) {
+        // User is signed in.
+        currentUser = user;
+        loginScreen.style.display = 'none';
+        mainContainer.style.display = 'block';
+        initializeApp();
+    } else {
+        // User is signed out.
+        currentUser = null;
+        loginScreen.style.display = 'block';
+        mainContainer.style.display = 'none';
+        if (dbRef) dbRef.off(); 
+        if (presenceRef) presenceRef.off();
+    }
+});
+
+document.getElementById('login-btn').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+});
+
+// --- Main App Initialization (runs after login) ---
+function initializeApp() {
+    // Attach event listeners for the main app
+    document.getElementById('generate-btn').addEventListener('click', () => {
+        currentOverrides = {};
+        generateAndRender();
+        publishOverrides();
+    });
+    document.getElementById('print-btn').addEventListener('click', handlePrintClick);
+    document.getElementById('saved-plans').addEventListener('change', handleSavedPlanChange);
+    document.getElementById('save-changes-btn').addEventListener('click', handleSaveChangesClick);
+    document.getElementById('share-btn').addEventListener('click', handleShareClick);
+    document.getElementById('stop-sharing-btn').addEventListener('click', handleStopSharingClick);
+    document.querySelector('.modal-close-btn').addEventListener('click', () => document.getElementById('replace-modal').classList.remove('visible'));
+    document.getElementById('replace-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) document.getElementById('replace-modal').classList.remove('visible');
+    });
+
+    renderSavedPlans();
+    const urlParams = new URLSearchParams(window.location.search);
+    const seed = urlParams.get('seed');
+    const overrides = urlParams.get('overrides');
+    
+    if (seed) {
+        initializePlanFromUrl(parseInt(seed), overrides);
+    }
+}
+
+// --- Real-time and Presence Functions ---
+function setupFirebaseListener() {
+    // Detach old listeners
+    if (dbRef) dbRef.off();
+    if (presenceRef) {
+        presenceRef.child(currentUser.uid).remove(); // Remove self from old presence list
+        presenceRef.off();
+    }
+    if (!currentSeed) return;
+
+    const channel = `plans/${currentSeed}`;
+    dbRef = db.ref(channel);
+    presenceRef = db.ref(`presence/${currentSeed}`);
+    
+    // Listen for remote changes to overrides
+    dbRef.on('value', (snapshot) => {
+        const remoteOverridesStr = snapshot.val() || "";
+        const localOverridesStr = serializeOverrides(currentOverrides);
+
+        if (remoteOverridesStr !== localOverridesStr) {
+            console.log("Remote change detected, updating UI.");
+            currentOverrides = parseOverrides(remoteOverridesStr);
+            applyOverrides();
+            renderSchedule(currentSchedule);
+            recalculateAndRenderShoppingList();
+            updateUrl();
+        }
+    });
+
+    // Handle user presence
+    const userRef = presenceRef.child(currentUser.uid);
+    userRef.set({
+        name: currentUser.displayName,
+        photoURL: currentUser.photoURL
+    });
+    userRef.onDisconnect().remove(); // Automatically remove on disconnect
+
+    // Listen for changes in presence list and render avatars
+    presenceRef.on('value', (snapshot) => {
+        const users = snapshot.val() || {};
+        const container = document.getElementById('presence-indicators');
+        container.innerHTML = '';
+        Object.values(users).forEach(user => {
+            const img = document.createElement('img');
+            img.src = user.photoURL;
+            img.className = 'user-avatar';
+            img.title = user.name;
+            container.appendChild(img);
+        });
+    });
+}
+
+function publishOverrides() {
+    if (dbRef) {
+        const overrideStr = serializeOverrides(currentOverrides);
+        dbRef.set(overrideStr);
+    }
+}
+
+function handleShareClick() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Plan URL copied to clipboard!');
+    }, () => {
+        alert('Failed to copy URL. Please copy it from the address bar.');
+    });
+}
+
+function handleStopSharingClick() {
+    if (confirm("Are you sure you want to stop sharing? This will clear the session for all current viewers.")) {
+        if (presenceRef) presenceRef.remove();
+        if (dbRef) dbRef.remove();
+    }
+}
+
 
 // --- Helper Functions for State Management ---
+// [ The functions parseOverrides, serializeOverrides, applyOverrides, updateUrl remain unchanged ]
+// [ All other functions like generateAndRender, renderSchedule, confirmReplacement, etc., also remain largely unchanged, but with one key addition: ]
+// [ They must now call publishOverrides() after making a change. ]
 function serializeOverrides(overridesObj) {
     return Object.entries(overridesObj).map(([index, data]) => {
         const mainIndex = allMains.indexOf(data.MainDish);
@@ -53,7 +186,6 @@ function parseOverrides(overridesStr) {
         let finalSideDish;
 
         if (fields.length === 5) { // New 5-part format with prep task
-            // *** THIS IS THE CORRECTED LINE ***
             let baseSideDish = allSideDishes[parseInt(fields[3])] || ""; 
             const prepTaskIndex = parseInt(fields[4]);
             finalSideDish = baseSideDish;
@@ -93,9 +225,8 @@ function updateUrl() {
     window.history.pushState({ path: newUrl }, '', newUrl);
 }
 
-// --- Initial Load ---
 function initializePlanFromUrl(seed, overridesStr) {
-    currentOverrides = {}; // Reset overrides on new load
+    currentOverrides = {};
     generateAndRender(seed, true);
     
     if (overridesStr) {
@@ -103,46 +234,22 @@ function initializePlanFromUrl(seed, overridesStr) {
         applyOverrides();
         renderSchedule(currentSchedule);
         recalculateAndRenderShoppingList();
-        // After applying overrides, update the URL immediately to ensure it's correct
         updateUrl();
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('generate-btn').addEventListener('click', () => {
-        currentOverrides = {}; // Clear overrides when generating a new plan
-        generateAndRender();
-    });
-    document.getElementById('print-btn').addEventListener('click', handlePrintClick);
-    document.getElementById('saved-plans').addEventListener('change', handleSavedPlanChange);
-    document.getElementById('save-changes-btn').addEventListener('click', handleSaveChangesClick);
-    document.querySelector('.modal-close-btn').addEventListener('click', () => document.getElementById('replace-modal').classList.remove('visible'));
-    document.getElementById('replace-modal').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) document.getElementById('replace-modal').classList.remove('visible');
-    });
-
-    renderSavedPlans();
-    const urlParams = new URLSearchParams(window.location.search);
-    const seed = urlParams.get('seed');
-    const overrides = urlParams.get('overrides');
-    if (seed) {
-        initializePlanFromUrl(parseInt(seed), overrides);
-    }
-});
-
-// --- Core Functions ---
 function generateAndRender(seed, isReplacement = false) {
     const forYear = document.getElementById('duration-toggle').checked;
     const result = generateDinnerSchedule(forYear, seed);
     currentSchedule = result.schedule;
     currentSeed = result.usedSeed;
     
-    // Only call renderSchedule and shopping list here if not being handled by initializePlanFromUrl
     if (!isReplacement || !new URLSearchParams(window.location.search).get('overrides')) {
         renderSchedule(currentSchedule);
         recalculateAndRenderShoppingList();
     }
     updateUrl();
+    setupFirebaseListener(); // Re-attach listener to the new seed's channel
 
     if (!isReplacement) {
         savePlan(currentSeed, '');
@@ -152,6 +259,57 @@ function generateAndRender(seed, isReplacement = false) {
     document.getElementById('print-btn').style.display = 'inline-flex';
 }
 
+function confirmReplacement(dayIndex, newMainDish, newCategory, newSideDish) {
+    currentSchedule[dayIndex].MainDish = newMainDish;
+    currentSchedule[dayIndex].Category = newCategory;
+    currentSchedule[dayIndex].SideDish = newSideDish;
+
+    currentOverrides[dayIndex] = {
+        MainDish: newMainDish,
+        SideDish: newSideDish,
+        Category: newCategory,
+    };
+    
+    updateUrl();
+    renderSchedule(currentSchedule);
+    recalculateAndRenderShoppingList();
+    
+    document.getElementById('save-changes-btn').style.display = 'inline-flex';
+    document.getElementById('replace-modal').classList.remove('visible');
+    
+    publishOverrides(); // Publish the change to Firebase
+}
+
+function confirmPrepChange(dayIndex, newPrepTask) {
+    const dayData = currentSchedule[dayIndex];
+    let sideDishBase = (dayData.SideDish || "").split(' (+ ')[0];
+    let newSideDish;
+
+    if (newPrepTask) {
+        newSideDish = `${sideDishBase} (+ Prep: ${newPrepTask})`;
+    } else {
+        newSideDish = sideDishBase;
+    }
+
+    dayData.SideDish = newSideDish;
+    currentOverrides[dayIndex] = {
+        MainDish: dayData.MainDish,
+        SideDish: dayData.SideDish,
+        Category: dayData.Category
+    };
+    
+    updateUrl();
+    
+    document.getElementById('save-changes-btn').style.display = 'inline-flex';
+    renderSchedule(currentSchedule);
+    recalculateAndRenderShoppingList();
+    document.getElementById('replace-modal').classList.remove('visible');
+
+    publishOverrides(); // Publish the change to Firebase
+}
+
+
+// --- All other functions (renderShoppingList, openReplaceModal, etc.) remain here without changes ---
 function handlePrintClick() { window.print(); }
 
 function handleSavedPlanChange(e) {
@@ -178,7 +336,6 @@ function handleSaveChangesClick() {
     }
 }
 
-// --- Render Functions ---
 function renderSchedule(schedule) {
     const cardContainer = document.getElementById('schedule-container');
     const tableBody = document.getElementById('print-schedule-body');
@@ -188,7 +345,7 @@ function renderSchedule(schedule) {
         const date = new Date(day.Date + 'T00:00:00');
         const dateString = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
         
-        let sideDishText = (day.SideDish || "").split(' (+ ')[0]; // Add fallback for safety
+        let sideDishText = (day.SideDish || "").split(' (+ ')[0]; 
         let prepTask = (day.SideDish || "").includes(' (+ Prep:') ? day.SideDish.split(' (+ Prep: ')[1].replace(')', '') : null;
         
         const noPrepRule = RULES.find(r => r.type === 'NO_PREP_ON_CATEGORY' && r.category === day.Category);
@@ -286,7 +443,6 @@ function recalculateAndRenderShoppingList() {
     renderShoppingList(shoppingList);
 }
 
-// --- Local Storage & State Management ---
 function getSavedPlans() { return JSON.parse(localStorage.getItem('mealPlans') || '[]'); }
 
 function savePlan(seed, overrideStr = '') {
@@ -313,7 +469,6 @@ function handleDeletePlanClick(e) {
     }
 }
 
-// --- Meal & Prep Replacement Logic ---
 function openReplaceModal(dayIndex) {
     const dayData = currentSchedule[dayIndex];
     let allMainsOptions = [];
@@ -368,27 +523,8 @@ function showSideDishOptions(dayIndex, newMainDish, newCategory) {
     backButton.onclick = () => openReplaceModal(dayIndex);
     const footer = document.createElement('div');
     footer.className = 'modal-footer';
-    footer.appendChild(footer);
-    optionsContainer.appendChild(backButton);
-}
-
-function confirmReplacement(dayIndex, newMainDish, newCategory, newSideDish) {
-    currentSchedule[dayIndex].MainDish = newMainDish;
-    currentSchedule[dayIndex].Category = newCategory;
-    currentSchedule[dayIndex].SideDish = newSideDish;
-
-    currentOverrides[dayIndex] = {
-        MainDish: newMainDish,
-        SideDish: newSideDish,
-        Category: newCategory,
-    };
-    
-    updateUrl();
-    renderSchedule(currentSchedule);
-    recalculateAndRenderShoppingList();
-    
-    document.getElementById('save-changes-btn').style.display = 'inline-flex';
-    document.getElementById('replace-modal').classList.remove('visible');
+    footer.appendChild(backButton);
+    optionsContainer.appendChild(footer);
 }
 
 function openPrepModal(dayIndex) {
@@ -419,33 +555,6 @@ function openPrepModal(dayIndex) {
     document.getElementById('replace-modal').classList.add('visible');
 }
 
-function confirmPrepChange(dayIndex, newPrepTask) {
-    const dayData = currentSchedule[dayIndex];
-    let sideDishBase = (dayData.SideDish || "").split(' (+ ')[0];
-    let newSideDish;
-
-    if (newPrepTask) {
-        newSideDish = `${sideDishBase} (+ Prep: ${newPrepTask})`;
-    } else {
-        newSideDish = sideDishBase;
-    }
-
-    dayData.SideDish = newSideDish;
-    currentOverrides[dayIndex] = {
-        MainDish: dayData.MainDish,
-        SideDish: dayData.SideDish,
-        Category: dayData.Category
-    };
-    
-    updateUrl();
-    
-    document.getElementById('save-changes-btn').style.display = 'inline-flex';
-    renderSchedule(currentSchedule);
-    recalculateAndRenderShoppingList();
-    document.getElementById('replace-modal').classList.remove('visible');
-}
-
-// --- UI Tab Logic ---
 function openTab(evt, tabName) {
   let i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tab-content");
